@@ -1,0 +1,79 @@
+[
+  {
+    "id": "ANM-001",
+    "type": "absolute_spike",
+    "month": 8,
+    "category": "Cloud",
+    "description": "AWS costs spike from ~$12K baseline to $18,245 (+50%) \u2014 rogue i3.8xlarge instances",
+    "expected_amount": 12100,
+    "actual_amount": 18245,
+    "injected": true,
+    "detection_hint": "Compare Month 8 cloud cost against 90-day moving average. Variance >50% should trigger absolute spike alert."
+  },
+  {
+    "id": "ANM-002",
+    "type": "duplicate_payment",
+    "month": 6,
+    "category": "Office",
+    "description": "WeWork rent paid twice in same month ($7,000 instead of $3,500)",
+    "expected_amount": 3500,
+    "actual_amount": 7000,
+    "injected": true,
+    "detection_hint": "Two WeWork payments in Month 6 \u2014 compare against expected single monthly payment. Timing anomaly: same vendor, same month."
+  },
+  {
+    "id": "ANM-003",
+    "type": "new_vendor",
+    "month": 9,
+    "category": "Software",
+    "description": "Unknown vendor 'DataSync Pro' charges $25,000 \u2014 single large transaction, verify legitimacy",
+    "expected_amount": 0,
+    "actual_amount": 25000,
+    "injected": true,
+    "detection_hint": "New vendor with no prior history makes a $25K charge. Flag: new vendor + amount > $5K threshold."
+  },
+  {
+    "id": "ANM-004",
+    "type": "trend_anomaly",
+    "month": 7,
+    "category": "Marketing",
+    "description": "Marketing spend escalates 5x ($3K \u2192 $15K/mo) without proportional revenue increase",
+    "expected_amount": 3500,
+    "actual_amount": 15000,
+    "injected": true,
+    "detection_hint": "Marketing spend increases from $3K baseline to $15K by Month 12. Trend detection: >5% sustained monthly increase is unsustainable."
+  },
+  {
+    "id": "ANM-005",
+    "type": "category_spike",
+    "month": 11,
+    "category": "Travel",
+    "description": "Travel expenses 3x normal ($6,000 vs $2,000 avg) \u2014 conference season",
+    "expected_amount": 2000,
+    "actual_amount": 6000,
+    "injected": true,
+    "detection_hint": "Travel in Month 11 is $6,000 vs ~$2,000 average. Category spike: 3x historical average triggers alert."
+  },
+  {
+    "id": "ANM-006",
+    "type": "payroll_creep",
+    "month": 10,
+    "category": "Payroll",
+    "description": "Payroll jumps ~$25K/month with 2 simultaneous new hires \u2014 unsustainable at current revenue",
+    "expected_amount": 91487.07,
+    "actual_amount": 117955.92,
+    "injected": true,
+    "detection_hint": "Payroll jumps from $91,487 to $117,956 in Month 10. Trend: unsustainable payroll growth rate."
+  },
+  {
+    "id": "ANM-007",
+    "type": "revenue_drop",
+    "month": 11,
+    "category": "Revenue",
+    "description": "Largest customer Acme Corp ($8K/mo) churns \u2014 MRR drops ~15%",
+    "expected_amount": 38385.91,
+    "actual_amount": 29677.36,
+    "injected": true,
+    "detection_hint": "MRR drops from $38,386 to $29,677 in Month 11. Customer churn: Acme Corp ($8K/mo) lost."
+  }
+]
