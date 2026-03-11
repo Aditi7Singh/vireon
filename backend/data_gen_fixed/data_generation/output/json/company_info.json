@@ -1,0 +1,16 @@
+{
+  "id": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+  "remote_id": "COMP-B081CE6C",
+  "created_at": "2026-03-04T02:07:43.348273Z",
+  "modified_at": "2026-03-04T02:07:43.348281Z",
+  "name": "SeedlingLabs",
+  "legal_name": "SeedlingLabs, Inc.",
+  "tax_number": "84-2345678",
+  "fiscal_year_end_month": 12,
+  "fiscal_year_end_day": 31,
+  "currency": "USD",
+  "urls": [
+    "https://seedlinglabs.com"
+  ],
+  "remote_was_deleted": false
+}

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import List, Optional
+from typing import List, Optional, Union
 from datetime import datetime, date
 from uuid import UUID
 
@@ -172,3 +172,23 @@ class User(UserBase):
     id: UUID
     is_active: bool
     model_config = ConfigDict(from_attributes=True)
+
+# --- Scenario Simulation Schemas ---
+
+class HiringScenarioRequest(BaseModel):
+    num_employees: int
+    avg_salary: float
+    company_id: UUID
+
+class RevenueScenarioRequest(BaseModel):
+    percentage_change: float # 0.1 for 10%
+    company_id: UUID
+
+class ScenarioResponse(BaseModel):
+    scenario: str
+    impact_metrics: dict
+    new_runway: Union[float, str]
+
+class ChatRequest(BaseModel):
+    query: str
+    company_id: UUID

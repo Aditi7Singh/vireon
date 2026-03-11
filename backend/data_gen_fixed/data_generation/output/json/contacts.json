@@ -1,0 +1,942 @@
+{
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": "2d0fae8a-af74-494d-9841-4d5bb35e434f",
+      "remote_id": "CONT-3D02C151",
+      "created_at": "2026-03-04T02:07:43.348914Z",
+      "modified_at": "2026-03-04T02:07:43.348916Z",
+      "name": "Amazon Web Services",
+      "is_supplier": true,
+      "is_customer": false,
+      "email_address": "billing@aws.amazon.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "250 Broadway",
+          "street_2": null,
+          "city": "San Francisco",
+          "state": "CA",
+          "country": "US",
+          "zip_code": "94105",
+          "created_at": "2026-03-04T02:07:43.348870Z",
+          "modified_at": "2026-03-04T02:07:43.348872Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-959-381-5012",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.348884Z",
+          "modified_at": "2026-03-04T02:07:43.348886Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "c4d3fe0a-9b7b-4403-ba6e-45e5aa327e7f",
+      "remote_id": "CONT-C96B044A",
+      "created_at": "2026-03-04T02:07:43.348996Z",
+      "modified_at": "2026-03-04T02:07:43.348998Z",
+      "name": "Google Cloud Platform",
+      "is_supplier": true,
+      "is_customer": false,
+      "email_address": "billing@cloud.google.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "1200 Innovation Way",
+          "street_2": null,
+          "city": "Austin",
+          "state": "TX",
+          "country": "US",
+          "zip_code": "78701",
+          "created_at": "2026-03-04T02:07:43.348926Z",
+          "modified_at": "2026-03-04T02:07:43.348927Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-954-204-9935",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.348960Z",
+          "modified_at": "2026-03-04T02:07:43.348963Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "654f27ef-9270-41fe-b305-16a514e005b9",
+      "remote_id": "CONT-425EDED1",
+      "created_at": "2026-03-04T02:07:43.349040Z",
+      "modified_at": "2026-03-04T02:07:43.349042Z",
+      "name": "WeWork",
+      "is_supplier": true,
+      "is_customer": false,
+      "email_address": "accounts@wework.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "250 Broadway",
+          "street_2": null,
+          "city": "Chicago",
+          "state": "IL",
+          "country": "US",
+          "zip_code": "60601",
+          "created_at": "2026-03-04T02:07:43.349006Z",
+          "modified_at": "2026-03-04T02:07:43.349007Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-232-130-2535",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349013Z",
+          "modified_at": "2026-03-04T02:07:43.349014Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "b14add94-2cd0-4944-bb03-dd9b81e607c3",
+      "remote_id": "CONT-F2E1A6D4",
+      "created_at": "2026-03-04T02:07:43.349080Z",
+      "modified_at": "2026-03-04T02:07:43.349082Z",
+      "name": "Gusto Payroll",
+      "is_supplier": true,
+      "is_customer": false,
+      "email_address": "billing@gusto.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "1200 Innovation Way",
+          "street_2": null,
+          "city": "Seattle",
+          "state": "WA",
+          "country": "US",
+          "zip_code": "98101",
+          "created_at": "2026-03-04T02:07:43.349048Z",
+          "modified_at": "2026-03-04T02:07:43.349049Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-717-716-1434",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349054Z",
+          "modified_at": "2026-03-04T02:07:43.349055Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "2a8ef022-8a30-48ba-b547-685b67a99640",
+      "remote_id": "CONT-89E89D51",
+      "created_at": "2026-03-04T02:07:43.349125Z",
+      "modified_at": "2026-03-04T02:07:43.349127Z",
+      "name": "HubSpot Inc",
+      "is_supplier": true,
+      "is_customer": false,
+      "email_address": "billing@hubspot.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "15 Harbor View",
+          "street_2": null,
+          "city": "Seattle",
+          "state": "WA",
+          "country": "US",
+          "zip_code": "98101",
+          "created_at": "2026-03-04T02:07:43.349087Z",
+          "modified_at": "2026-03-04T02:07:43.349091Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-933-765-9928",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349095Z",
+          "modified_at": "2026-03-04T02:07:43.349097Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "f9b54be5-6705-4ee6-bfaf-a9b595e9c0b7",
+      "remote_id": "CONT-244DEF01",
+      "created_at": "2026-03-04T02:07:43.349164Z",
+      "modified_at": "2026-03-04T02:07:43.349165Z",
+      "name": "Slack Technologies",
+      "is_supplier": true,
+      "is_customer": false,
+      "email_address": "billing@slack.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "88 Silicon Ct",
+          "street_2": null,
+          "city": "Seattle",
+          "state": "WA",
+          "country": "US",
+          "zip_code": "98101",
+          "created_at": "2026-03-04T02:07:43.349132Z",
+          "modified_at": "2026-03-04T02:07:43.349133Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-659-703-5557",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349138Z",
+          "modified_at": "2026-03-04T02:07:43.349139Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "b91b9509-b353-49d3-a2af-ba67e9937fe9",
+      "remote_id": "CONT-26A93641",
+      "created_at": "2026-03-04T02:07:43.349201Z",
+      "modified_at": "2026-03-04T02:07:43.349202Z",
+      "name": "GitHub Inc",
+      "is_supplier": true,
+      "is_customer": false,
+      "email_address": "billing@github.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "100 Market St",
+          "street_2": null,
+          "city": "Austin",
+          "state": "TX",
+          "country": "US",
+          "zip_code": "78701",
+          "created_at": "2026-03-04T02:07:43.349170Z",
+          "modified_at": "2026-03-04T02:07:43.349172Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-914-532-6574",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349176Z",
+          "modified_at": "2026-03-04T02:07:43.349177Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "0dd784e1-db34-4d00-8b47-674e3a8b936e",
+      "remote_id": "CONT-35FDC9AE",
+      "created_at": "2026-03-04T02:07:43.349238Z",
+      "modified_at": "2026-03-04T02:07:43.349240Z",
+      "name": "Adobe Systems",
+      "is_supplier": true,
+      "is_customer": false,
+      "email_address": "billing@adobe.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "75 Startup Blvd",
+          "street_2": null,
+          "city": "Austin",
+          "state": "TX",
+          "country": "US",
+          "zip_code": "78701",
+          "created_at": "2026-03-04T02:07:43.349207Z",
+          "modified_at": "2026-03-04T02:07:43.349208Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-420-881-6514",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349212Z",
+          "modified_at": "2026-03-04T02:07:43.349214Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "2d8b28d0-44cb-4158-8a3c-1546b4f87fe6",
+      "remote_id": "CONT-BFEE7AC3",
+      "created_at": "2026-03-04T02:07:43.349276Z",
+      "modified_at": "2026-03-04T02:07:43.349277Z",
+      "name": "Figma Inc",
+      "is_supplier": true,
+      "is_customer": false,
+      "email_address": "billing@figma.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "250 Broadway",
+          "street_2": null,
+          "city": "New York",
+          "state": "NY",
+          "country": "US",
+          "zip_code": "10013",
+          "created_at": "2026-03-04T02:07:43.349244Z",
+          "modified_at": "2026-03-04T02:07:43.349246Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-589-199-6881",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349250Z",
+          "modified_at": "2026-03-04T02:07:43.349252Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "065bac99-7a9a-4ee5-b25e-22bd77ef8c69",
+      "remote_id": "CONT-C117FBF1",
+      "created_at": "2026-03-04T02:07:43.349313Z",
+      "modified_at": "2026-03-04T02:07:43.349314Z",
+      "name": "Mitchell & Associates LLP",
+      "is_supplier": true,
+      "is_customer": false,
+      "email_address": "ar@mitchelllaw.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "300 Enterprise Ave",
+          "street_2": null,
+          "city": "Denver",
+          "state": "CO",
+          "country": "US",
+          "zip_code": "80202",
+          "created_at": "2026-03-04T02:07:43.349282Z",
+          "modified_at": "2026-03-04T02:07:43.349283Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-244-847-8527",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349287Z",
+          "modified_at": "2026-03-04T02:07:43.349289Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "58d41ae7-03b8-46e2-a8d2-07f714ec6876",
+      "remote_id": "CONT-B43697D8",
+      "created_at": "2026-03-04T02:07:43.349341Z",
+      "modified_at": "2026-03-04T02:07:43.349343Z",
+      "name": "Sentinel Insurance Co",
+      "is_supplier": true,
+      "is_customer": false,
+      "email_address": "billing@sentinelins.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "15 Harbor View",
+          "street_2": null,
+          "city": "New York",
+          "state": "NY",
+          "country": "US",
+          "zip_code": "10013",
+          "created_at": "2026-03-04T02:07:43.349318Z",
+          "modified_at": "2026-03-04T02:07:43.349320Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-587-180-5803",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349324Z",
+          "modified_at": "2026-03-04T02:07:43.349326Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "57fb143a-daf3-43c3-97d2-a2ecee65567d",
+      "remote_id": "CONT-1C17D2B5",
+      "created_at": "2026-03-04T02:07:43.349383Z",
+      "modified_at": "2026-03-04T02:07:43.349385Z",
+      "name": "TalentBridge Recruiting",
+      "is_supplier": true,
+      "is_customer": false,
+      "email_address": "invoices@talentbridge.io",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "900 Capital Heights Pkwy",
+          "street_2": null,
+          "city": "Boston",
+          "state": "MA",
+          "country": "US",
+          "zip_code": "02101",
+          "created_at": "2026-03-04T02:07:43.349348Z",
+          "modified_at": "2026-03-04T02:07:43.349351Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-791-296-2139",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349356Z",
+          "modified_at": "2026-03-04T02:07:43.349357Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "f53db716-9bda-4edf-be9b-1a104e839468",
+      "remote_id": "CONT-1EA6F612",
+      "created_at": "2026-03-04T02:07:43.349433Z",
+      "modified_at": "2026-03-04T02:07:43.349441Z",
+      "name": "Staples Business",
+      "is_supplier": true,
+      "is_customer": false,
+      "email_address": "accounts@staples.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "100 Market St",
+          "street_2": null,
+          "city": "Seattle",
+          "state": "WA",
+          "country": "US",
+          "zip_code": "98101",
+          "created_at": "2026-03-04T02:07:43.349392Z",
+          "modified_at": "2026-03-04T02:07:43.349394Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-991-396-2307",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349400Z",
+          "modified_at": "2026-03-04T02:07:43.349403Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "8e9eaca9-e9be-497d-97ef-90af7b218b86",
+      "remote_id": "CONT-E2F14A69",
+      "created_at": "2026-03-04T02:07:43.349481Z",
+      "modified_at": "2026-03-04T02:07:43.349483Z",
+      "name": "ClearView Travel",
+      "is_supplier": true,
+      "is_customer": false,
+      "email_address": "billing@clearviewtravel.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "1200 Innovation Way",
+          "street_2": null,
+          "city": "New York",
+          "state": "NY",
+          "country": "US",
+          "zip_code": "10013",
+          "created_at": "2026-03-04T02:07:43.349446Z",
+          "modified_at": "2026-03-04T02:07:43.349447Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-589-384-8428",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349451Z",
+          "modified_at": "2026-03-04T02:07:43.349453Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "c9108961-9723-4346-9b4e-a31f0ea17e07",
+      "remote_id": "CONT-A642018F",
+      "created_at": "2026-03-04T02:07:43.349518Z",
+      "modified_at": "2026-03-04T02:07:43.349520Z",
+      "name": "Notion Labs",
+      "is_supplier": true,
+      "is_customer": false,
+      "email_address": "billing@notion.so",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "300 Enterprise Ave",
+          "street_2": null,
+          "city": "Austin",
+          "state": "TX",
+          "country": "US",
+          "zip_code": "78701",
+          "created_at": "2026-03-04T02:07:43.349487Z",
+          "modified_at": "2026-03-04T02:07:43.349488Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-579-463-4432",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349492Z",
+          "modified_at": "2026-03-04T02:07:43.349494Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "526d61f0-18d0-4825-9e37-0bedaa90f393",
+      "remote_id": "CONT-63B3B744",
+      "created_at": "2026-03-04T02:07:43.349558Z",
+      "modified_at": "2026-03-04T02:07:43.349560Z",
+      "name": "Acme Corp",
+      "is_supplier": false,
+      "is_customer": true,
+      "email_address": "accounts@acmecorp.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "75 Startup Blvd",
+          "street_2": null,
+          "city": "New York",
+          "state": "NY",
+          "country": "US",
+          "zip_code": "10013",
+          "created_at": "2026-03-04T02:07:43.349527Z",
+          "modified_at": "2026-03-04T02:07:43.349529Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-823-750-3803",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349533Z",
+          "modified_at": "2026-03-04T02:07:43.349534Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "407569d1-72bf-4375-966b-03adae88cbcd",
+      "remote_id": "CONT-15658502",
+      "created_at": "2026-03-04T02:07:43.349603Z",
+      "modified_at": "2026-03-04T02:07:43.349605Z",
+      "name": "TechFlow Solutions",
+      "is_supplier": false,
+      "is_customer": true,
+      "email_address": "accounts@techflowsolutions.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "15 Harbor View",
+          "street_2": null,
+          "city": "Seattle",
+          "state": "WA",
+          "country": "US",
+          "zip_code": "98101",
+          "created_at": "2026-03-04T02:07:43.349567Z",
+          "modified_at": "2026-03-04T02:07:43.349568Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-367-573-7216",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349573Z",
+          "modified_at": "2026-03-04T02:07:43.349574Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "9827f168-b058-4208-84f2-436f80785f55",
+      "remote_id": "CONT-BD3B1913",
+      "created_at": "2026-03-04T02:07:43.349643Z",
+      "modified_at": "2026-03-04T02:07:43.349645Z",
+      "name": "DataBridge Inc",
+      "is_supplier": false,
+      "is_customer": true,
+      "email_address": "accounts@databridgeinc.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "75 Startup Blvd",
+          "street_2": null,
+          "city": "Seattle",
+          "state": "WA",
+          "country": "US",
+          "zip_code": "98101",
+          "created_at": "2026-03-04T02:07:43.349610Z",
+          "modified_at": "2026-03-04T02:07:43.349612Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-901-432-1916",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349616Z",
+          "modified_at": "2026-03-04T02:07:43.349617Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "76126b06-c78a-4784-944b-a68232b4d7ae",
+      "remote_id": "CONT-B23DF670",
+      "created_at": "2026-03-04T02:07:43.349683Z",
+      "modified_at": "2026-03-04T02:07:43.349685Z",
+      "name": "CloudNine Analytics",
+      "is_supplier": false,
+      "is_customer": true,
+      "email_address": "accounts@cloudnineanalytics.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "1200 Innovation Way",
+          "street_2": null,
+          "city": "San Francisco",
+          "state": "CA",
+          "country": "US",
+          "zip_code": "94105",
+          "created_at": "2026-03-04T02:07:43.349650Z",
+          "modified_at": "2026-03-04T02:07:43.349651Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-523-510-5386",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349659Z",
+          "modified_at": "2026-03-04T02:07:43.349660Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "e3149218-00e4-4aea-b86c-3e86032c3a70",
+      "remote_id": "CONT-116D719A",
+      "created_at": "2026-03-04T02:07:43.349712Z",
+      "modified_at": "2026-03-04T02:07:43.349713Z",
+      "name": "GreenLeaf Ventures",
+      "is_supplier": false,
+      "is_customer": true,
+      "email_address": "accounts@greenleafventures.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "250 Broadway",
+          "street_2": null,
+          "city": "Seattle",
+          "state": "WA",
+          "country": "US",
+          "zip_code": "98101",
+          "created_at": "2026-03-04T02:07:43.349689Z",
+          "modified_at": "2026-03-04T02:07:43.349691Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-780-997-6155",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349695Z",
+          "modified_at": "2026-03-04T02:07:43.349696Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "b5877515-569a-40da-a810-dd8c46e7519f",
+      "remote_id": "CONT-6B31E425",
+      "created_at": "2026-03-04T02:07:43.349739Z",
+      "modified_at": "2026-03-04T02:07:43.349740Z",
+      "name": "Quantum Dynamics",
+      "is_supplier": false,
+      "is_customer": true,
+      "email_address": "accounts@quantumdynamics.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "1200 Innovation Way",
+          "street_2": null,
+          "city": "Los Angeles",
+          "state": "CA",
+          "country": "US",
+          "zip_code": "90012",
+          "created_at": "2026-03-04T02:07:43.349717Z",
+          "modified_at": "2026-03-04T02:07:43.349718Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-605-758-8517",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349722Z",
+          "modified_at": "2026-03-04T02:07:43.349724Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "069e96b6-6448-479a-abb0-d21ee1a6c683",
+      "remote_id": "CONT-B5B03B7F",
+      "created_at": "2026-03-04T02:07:43.349766Z",
+      "modified_at": "2026-03-04T02:07:43.349768Z",
+      "name": "NexaPoint",
+      "is_supplier": false,
+      "is_customer": true,
+      "email_address": "accounts@nexapoint.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "500 Tech Park Dr",
+          "street_2": null,
+          "city": "Denver",
+          "state": "CO",
+          "country": "US",
+          "zip_code": "80202",
+          "created_at": "2026-03-04T02:07:43.349744Z",
+          "modified_at": "2026-03-04T02:07:43.349746Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-342-352-9830",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349749Z",
+          "modified_at": "2026-03-04T02:07:43.349751Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "eeb40c2d-bdf1-43f8-9458-5087a360dac7",
+      "remote_id": "CONT-D5704555",
+      "created_at": "2026-03-04T02:07:43.349794Z",
+      "modified_at": "2026-03-04T02:07:43.349795Z",
+      "name": "SilverStack Labs",
+      "is_supplier": false,
+      "is_customer": true,
+      "email_address": "accounts@silverstacklabs.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "75 Startup Blvd",
+          "street_2": null,
+          "city": "Chicago",
+          "state": "IL",
+          "country": "US",
+          "zip_code": "60601",
+          "created_at": "2026-03-04T02:07:43.349772Z",
+          "modified_at": "2026-03-04T02:07:43.349774Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-797-508-6930",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349777Z",
+          "modified_at": "2026-03-04T02:07:43.349779Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "4f311125-f620-4064-b0e0-ff0e12dba356",
+      "remote_id": "CONT-52B1992D",
+      "created_at": "2026-03-04T02:07:43.349821Z",
+      "modified_at": "2026-03-04T02:07:43.349823Z",
+      "name": "Meridian Health",
+      "is_supplier": false,
+      "is_customer": true,
+      "email_address": "accounts@meridianhealth.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "1200 Innovation Way",
+          "street_2": null,
+          "city": "Austin",
+          "state": "TX",
+          "country": "US",
+          "zip_code": "78701",
+          "created_at": "2026-03-04T02:07:43.349799Z",
+          "modified_at": "2026-03-04T02:07:43.349801Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-721-605-2489",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349805Z",
+          "modified_at": "2026-03-04T02:07:43.349806Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "61983172-1e52-4082-b893-4275f7e31dae",
+      "remote_id": "CONT-016F24C0",
+      "created_at": "2026-03-04T02:07:43.349852Z",
+      "modified_at": "2026-03-04T02:07:43.349854Z",
+      "name": "Orion Platforms",
+      "is_supplier": false,
+      "is_customer": true,
+      "email_address": "accounts@orionplatforms.com",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "100 Market St",
+          "street_2": null,
+          "city": "New York",
+          "state": "NY",
+          "country": "US",
+          "zip_code": "10013",
+          "created_at": "2026-03-04T02:07:43.349827Z",
+          "modified_at": "2026-03-04T02:07:43.349829Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-356-742-3621",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.349832Z",
+          "modified_at": "2026-03-04T02:07:43.349834Z"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "ef1ba464-d759-45ef-964c-cb41dd43e16c",
+      "remote_id": "CONT-2380D725",
+      "created_at": "2026-03-04T02:07:43.365946Z",
+      "modified_at": "2026-03-04T02:07:43.365948Z",
+      "name": "DataSync Pro LLC",
+      "is_supplier": true,
+      "is_customer": false,
+      "email_address": "billing@datasyncpro.io",
+      "tax_number": null,
+      "status": "ACTIVE",
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "addresses": [
+        {
+          "type": "BILLING",
+          "street_1": "1600 Unknown Blvd",
+          "street_2": null,
+          "city": "Austin",
+          "state": "TX",
+          "country": "US",
+          "zip_code": "78759",
+          "created_at": "2026-03-04T02:07:43.365886Z",
+          "modified_at": "2026-03-04T02:07:43.365888Z"
+        }
+      ],
+      "phone_numbers": [
+        {
+          "number": "+1-512-555-0199",
+          "type": "PRIMARY",
+          "created_at": "2026-03-04T02:07:43.365895Z",
+          "modified_at": "2026-03-04T02:07:43.365897Z"
+        }
+      ],
+      "remote_was_deleted": false
+    }
+  ]
+}

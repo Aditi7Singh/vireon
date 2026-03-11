@@ -12,3 +12,5 @@ passlib[bcrypt]
 alembic
 python-multipart
 bcrypt==3.2.0
+httpx
+python-dateutil

@@ -1,0 +1,138 @@
+"""
+MRR / subscription revenue generator.
+FIX: Annual billing customers invoice once per year BUT their MRR is spread
+     correctly across all months in monthly_mrr (deferred revenue recognition).
+FIX: company field populated on every Invoice.
+"""
+
+from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
+import random
+
+from data_generation.config import CUSTOMERS, START_DATE, NUM_MONTHS
+from data_generation.models import Invoice, InvoiceType, InvoiceStatus, InvoiceLineItem, _date_iso
+
+
+def generate_revenue(
+    accounts: list,
+    customer_contacts: dict,
+    company_id: str = None,
+    seed: int = 42,
+    churned_customer: str = "Acme Corp",
+    churn_month: int = 11,
+) -> dict:
+    """
+    Generate monthly subscription revenue invoices (ACCOUNTS_RECEIVABLE).
+
+    Annual billing: invoice is created once per year (cash comes in upfront),
+    but monthly_mrr correctly spreads the recognized MRR every active month.
+
+    Returns dict with:
+        invoices              - list of AR Invoice objects
+        monthly_mrr           - month_num -> recognized MRR (correct for all billing types)
+        customer_mrr_history  - customer_name -> {month: mrr}
+    """
+    rng = random.Random(seed)
+
+    revenue_account = None
+    ar_account      = None
+    for acct in accounts:
+        if acct.name == "SaaS Subscription Revenue":
+            revenue_account = acct
+        elif acct.name == "Accounts Receivable":
+            ar_account = acct
+
+    invoices             = []
+    monthly_mrr          = {}
+    customer_mrr_history = {}
+    invoice_counter      = 1000
+
+    for month_num in range(1, NUM_MONTHS + 1):
+        month_date   = START_DATE + relativedelta(months=month_num - 1)
+        month_total_mrr = 0.0
+
+        for cust_def in CUSTOMERS:
+            cust_name = cust_def["name"]
+
+            if month_num < cust_def["start_month"]:
+                continue
+
+            # Anomaly #7: largest customer churns in churn_month
+            if cust_name == churned_customer and month_num >= churn_month:
+                continue
+
+            # Organic MRR growth per customer (~1.5%/mo)
+            months_active = month_num - cust_def["start_month"]
+            current_mrr   = round(cust_def["mrr"] * (1.015 ** months_active), 2)
+
+            if cust_name not in customer_mrr_history:
+                customer_mrr_history[cust_name] = {}
+            customer_mrr_history[cust_name][month_num] = current_mrr
+
+            # FIX: Always add to monthly_mrr regardless of billing type.
+            # Annual customers generate cash upfront but MRR is recognized monthly.
+            month_total_mrr += current_mrr
+
+            # ── Invoice creation ──
+            # Monthly billing: one invoice per month
+            # Annual billing:  one invoice at contract start (and every 12th month after)
+            if cust_def["billing"] == "annual":
+                months_since_start = month_num - cust_def["start_month"]
+                if months_since_start % 12 != 0:
+                    continue   # No invoice this month — already invoiced annually
+                invoice_amount = round(current_mrr * 12, 2)   # Full year upfront
+            else:
+                invoice_amount = current_mrr
+
+            invoice_counter += 1
+            issue         = month_date.replace(day=1)
+            payment_terms = cust_def.get("payment_terms", 30)
+            due           = issue + timedelta(days=payment_terms)
+
+            # Payment timing: GreenLeaf always pays late; 15% chance of slight lateness
+            days_late = 0
+            if cust_name == "GreenLeaf Ventures":
+                days_late = rng.randint(30, 50)
+            elif rng.random() < 0.15:
+                days_late = rng.randint(5, 15)
+
+            paid_date = due + timedelta(days=days_late) if month_num < NUM_MONTHS else None
+            status    = InvoiceStatus.PAID if paid_date else InvoiceStatus.OPEN
+            balance   = 0.0 if status == InvoiceStatus.PAID else invoice_amount
+
+            contact_obj = customer_contacts.get(cust_name)
+            contact_id  = contact_obj.id if contact_obj else None
+
+            line_item = InvoiceLineItem(
+                description=f"SaaS Subscription — {cust_name} — {month_date.strftime('%B %Y')}",
+                unit_price=invoice_amount,
+                quantity=1.0,
+                total_amount=invoice_amount,
+                account=revenue_account.id if revenue_account else None,
+            )
+
+            inv = Invoice(
+                type=InvoiceType.ACCOUNTS_RECEIVABLE,
+                contact=contact_id,
+                number=f"INV-{invoice_counter:05d}",
+                issue_date=_date_iso(issue),
+                due_date=_date_iso(due),
+                paid_on_date=_date_iso(paid_date) if paid_date else None,
+                memo=f"Subscription invoice for {cust_name}",
+                company=company_id,     # FIX: was always null
+                currency="USD",
+                total_amount=invoice_amount,
+                balance=balance,
+                sub_total=invoice_amount,
+                status=status,
+                line_items=[line_item],
+            )
+            invoices.append(inv)
+
+        monthly_mrr[month_num] = round(month_total_mrr, 2)
+
+    return {
+        "invoices":             invoices,
+        "monthly_mrr":          monthly_mrr,
+        "customer_mrr_history": customer_mrr_history,
+    }

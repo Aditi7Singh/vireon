@@ -4,7 +4,7 @@ import requests
 from datetime import datetime
 
 BASE_URL = "http://localhost:8000"
-DATA_DIR = "/Users/asingh/Documents/v0/vireon/backend/simulation/output/json"
+DATA_DIR = "/Users/asingh/Documents/v0/vireon/backend/data_gen_fixed/data_generation/output/json"
 
 def load_json(filename):
     with open(os.path.join(DATA_DIR, filename), 'r') as f:
@@ -55,7 +55,7 @@ def run_ingestion():
             "name": acc["name"],
             "description": acc.get("description"),
             "classification": acc["classification"],
-            "type": acc["account_type"], # Map account_type to type
+            "type": acc["type"], # Use 'type' field directly from fixed data
             "status": acc.get("status", "ACTIVE").lower(),
             "currency": acc.get("currency", "USD")
         })
@@ -93,8 +93,11 @@ def run_ingestion():
             "transaction_date": exp["transaction_date"][:10],
             "account_remote_id": exp["account"],
             "contact_remote_id": exp.get("contact"),
-            "total_amount": abs(exp["total_amount"]), # Use positive values
+            "total_amount": abs(exp["total_amount"]),
+            "sub_total": abs(exp.get("sub_total", exp["total_amount"])),
+            "tax_amount": abs(exp.get("total_tax_amount", 0)),
             "category": exp.get("memo", "General"),
+            "memo": exp.get("memo", ""),
             "currency": exp.get("currency", "USD")
         })
 
@@ -133,7 +136,7 @@ def run_ingestion():
     try:
         token = login()
         headers = {"Authorization": f"Bearer {token}"}
-        response = requests.post(f"{BASE_URL}/sandbox/ingest", json=payload, headers=headers)
+        response = requests.post(f"{BASE_URL}/sandbox/ingest?clear_existing=true", json=payload, headers=headers)
         response.raise_for_status()
         print(f"Success: {response.json()['message']}")
     except Exception as e:
