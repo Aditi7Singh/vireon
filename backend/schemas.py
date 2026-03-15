@@ -161,6 +161,37 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: Optional[str] = None
 
+
+# ============================================================================
+# AGENT SCHEMAS - CFO Chat Endpoints
+# ============================================================================
+
+class AgentChatRequest(BaseModel):
+    """Request schema for /agent/chat endpoint."""
+    message: str
+    session_id: Optional[str] = None
+
+
+class ConversationMessage(BaseModel):
+    """Single message in conversation history."""
+    role: str  # "user" or "assistant"
+    content: str
+    timestamp: str
+
+
+class AgentChatResponse(BaseModel):
+    """Response schema for /agent/chat endpoint."""
+    response: str
+    session_id: str
+    query_type: str  # "simple", "complex", "alert"
+    timestamp: str
+
+
+class AgentHistoryResponse(BaseModel):
+    """Response schema for /agent/history endpoint."""
+    session_id: str
+    messages: List[ConversationMessage]
+
 class UserBase(BaseModel):
     username: str
     email: Optional[str] = None

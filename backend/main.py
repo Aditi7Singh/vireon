@@ -1,22 +1,56 @@
 from fastapi import FastAPI, Depends, HTTPException, Request, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from typing import List
 import models, schemas, database, anomaly_detection, auth
 import uuid
 from uuid import UUID
-from datetime import timedelta
+from datetime import timedelta, datetime
 from analytics import metrics, scenarios
 from agent.agent_runner import AgentRunner
 import os
 from typing import List, Dict, Any, Optional
 from erpnext_client.client import ERPNextClient
+import logging
+import json
+
+# Configure logging
+logger = logging.getLogger(__name__)
+
+# Import agent components
+from agent.cfo_agent import run_cfo_query
+from agent.memory import new_session_id, get_checkpointer, build_config
+from config.settings import Settings
 
 app = FastAPI(title="SeedlingLabs CFO AI API", docs_url="/docs", redoc_url="/redoc")
 
+# Add CORS middleware for Next.js frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://localhost:3001"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Create tables if they don't exist
 models.Base.metadata.create_all(bind=database.engine)
+
+@app.on_event("startup")
+async def startup_event():
+    """Health check and configuration logging on startup."""
+    logger.info("=" * 70)
+    logger.info("Agentic CFO Backend - Startup")
+    logger.info("=" * 70)
+    logger.info(f"LLM Mode: {'Ollama Local' if Settings.USE_LOCAL_LLM else 'Groq API'}")
+    logger.info(f"Groq Model (Fast): {Settings.GROQ_FAST_MODEL}")
+    logger.info(f"Groq Model (Thinking): {Settings.GROQ_THINK_MODEL}")
+    logger.info(f"Company: {Settings.COMPANY_NAME}")
+    logger.info(f"Session DB: {Settings.SESSION_DB_PATH}")
+    logger.info("✓ Agentic CFO backend ready")
+    logger.info("=" * 70)
 
 @app.get("/")
 def read_root():
@@ -722,3 +756,638 @@ async def manual_sync_erpnext(db: Session = Depends(database.get_db), current_us
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         await client.close()
+
+
+# ============================================================================
+# AGENT ENDPOINTS - CFO Chat Interface
+# ============================================================================
+
+@app.post("/agent/chat", response_model=schemas.AgentChatResponse)
+async def agent_chat(request: schemas.AgentChatRequest):
+    """
+    Main CFO agent chat endpoint.
+    
+    Accepts a natural language query and returns CFO-quality financial analysis.
+    Supports multi-turn conversations via session_id.
+    
+    Args:
+        request: AgentChatRequest with message and optional session_id
+    
+    Returns:
+        AgentChatResponse with response, session_id, query_type, timestamp
+    """
+    try:
+        logger.info(f"[AGENT] Chat request: {request.message[:60]}...")
+        
+        # Generate session if not provided
+        session_id = request.session_id or new_session_id()
+        
+        # Run the CFO agent
+        response = run_cfo_query(
+            user_message=request.message,
+            session_id=session_id
+        )
+        
+        # Get routing decision to include query_type in response
+        from agent.routing import classify_query
+        query_type = classify_query(request.message)
+        
+        logger.info(f"[AGENT] Response generated ({query_type})")
+        
+        return schemas.AgentChatResponse(
+            response=response,
+            session_id=session_id,
+            query_type=query_type,
+            timestamp=datetime.utcnow().isoformat() + "Z"
+        )
+    
+    except ValueError as e:
+        logger.error(f"[AGENT] Validation error: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        logger.error(f"[AGENT] Agent execution failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        logger.error(f"[AGENT] Unexpected error: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Agent processing failed")
+
+
+@app.post("/agent/chat/stream")
+async def agent_chat_stream(request: schemas.AgentChatRequest):
+    """
+    Streaming version of CFO agent chat.
+    
+    Returns Server-Sent Events (SSE) stream with reasoning steps and final response.
+    Useful for real-time UI updates while agent is thinking.
+    
+    Args:
+        request: AgentChatRequest with message and optional session_id
+    
+    Returns:
+        StreamingResponse with text/event-stream media type
+    """
+    async def event_generator():
+        try:
+            session_id = request.session_id or new_session_id()
+            logger.info(f"[STREAM] Starting stream for session {session_id[:30]}...")
+            
+            # Build graph and stream execution
+            from agent.cfo_agent import build_graph
+            from agent.memory import get_company_context, build_config
+            from langchain_core.messages import HumanMessage
+            
+            graph = build_graph()
+            config = build_config(session_id)
+            company_context = get_company_context()
+            
+            from agent.routing import classify_query
+            query_type = classify_query(request.message)
+            
+            initial_state = {
+                "messages": [HumanMessage(content=request.message)],
+                "query_type": query_type,
+                "company_context": company_context,
+                "session_id": session_id,
+                "tool_error_count": 0,
+            }
+            
+            # Stream the graph execution
+            full_response = ""
+            for event in graph.stream(initial_state, config=config):
+                # Extract response as events complete
+                if event:
+                    # Yield streaming event
+                    yield f"data: {json.dumps({'token': '', 'done': False})}\n\n"
+            
+            # After graph completes, extract final response
+            from langchain_core.messages import AIMessage
+            result = graph.invoke(initial_state, config=config)
+            for msg in reversed(result.get("messages", [])):
+                if isinstance(msg, AIMessage) and msg.content:
+                    full_response = msg.content
+                    break
+            
+            # Send final chunk
+            yield f"data: {json.dumps({'token': full_response, 'done': True, 'session_id': session_id})}\n\n"
+            logger.info(f"[STREAM] Stream completed for session {session_id[:30]}...")
+            
+        except Exception as e:
+            logger.error(f"[STREAM] Error during streaming: {e}", exc_info=True)
+            yield f"data: {json.dumps({'error': str(e), 'done': True})}\n\n"
+    
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache"}
+    )
+
+
+@app.get("/agent/history/{session_id}", response_model=schemas.AgentHistoryResponse)
+async def agent_history(session_id: str):
+    """
+    Get full conversation history for a session.
+    
+    Retrieves all messages (user and assistant) from the session's checkpointer.
+    Useful for viewing past conversations or resuming context.
+    
+    Args:
+        session_id: Session identifier (format: cfo-session-*)
+    
+    Returns:
+        AgentHistoryResponse with session_id and list of messages
+    """
+    try:
+        logger.info(f"[HISTORY] Retrieving history for session {session_id[:30]}...")
+        
+        # Load checkpointer and retrieve state
+        checkpointer = get_checkpointer()
+        from langchain_core.messages import AIMessage, HumanMessage
+        
+        # Try to load the saved state
+        try:
+            config = build_config(session_id)
+            values = checkpointer.get(config, "values") or {}
+            messages = values.get("messages", [])
+        except Exception:
+            # Session may not exist yet
+            messages = []
+        
+        # Convert LangChain messages to readable schema
+        conversation = []
+        for msg in messages:
+            if isinstance(msg, HumanMessage):
+                conversation.append(schemas.ConversationMessage(
+                    role="user",
+                    content=msg.content,
+                    timestamp=datetime.utcnow().isoformat() + "Z"
+                ))
+            elif isinstance(msg, AIMessage):
+                conversation.append(schemas.ConversationMessage(
+                    role="assistant",
+                    content=msg.content,
+                    timestamp=datetime.utcnow().isoformat() + "Z"
+                ))
+        
+        logger.info(f"[HISTORY] Retrieved {len(conversation)} messages for session {session_id[:30]}")
+        
+        return schemas.AgentHistoryResponse(
+            session_id=session_id,
+            messages=conversation
+        )
+    
+    except Exception as e:
+        logger.error(f"[HISTORY] Error retrieving history: {e}", exc_info=True)
+        # Return empty history on error instead of failing the whole request
+        return schemas.AgentHistoryResponse(
+            session_id=session_id,
+            messages=[]
+        )
+
+
+# --- Phase 4: Anomaly Detection Endpoints ---
+
+@app.post("/alerts/scan-now")
+async def trigger_scan_now():
+    """
+    Trigger an on-demand anomaly detection scan.
+    
+    Useful for manual verification or testing without waiting for daily schedule.
+    Returns immediately with task ID; actual scan runs in background.
+    
+    Returns:
+        dict: Task ID and status message
+    
+    Example response:
+        {
+            "task_id": "abc123def456",
+            "message": "Anomaly scan started",
+            "status": "queued"
+        }
+    """
+    try:
+        from backend.anomaly.tasks import trigger_scan_now as celery_trigger_scan
+        
+        logger.info("[ALERTS] On-demand scan triggered from API")
+        
+        # Queue the scan to run immediately
+        task = celery_trigger_scan.delay()
+        
+        logger.info(f"[ALERTS] Scan queued with task_id: {task.id}")
+        
+        return {
+            "task_id": str(task.id),
+            "message": "Anomaly scan queued",
+            "status": "queued",
+            "endpoint": "/alerts/scan-status/{task_id}"
+        }
+    
+    except Exception as e:
+        logger.error(f"[ALERTS] Failed to trigger scan: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to trigger anomaly scan: {str(e)}"
+        )
+
+
+@app.get("/alerts/scan-status/{task_id}")
+async def get_scan_status(task_id: str):
+    """
+    Get the status of an on-demand anomaly scan task.
+    
+    Polls the Celery task to check status and retrieve results when complete.
+    
+    Args:
+        task_id: Task ID from trigger_scan_now response
+    
+    Returns:
+        dict: Task status (pending/started/success/failure) and results if complete
+    
+    Example responses:
+        {"status": "pending", "task_id": "abc123"}
+        {"status": "success", "alerts_found": 3, "critical_count": 1, ...}
+        {"status": "failure", "error": "..."}
+    """
+    try:
+        from backend.anomaly.celery_app import app as celery_app
+        
+        # Get task result from Celery
+        task = celery_app.AsyncResult(task_id)
+        
+        if task.state == 'PENDING':
+            return {
+                "status": "pending",
+                "task_id": task_id,
+                "message": "Scan in progress..."
+            }
+        
+        elif task.state == 'STARTED':
+            return {
+                "status": "started",
+                "task_id": task_id,
+                "message": "Scan started, processing..."
+            }
+        
+        elif task.state == 'SUCCESS':
+            logger.info(f"[ALERTS] Scan completed: {task.result.get('alerts_found', 0)} alerts")
+            return {
+                "status": "success",
+                "task_id": task_id,
+                "result": task.result
+            }
+        
+        elif task.state == 'FAILURE':
+            logger.error(f"[ALERTS] Scan failed: {task.result}")
+            return {
+                "status": "failure",
+                "task_id": task_id,
+                "error": str(task.result)
+            }
+        
+        else:
+            return {
+                "status": task.state,
+                "task_id": task_id
+            }
+    
+    except Exception as e:
+        logger.error(f"[ALERTS] Error getting scan status: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error retrieving scan status: {str(e)}"
+        )
+
+
+@app.patch("/alerts/{alert_id}/dismiss")
+async def dismiss_alert(alert_id: int):
+    """
+    Dismiss an alert (mark as 'dismissed' in PostgreSQL).
+    
+    Used to manually dismiss false positives or alerts that have been reviewed.
+    
+    Args:
+        alert_id: ID of the alert to dismiss
+    
+    Returns:
+        dict: Updated alert status and details
+    
+    Example response:
+        {
+            "status": "success",
+            "alert_id": 123,
+            "alert_status": "dismissed",
+            "message": "Alert 123 dismissed"
+        }
+    """
+    try:
+        import psycopg2
+        
+        logger.info(f"[ALERTS] Dismissing alert {alert_id}")
+        
+        # Connect to alerts database
+        db_url = os.getenv("DATABASE_URL")
+        if not db_url:
+            raise ValueError("DATABASE_URL not configured")
+        
+        conn = psycopg2.connect(db_url)
+        cursor = conn.cursor()
+        
+        # Update alert status
+        cursor.execute("""
+            UPDATE alerts 
+            SET status = 'dismissed', updated_at = NOW()
+            WHERE id = %s
+            RETURNING id, status, severity, alert_type, category, updated_at
+        """, (alert_id,))
+        
+        result = cursor.fetchone()
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        if result:
+            logger.info(f"[ALERTS] ✓ Alert {alert_id} dismissed")
+            return {
+                "status": "success",
+                "alert_id": result[0],
+                "alert_status": result[1],
+                "severity": result[2],
+                "alert_type": result[3],
+                "category": result[4],
+                "updated_at": result[5].isoformat() if result[5] else None,
+                "message": f"Alert {alert_id} dismissed"
+            }
+        else:
+            logger.warning(f"[ALERTS] Alert {alert_id} not found")
+            raise HTTPException(
+                status_code=404,
+                detail=f"Alert {alert_id} not found"
+            )
+    
+    except psycopg2.Error as e:
+        logger.error(f"[ALERTS] Database error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Database error: {str(e)}"
+        )
+    except Exception as e:
+        logger.error(f"[ALERTS] Error dismissing alert: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error dismissing alert: {str(e)}"
+        )
+
+
+@app.get("/alerts")
+async def get_active_alerts(
+    severity: str = None,
+    category: str = None,
+    limit: int = 20,
+    status_filter: str = "active"
+):
+    """
+    Get financial anomaly alerts from Phase 4 scanner.
+    
+    Queries PostgreSQL for active alerts with optional filtering.
+    Used by Phase 3 agent's get_active_alerts() tool.
+    
+    Query Parameters:
+        severity: Filter by severity (critical, warning, info) - optional
+        category: Filter by category (aws, payroll, saas, etc.) - optional
+        limit: Max alerts to return (default 20, max 100)
+        status_filter: Alert status (default 'active')
+    
+    Returns:
+        dict: Structured response with alerts list and metadata
+    
+    Example response:
+        {
+            "alerts": [
+                {
+                    "id": "uuid",
+                    "severity": "critical",
+                    "alert_type": "spike",
+                    "category": "aws",
+                    "description": "AWS $18,245 vs expected $12,100 (+50.6%)",
+                    "amount": 18245.00,
+                    "baseline": 12100.00,
+                    "delta_pct": 50.6,
+                    "runway_impact": -0.4,
+                    "suggested_owner": "CTO",
+                    "created_at": "2025-01-15T02:00:00Z"
+                }
+            ],
+            "total": 3,
+            "critical_count": 1,
+            "warning_count": 2,
+            "info_count": 0,
+            "last_scan_at": "2025-01-15T02:00:00Z"
+        }
+    """
+    try:
+        import psycopg2
+        from psycopg2.extras import RealDictCursor
+        
+        # Validate limit
+        limit = min(int(limit), 100) if limit else 20
+        limit = max(limit, 1)
+        
+        db_url = os.getenv("DATABASE_URL")
+        if not db_url:
+            raise ValueError("DATABASE_URL not configured")
+        
+        conn = psycopg2.connect(db_url)
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        
+        # Build WHERE clause with filters
+        where_clauses = [f"status = '{status_filter}'"]
+        params = []
+        
+        if severity:
+            where_clauses.append("LOWER(severity) = %s")
+            params.append(severity.lower())
+        
+        if category:
+            where_clauses.append("LOWER(category) = %s")
+            params.append(category.lower())
+        
+        where_sql = " AND ".join(where_clauses)
+        
+        # Get alerts ordered by severity then recency
+        query = f"""
+            SELECT 
+                id, 
+                severity, 
+                alert_type, 
+                category, 
+                amount, 
+                baseline, 
+                delta_pct, 
+                description, 
+                runway_impact,
+                suggested_owner,
+                status, 
+                created_at,
+                updated_at
+            FROM alerts
+            WHERE {where_sql}
+            ORDER BY 
+                CASE LOWER(severity) 
+                    WHEN 'critical' THEN 1 
+                    WHEN 'warning' THEN 2 
+                    ELSE 3 
+                END,
+                created_at DESC
+            LIMIT %s
+        """
+        
+        cursor.execute(query, params + [limit])
+        alert_rows = cursor.fetchall()
+        
+        # Get severity counts for metadata
+        count_query = """
+            SELECT 
+                LOWER(severity) as severity,
+                COUNT(*) as count
+            FROM alerts
+            WHERE status = %s
+            GROUP BY LOWER(severity)
+        """
+        cursor.execute(count_query, [status_filter])
+        severity_counts = cursor.fetchall()
+        
+        # Get last scan timestamp
+        cursor.execute("""
+            SELECT run_at 
+            FROM anomaly_runs 
+            WHERE status = 'success'
+            ORDER BY run_at DESC 
+            LIMIT 1
+        """)
+        last_scan_row = cursor.fetchone()
+        last_scan_at = last_scan_row["run_at"].isoformat() if last_scan_row and last_scan_row["run_at"] else None
+        
+        cursor.close()
+        conn.close()
+        
+        # Build alerts list
+        alerts = []
+        for row in alert_rows:
+            alerts.append({
+                "id": row["id"],
+                "severity": row["severity"],
+                "alert_type": row["alert_type"],
+                "category": row["category"],
+                "amount": float(row["amount"]) if row["amount"] else None,
+                "baseline": float(row["baseline"]) if row["baseline"] else None,
+                "delta_pct": float(row["delta_pct"]) if row["delta_pct"] else None,
+                "description": row["description"],
+                "runway_impact": float(row["runway_impact"]) if row["runway_impact"] else None,
+                "suggested_owner": row["suggested_owner"],
+                "created_at": row["created_at"].isoformat() if row["created_at"] else None,
+            })
+        
+        # Build severity counts
+        total_count = 0
+        critical_count = 0
+        warning_count = 0
+        info_count = 0
+        
+        for count_row in severity_counts:
+            severity = count_row["severity"].lower()
+            count = count_row["count"]
+            total_count += count
+            
+            if severity == "critical":
+                critical_count = count
+            elif severity == "warning":
+                warning_count = count
+            elif severity == "info":
+                info_count = count
+        
+        logger.info(f"[ALERTS] Retrieved {len(alerts)} alerts (total: {total_count}, critical: {critical_count})")
+        
+        return {
+            "alerts": alerts,
+            "total": total_count,
+            "critical_count": critical_count,
+            "warning_count": warning_count,
+            "info_count": info_count,
+            "last_scan_at": last_scan_at,
+            "filtered": {
+                "severity": severity.lower() if severity else None,
+                "category": category.lower() if category else None,
+                "limit": limit
+            }
+        }
+    
+    except psycopg2.Error as e:
+        logger.error(f"[ALERTS] Database error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Database error: {str(e)}"
+        )
+    except Exception as e:
+        logger.error(f"[ALERTS] Error retrieving alerts: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error retrieving alerts: {str(e)}"
+        )
+        config = build_config(session_id)
+        
+        # Get saved state from checkpointer
+        # Note: This depends on LangGraph's persistence layer
+        try:
+            # Try to get state directly from checkpointer
+            from langgraph.graph import StateGraph
+            saved_state = None
+            
+            # For MemorySaver, we need to iterate through saved states
+            if hasattr(checkpointer, 'storage'):
+                # MemorySaver has a storage dict
+                saved_state = checkpointer.storage.get(session_id)
+            
+            # If no state found, try alternative approach
+            if not saved_state:
+                # Return empty history if session not found
+                logger.warning(f"Session {session_id} not found in storage")
+                return schemas.AgentHistoryResponse(
+                    session_id=session_id,
+                    messages=[]
+                )
+            
+            # Convert saved state messages to response format
+            messages = []
+            if "messages" in saved_state.get("values", {}):
+                from langchain_core.messages import AIMessage, HumanMessage
+                for msg in saved_state["values"]["messages"]:
+                    if isinstance(msg, HumanMessage):
+                        role = "user"
+                    elif isinstance(msg, AIMessage):
+                        role = "assistant"
+                    else:
+                        continue
+                    
+                    messages.append(schemas.ConversationMessage(
+                        role=role,
+                        content=msg.content if isinstance(msg.content, str) else str(msg.content),
+                        timestamp=datetime.utcnow().isoformat() + "Z"
+                    ))
+            
+            logger.info(f"[HISTORY] Retrieved {len(messages)} messages for session {session_id[:30]}...")
+            
+            return schemas.AgentHistoryResponse(
+                session_id=session_id,
+                messages=messages
+            )
+        
+        except AttributeError:
+            # Checkpointer doesn't expose state directly
+            logger.warning(f"Checkpointer doesn't expose state retrieval")
+            return schemas.AgentHistoryResponse(
+                session_id=session_id,
+                messages=[]
+            )
+    
+    except Exception as e:
+        logger.error(f"[HISTORY] Error retrieving history: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve conversation history: {str(e)}")
