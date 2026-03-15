@@ -22,7 +22,7 @@ from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
 from langchain_groq import ChatGroq
 
-from backend.agent.memory import (
+from .memory import (
     get_checkpointer,
     build_config,
     new_session_id,

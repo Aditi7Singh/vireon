@@ -13,6 +13,7 @@ from agent.agent_runner import AgentRunner
 import os
 from typing import List, Dict, Any, Optional
 from erpnext_client.client import ERPNextClient
+from integrations.merge_client import MergeAccountingClient, get_merge_client
 import logging
 import json
 
@@ -375,6 +376,8 @@ def get_erpnext_client() -> ERPNextClient:
     """Get configured ERPNext client from environment variables."""
     base_url = os.getenv("ERPNEXT_URL")
     site_name = os.getenv("ERPNEXT_SITE_NAME")
+    api_key = os.getenv("ERPNEXT_API_KEY")
+    api_secret = os.getenv("ERPNEXT_API_SECRET")
     
     if not base_url or not api_key or not api_secret:
         raise HTTPException(
@@ -382,6 +385,32 @@ def get_erpnext_client() -> ERPNextClient:
             detail="ERPNext not configured. Set ERPNEXT_URL, ERPNEXT_API_KEY, and ERPNEXT_API_SECRET in environment."
         )
     return ERPNextClient(base_url, api_key, api_secret, site_name=site_name)
+
+
+def get_data_client():
+    """
+    Get configured data client based on DATA_SOURCE environment variable.
+    
+    This allows seamless switching between:
+    - "erpnext": Simulator (development)
+    - "merge": Merge.dev production integration (QuickBooks, Xero, etc.)
+    
+    Environment variable: DATA_SOURCE (default: "erpnext")
+    
+    To switch to production Merge.dev:
+    1. Set DATA_SOURCE=merge in .env
+    2. Set MERGE_API_KEY and MERGE_ACCOUNT_TOKEN
+    3. Restart the server
+    """
+    data_source = os.getenv("DATA_SOURCE", "erpnext").lower()
+    
+    logger.info(f"Using data source: {data_source}")
+    
+    if data_source == "merge":
+        return get_merge_client()
+    else:
+        # Default to ERPNext simulator
+        return get_erpnext_client()
 
 @app.get("/sync/erpnext/status")
 async def get_erpnext_status(
