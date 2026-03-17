@@ -195,6 +195,54 @@ class Anomaly(Base):
     status = Column(String(20), default="open")
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
+class UserRole(str, enum.Enum):
+    ADMIN = "ADMIN"
+    VIEWER = "VIEWER"
+    EDITOR = "EDITOR"
+
+class Budget(Base):
+    __tablename__ = "budgets"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"))
+    name = Column(String(255), nullable=False)
+    fiscal_year = Column(Integer)
+    status = Column(String(50), default="active")
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    lines = relationship("BudgetLine", back_populates="budget")
+
+class BudgetLine(Base):
+    __tablename__ = "budget_lines"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    budget_id = Column(UUID(as_uuid=True), ForeignKey("budgets.id", ondelete="CASCADE"))
+    category = Column(String(100), nullable=False)
+    monthly_amount = Column(Numeric(15, 2), nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    budget = relationship("Budget", back_populates="lines")
+
+class Forecast(Base):
+    __tablename__ = "forecasts"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"))
+    forecast_date = Column(Date, nullable=False)
+    mrr_predicted = Column(Numeric(15, 2))
+    cash_predicted = Column(Numeric(15, 2))
+    confidence_lower = Column(Numeric(15, 2))
+    confidence_upper = Column(Numeric(15, 2))
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+class Document(Base):
+    __tablename__ = "documents"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"))
+    file_name = Column(String(255))
+    file_type = Column(String(50)) # receipt, invoice, bank_statement
+    status = Column(String(20), default="processed")
+    ocr_text = Column(Text)
+    extracted_data = Column(JSON)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
 class User(Base):
     __tablename__ = "users"
 
@@ -202,5 +250,6 @@ class User(Base):
     username = Column(String(100), unique=True, index=True)
     hashed_password = Column(String(255))
     email = Column(String(255), unique=True, index=True)
+    role = Column(String(50), default=UserRole.VIEWER) # Default to Viewer
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)

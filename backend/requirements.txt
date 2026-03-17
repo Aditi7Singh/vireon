@@ -14,3 +14,9 @@ python-multipart
 bcrypt==3.2.0
 httpx
 python-dateutil
+pytest
+pytest-asyncio
+slowapi
+pydantic-settings
+pandas
+numpy

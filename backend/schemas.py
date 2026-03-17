@@ -145,6 +145,27 @@ class Anomaly(AnomalyBase):
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
 
+class Alert(BaseModel):
+    id: str
+    severity: str
+    alert_type: str
+    category: str
+    description: str
+    amount: float
+    baseline: float
+    delta_pct: float
+    runway_impact: float
+    suggested_owner: str
+    created_at: str
+    status: str
+
+class AlertsResponse(BaseModel):
+    alerts: List[Alert]
+    total: int
+    critical_count: int
+    warning_count: int
+    last_scan_at: str
+
 class SandboxData(BaseModel):
     company: CompanyCreate
     accounts: List[AccountCreate]
@@ -164,12 +185,14 @@ class TokenData(BaseModel):
 class UserBase(BaseModel):
     username: str
     email: Optional[str] = None
+    role: Optional[str] = "VIEWER"
 
 class UserCreate(UserBase):
     password: str
 
 class User(UserBase):
     id: UUID
+    role: str
     is_active: bool
     model_config = ConfigDict(from_attributes=True)
 
@@ -190,5 +213,35 @@ class ScenarioResponse(BaseModel):
     new_runway: Union[float, str]
 
 class ChatRequest(BaseModel):
-    query: str
-    company_id: UUID
+    message: str
+    session_id: Optional[str] = None
+    company_id: Optional[UUID] = None
+
+class BudgetLineBase(BaseModel):
+    category: str
+    monthly_amount: float
+
+class BudgetLine(BudgetLineBase):
+    id: UUID
+    model_config = ConfigDict(from_attributes=True)
+
+class BudgetBase(BaseModel):
+    name: str
+    fiscal_year: int
+    status: str = "active"
+
+class Budget(BudgetBase):
+    id: UUID
+    lines: List[BudgetLine]
+    model_config = ConfigDict(from_attributes=True)
+
+class ForecastBase(BaseModel):
+    forecast_date: date
+    mrr_predicted: float
+    cash_predicted: float
+    confidence_lower: float
+    confidence_upper: float
+
+class Forecast(ForecastBase):
+    id: UUID
+    model_config = ConfigDict(from_attributes=True)
