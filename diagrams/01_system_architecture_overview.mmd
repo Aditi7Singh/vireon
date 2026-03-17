@@ -1,0 +1,30 @@
+graph TB
+    User["👤 End Users<br/>(Founders/CFOs)"]
+    
+    User -->|HTTP/JSON| Frontend["🎨 FRONTEND<br/>(Next.js React)<br/>Dashboard | Runway | Expenses<br/>Revenue | Scenarios | Alerts | Agent"]
+    
+    Frontend -->|REST API + WebSocket| APIGateway["🔌 API GATEWAY<br/>(FastAPI)<br/>Auth | Rate Limiting | CORS<br/>8 Routers | 25+ Endpoints"]
+    
+    APIGateway -->|Routes| BizLogic["⚙️ BUSINESS LOGIC<br/>Math Engine<br/>AI Agent LangGraph<br/>Anomaly Detection<br/>Forecasting"]
+    
+    BizLogic -->|Query| Database["💾 DATABASE<br/>(PostgreSQL)<br/>Companies | Accounts | Invoices<br/>Expenses | Metrics | Anomalies<br/>Users | Sessions | Budgets"]
+    
+    APIGateway -->|Fetch/Store| Cache["⚡ CACHE & JOBS<br/>(Redis)<br/>Celery Tasks<br/>Scheduler Beat<br/>Session Storage<br/>Metrics Cache TTL 5min"]
+    
+    APIGateway -->|Async Requests| ERPSync["🔗 ERP SYNC<br/>(Celery Tasks)<br/>Daily @ 2 AM UTC<br/>Circuit Breaker<br/>Retry Logic<br/>Caching 5min"]
+    
+    ERPSync -->|REST API| ERPNext["📊 ERPNEXT<br/>(External ERP)<br/>Sales Invoices<br/>Purchase Invoices<br/>GL Entries<br/>Payments<br/>Customers/Suppliers"]
+    
+    Database --> Visualize["📈 Visualization<br/>KPI Cards | Charts<br/>Alerts | Forecasts<br/>Scenario Comparisons"]
+    
+    Visualize --> User
+    
+    style User fill:#e1f5ff
+    style Frontend fill:#fff3e0
+    style APIGateway fill:#f3e5f5
+    style BizLogic fill:#e8f5e9
+    style Database fill:#fce4ec
+    style Cache fill:#fff8e1
+    style ERPSync fill:#e0f2f1
+    style ERPNext fill:#ffe0b2
+    style Visualize fill:#f1f8e9

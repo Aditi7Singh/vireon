@@ -1,0 +1,1976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIREON - Complete Architecture Diagrams</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+        
+        .toc {
+            background: #f8f9fa;
+            padding: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .toc h2 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.3em;
+        }
+        
+        .toc ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        
+        .toc li {
+            background: white;
+            padding: 12px 16px;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .toc li:hover {
+            background: #f0f4ff;
+            transform: translateX(5px);
+        }
+        
+        .toc a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .diagram-section {
+            margin-bottom: 60px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 30px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .diagram-section h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .diagram-section .description {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+        
+        .diagram-wrapper {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            overflow-x: auto;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .diagram-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+        }
+        
+        .download-btn:hover {
+            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.6);
+        }
+        
+        .copy-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        }
+        
+        .copy-btn:hover {
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            color: #1565c0;
+        }
+        
+        .info-box strong {
+            color: #0d47a1;
+        }
+        
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            border-top: 2px solid #e0e0e0;
+            margin-top: 40px;
+        }
+        
+        .file-section {
+            margin-top: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+        }
+        
+        .file-section h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .file-code {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin-top: 10px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .location-info {
+            background: #fffde7;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            border-left: 4px solid #fbc02d;
+            color: #f57f17;
+        }
+        
+        .download-all {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            border: none;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .download-all:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+        }
+        
+        .diagram-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .diagram-wrapper {
+                min-height: 300px;
+            }
+            
+            .toc ul {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .success-message {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 6px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-message" id="successMessage">✓ Downloaded successfully!</div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🎨 VIREON Architecture & Diagrams</h1>
+            <p>Complete Technical Visualization - All Diagrams as Downloadable Images</p>
+        </div>
+        
+        <div class="toc">
+            <h2>📋 Complete Architecture & Design Documentation</h2>
+            <ul>
+                <li><a href="#diagram1">1. System Architecture Overview</a></li>
+                <li><a href="#diagram2">2. AI Agent Query Execution</a></li>
+                <li><a href="#diagram3">3. ERPNext Financial Data Sync</a></li>
+                <li><a href="#diagram4">4. Anomaly Detection Flow</a></li>
+                <li><a href="#diagram5">5. Math Engine Scenarios</a></li>
+                <li><a href="#diagram6">6. Database Schema ER</a></li>
+                <li><a href="#diagram7">7. Use Case Diagram</a></li>
+                <li><a href="#diagram8">8. Actor/User Personas</a></li>
+                <li><a href="#diagram9">9. User Stories & Workflows</a></li>
+                <li><a href="#diagram10">10. Class/Domain Model</a></li>
+                <li><a href="#diagram11">11. High-Level Design (HLD)</a></li>
+                <li><a href="#diagram12">12. Low-Level Design (LLD)</a></li>
+                <li><a href="#diagram13">13. Complete End-to-End Flow</a></li>
+                <li><a href="#diagram14">14. API Design & Endpoints</a></li>
+                <li><a href="#diagram15">15. Interactive User Flow</a></li>
+                <li><a href="#diagram16">16. Deployment Architecture</a></li>
+                <li><a href="#diagram17">17. Data Flow Pipeline</a></li>
+            </ul>
+        </div>
+        
+        <div class="content">
+            <!-- DIAGRAM 1 -->
+            <div class="diagram-section" id="diagram1">
+                <h2><span class="diagram-number">1</span> System Architecture Overview</h2>
+                <p class="description">
+                    Complete system architecture showing all layers: Frontend, API Gateway, Business Logic, Database, 
+                    Cache/Job Queue, and ERP Integration. Visualizes how users interact with the platform through the UI, 
+                    APIs, and backend services.
+                </p>
+                <div class="diagram-controls">
+                    <button class="download-btn" onclick="downloadDiagram('diagram1-svg', '01_system_architecture_overview')">📥 Download as PNG</button>
+                    <button class="copy-btn" onclick="copySVG('diagram1-svg')">📋 Copy SVG</button>
+                </div>
+                <div class="diagram-wrapper" id="diagram1-svg">
+                    <div class="mermaid">
+graph TB
+    User["👤 End Users<br/>(Founders/CFOs)"]
+    
+    User -->|HTTP/JSON| Frontend["🎨 FRONTEND<br/>(Next.js React)<br/>Dashboard | Runway | Expenses<br/>Revenue | Scenarios | Alerts | Agent"]
+    
+    Frontend -->|REST API + WebSocket| APIGateway["🔌 API GATEWAY<br/>(FastAPI)<br/>Auth | Rate Limiting | CORS<br/>8 Routers | 25+ Endpoints"]
+    
+    APIGateway -->|Routes| BizLogic["⚙️ BUSINESS LOGIC<br/>Math Engine<br/>AI Agent LangGraph<br/>Anomaly Detection<br/>Forecasting"]
+    
+    BizLogic -->|Query| Database["💾 DATABASE<br/>(PostgreSQL)<br/>Companies | Accounts | Invoices<br/>Expenses | Metrics | Anomalies<br/>Users | Sessions | Budgets"]
+    
+    APIGateway -->|Fetch/Store| Cache["⚡ CACHE & JOBS<br/>(Redis)<br/>Celery Tasks<br/>Scheduler Beat<br/>Session Storage<br/>Metrics Cache TTL 5min"]
+    
+    APIGateway -->|Async Requests| ERPSync["🔗 ERP SYNC<br/>(Celery Tasks)<br/>Daily @ 2 AM UTC<br/>Circuit Breaker<br/>Retry Logic<br/>Caching 5min"]
+    
+    ERPSync -->|REST API| ERPNext["📊 ERPNEXT<br/>(External ERP)<br/>Sales Invoices<br/>Purchase Invoices<br/>GL Entries<br/>Payments<br/>Customers/Suppliers"]
+    
+    Database --> Visualize["📈 Visualization<br/>KPI Cards | Charts<br/>Alerts | Forecasts<br/>Scenario Comparisons"]
+    
+    Visualize --> User
+    
+    style User fill:#e1f5ff
+    style Frontend fill:#fff3e0
+    style APIGateway fill:#f3e5f5
+    style BizLogic fill:#e8f5e9
+    style Database fill:#fce4ec
+    style Cache fill:#fff8e1
+    style ERPSync fill:#e0f2f1
+    style ERPNext fill:#ffe0b2
+    style Visualize fill:#f1f8e9
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> This diagram shows all major system components and their interactions. 
+                    The Frontend communicates via REST APIs and WebSockets, while background jobs handle ERP sync and anomaly detection asynchronously.
+                </div>
+            </div>
+            
+            <!-- DIAGRAM 2 -->
+            <div class="diagram-section" id="diagram2">
+                <h2><span class="diagram-number">2</span> AI Agent Query Execution</h2>
+                <p class="description">
+                    Flowchart showing how user queries are processed through the LangGraph state machine. 
+                    Shows the 4-node pipeline: classify → agent → tools → analyze, with tool execution from database.
+                </p>
+                <div class="diagram-controls">
+                    <button class="download-btn" onclick="downloadDiagram('diagram2-svg', '02_ai_agent_query_flow')">📥 Download as PNG</button>
+                    <button class="copy-btn" onclick="copySVG('diagram2-svg')">📋 Copy SVG</button>
+                </div>
+                <div class="diagram-wrapper" id="diagram2-svg">
+                    <div class="mermaid">
+flowchart TD
+    User["👤 User Query<br/>What's my runway?"] --> Frontend["🎨 Frontend<br/>POST /agent/chat"]
+    Frontend --> APIGate["🔌 API Gateway<br/>Validate Request<br/>Load Company Context"]
+    
+    APIGate --> Classify["1️⃣ CLASSIFY NODE<br/>Extract keywords:<br/>runway, cash, burn?<br/>→ route to LLM"]
+    
+    Classify --> QueryType{Query Type?}
+    QueryType -->|Simple| SimpleModel["🤖 Simple Query<br/>Use: Qwen3<br/>Fast model"]
+    QueryType -->|Complex| ComplexModel["🤖 Complex Query<br/>Use: Claude<br/>Thinking budget: 10k"]
+    
+    SimpleModel --> Agent["2️⃣ AGENT NODE<br/>Load CFO Prompt<br/>Bind 10 Tools<br/>Invoke LLM"]
+    ComplexModel --> Agent
+    
+    Agent --> LLMOut{LLM Output<br/>has tool_calls?}
+    
+    LLMOut -->|No Calls| Analyze["4️⃣ ANALYZE NODE<br/>Safety check<br/>error_count < 3?"]
+    LLMOut -->|Yes - Calls| Tools["3️⃣ TOOLS NODE<br/>Execute each tool"]
+    
+    Tools --> ToolList["🔧 Available Tools:<br/>• get_cash_balance()<br/>• get_burn_rate()<br/>• get_runway()<br/>• simulate_hire()<br/>• simulate_revenue()<br/>• simulate_cost_cut()<br/>+ 4 more..."]
+    
+    ToolList --> ToolExec["Execute Tools<br/>→ Query Database<br/>→ Call Math Engine<br/>→ Return Results"]
+    
+    ToolExec --> ToolResults["Collect Results<br/>ToolMessage[] returned<br/>Back to Agent"]
+    
+    ToolResults --> Agent
+    
+    Analyze --> Check{Safety Check<br/>Passed?}
+    
+    Check -->|Yes| Response["✅ Format Response<br/>Natural language<br/>With calculations"]
+    Check -->|No| Error["❌ Inject Error<br/>Graceful Degradation"]
+    
+    Response --> Backend["Backend Returns<br/>{response, session_id,<br/>timestamp}"]
+    Error --> Backend
+    
+    Backend --> Frontend2["Frontend Receives<br/>ChatDrawer renders<br/>Persist in Zustand"]
+    
+    Frontend2 --> UserDisplay["👤 User Sees:<br/>Runway: 18.8 months<br/>Cash: $2.35M<br/>Burn: $125k/month"]
+    
+    UserDisplay --> End["🔚 Session persisted<br/>to LangGraph storage"]
+    
+    style User fill:#e1f5ff
+    style Frontend fill:#fff3e0
+    style APIGate fill:#f3e5f5
+    style Classify fill:#e8f5e9
+    style SimpleModel fill:#bbdefb
+    style ComplexModel fill:#bbdefb
+    style Agent fill:#e8f5e9
+    style Tools fill:#e8f5e9
+    style ToolList fill:#fffde7
+    style ToolExec fill:#fffde7
+    style Analyze fill:#e8f5e9
+    style Response fill:#c8e6c9
+    style Error fill:#ffccbc
+    style Backend fill:#fff3e0
+    style Frontend2 fill:#fff3e0
+    style UserDisplay fill:#e1f5ff
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> The 4-node pipeline (classify → agent → tools → analyze) processes queries intelligently. 
+                    Simple queries use fast Qwen3 model, complex ones use Claude with extended thinking. Tools fetch data and math engine calculates results.
+                </div>
+            </div>
+            
+            <!-- DIAGRAM 3 -->
+            <div class="diagram-section" id="diagram3">
+                <h2><span class="diagram-number">3</span> ERPNext Sync Flow</h2>
+                <p class="description">
+                    Sequence diagram showing how financial data flows from ERPNext into Vireon. Daily scheduled sync fetches 
+                    Sales Invoices, Purchase Invoices, Payments, and GL Entries with circuit breaker and caching for resilience.
+                </p>
+                <div class="diagram-controls">
+                    <button class="download-btn" onclick="downloadDiagram('diagram3-svg', '03_erpnext_sync_flow')">📥 Download as PNG</button>
+                    <button class="copy-btn" onclick="copySVG('diagram3-svg')">📋 Copy SVG</button>
+                </div>
+                <div class="diagram-wrapper" id="diagram3-svg">
+                    <div class="mermaid">
+flowchart TD
+    Scheduler["🕐 Celery Beat<br/>Daily scheduler<br/>Fires at midnight"] --> Task["📦 Sync Task<br/>sync_erpnext_neon.py"]
+    
+    Task --> CheckCircuit{"🔌 Circuit Breaker<br/>state check"}
+    
+    CheckCircuit -->|OPEN<br/>too many failures| Skip["⏸️ Skip Sync<br/>Wait 30 minutes<br/>failure_count ≥ threshold"]
+    Skip --> RetryLater["Schedule retry<br/>30 min window"]
+    
+    CheckCircuit -->|CLOSED<br/>normal| AttemptSync["Attempt sync<br/>Retry budget: 3x"]
+    
+    AttemptSync --> Request["1️⃣ API Request<br/>GET /api/method/frappe<br/>Companies, Invoices<br/>Accounts, Transactions"]
+    
+    Request --> Timeout{"Response<br/>within<br/>timeout?"}
+    
+    Timeout -->|Timeout/500/503| FailureLogic["2️⃣ Handle Failure<br/>error_count++<br/>Log error"]
+    Timeout -->|Success 200| Parse["3️⃣ Parse Response<br/>Validate JSON schema<br/>Transform structure"]
+    
+    FailureLogic --> RetryCheck{"Retries<br/>remaining<br/>< 3?"}
+    
+    RetryCheck -->|Yes| Backoff["⏳ Exponential Backoff<br/>wait = 2^attempt minutes<br/>Attempt 1: 2min, 2: 4min, 3: 8min"]
+    Backoff --> AttemptSync
+    
+    RetryCheck -->|No| CircuitOpen{"failure_count<br/>≥ 5?"}
+    CircuitOpen -->|Yes| OpenCircuit["⛔ OPEN Circuit<br/>Stop syncing<br/>Set 30min timer"]
+    CircuitOpen -->|No| LastAttempt["Mark failure<br/>Next sync will retry from start"]
+    
+    OpenCircuit --> AlertOps["🚨 Alert Operations<br/>ERPNext unreachable"]
+    AlertOps --> End1["🔚 End with alert"]
+    LastAttempt --> End1
+    
+    Parse --> Validate["4️⃣ Data Validation<br/>Check:<br/>• All required fields<br/>• Data types<br/>• Foreign key refs"]
+    
+    Validate --> Valid{Data<br/>valid?}
+    
+    Valid -->|Invalid| DataError["❌ Validation Error<br/>Log bad record<br/>Skip this batch"]
+    DataError --> End2["🔚 End with errors logged"]
+    
+    Valid -->|Yes| DBInsert["5️⃣ Database Insert<br/>Connection pool: 5<br/>Bulk insert"]
+    
+    DBInsert --> Store["Store in PostgreSQL:<br/>• companies<br/>• invoices<br/>• accounts<br/>• transactions<br/>• timestamps"]
+    
+    Store --> Success["✅ Success!<br/>success_count++<br/>reset error_count"]
+    
+    Success --> CircuitCheck{success_count<br/>≥ 2?<br/>Circuit OPEN?}
+    
+    CircuitCheck -->|Yes| CloseCircuit["🔓 CLOSE Circuit<br/>Resume normal ops<br/>success_count = 0"]
+    CircuitCheck -->|No| AlreadyClosed["Already CLOSED<br/>Continue normally"]
+    
+    CloseCircuit --> Complete["📊 Update sync stats:<br/>• last_sync_time<br/>• record_count<br/>• duration_ms"]
+    AlreadyClosed --> Complete
+    
+    Complete --> Log["Log to sync_log table:<br/>{timestamp, status<br/>records_synced, errors}"]
+    
+    Log --> End3["🔚 Sync complete<br/>Wait for next cycle"]
+    
+    RetryLater --> End4["🔚 End - retrying later"]
+    
+    style Scheduler fill:#fff3e0
+    style Task fill:#e8f5e9
+    style CheckCircuit fill:#f3e5f5
+    style Skip fill:#ffccbc
+    style AttemptSync fill:#e8f5e9
+    style Request fill:#bbdefb
+    style Parse fill:#e8f5e9
+    style DBInsert fill:#e8f5e9
+    style Store fill:#fffde7
+    style Success fill:#c8e6c9
+    style OpenCircuit fill:#ffccbc
+    style CloseCircuit fill:#c8e6c9
+    style AlertOps fill:#ffccbc
+    style DataError fill:#ffccbc
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> ERPNext sync runs daily at 2 AM UTC via Celery scheduler. Data is fetched with circuit breaker protection, 
+                    cached for 5 minutes, and transformed before being stored. Monthly metrics snapshot is calculated for performance optimization.
+                </div>
+            </div>
+            
+            <!-- DIAGRAM 4 -->
+            <div class="diagram-section" id="diagram4">
+                <h2><span class="diagram-number">4</span> Anomaly Detection Flow</h2>
+                <p class="description">
+                    Flowchart showing the anomaly detection process. Loads 90-day transaction history, calculates category baselines, 
+                    detects spending spikes using threshold-based algorithm, and generates alerts with severity classification.
+                </p>
+                <div class="diagram-controls">
+                    <button class="download-btn" onclick="downloadDiagram('diagram4-svg', '04_anomaly_detection_flow')">📥 Download as PNG</button>
+                    <button class="copy-btn" onclick="copySVG('diagram4-svg')">📋 Copy SVG</button>
+                </div>
+                <div class="diagram-wrapper" id="diagram4-svg">
+                    <div class="mermaid">
+flowchart TD
+    Start["🚨 Trigger Anomaly Scan<br/>POST /alerts/scan-now<br/>OR Celery Beat Hourly"] --> LoadGL["Load GL Transactions<br/>90-day lookback<br/>FROM Expense table"]
+    
+    LoadGL --> GroupBy["Group by Category<br/>Salaries | Cloud | Travel<br/>Meals | Misc | etc."]
+    
+    GroupBy --> Baseline["Calculate Baselines<br/>baseline_avg = MEAN<br/>baseline_std = STD"]
+    
+    Baseline --> DetectAnom["Detect Anomalies<br/>Per Transaction:"]
+    
+    DetectAnom --> ThresholdCheck{Compare:<br/>amount vs<br/>baseline × threshold?}
+    
+    ThresholdCheck -->|amount > avg × 1.5| CRITICAL["⚠️ CRITICAL SPIKE<br/>Severity: CRITICAL<br/>Runway Impact: HIGH<br/>> 50% above baseline"]
+    
+    ThresholdCheck -->|amount > avg × 1.15| WARNING["⚠️ WARNING SPIKE<br/>Severity: WARNING<br/>Runway Impact: LOW<br/>15-50% above baseline"]
+    
+    ThresholdCheck -->|amount < avg × 1.15| NORMAL["✓ NORMAL<br/>No alert needed"]
+    
+    CRITICAL --> Generate["Generate Alert<br/>alert_id, company_id<br/>severity, type, description<br/>expected_value, actual_value<br/>delta_pct, status=open"]
+    
+    WARNING --> Generate
+    NORMAL --> End1["🔚 Continue to next<br/>transaction"]
+    
+    Generate --> Persist["INSERT INTO anomalies<br/>Persist to Database"]
+    
+    Persist --> Frontend["📱 Frontend Polling<br/>GET /alerts?company_id=..."]
+    
+    Frontend --> Display["Display in AlertList<br/>🔴 Red banner for CRITICAL<br/>🟡 Yellow for WARNING<br/>Show delta_pct, impact"]
+    
+    Display --> Action{"User<br/>Action?"}
+    
+    Action -->|View Details| Drill["Drill-down: Show all<br/>related transactions"]
+    
+    Action -->|Dismiss| Dismiss["PATCH /alerts/{id}/dismiss<br/>status = dismissed<br/>Alert no longer shown"]
+    
+    Action -->|No Action| Monitor["Continue monitoring..."]
+    
+    Drill --> End2["🔚"]
+    Dismiss --> End3["🔚"]
+    Monitor --> End4["🔚"]
+    End1 --> End5["🔚"]
+    
+    style Start fill:#ff6b6b
+    style CRITICAL fill:#ff6b6b
+    style WARNING fill:#ffd93d
+    style NORMAL fill:#6bcf7f
+    style Generate fill:#ff9999
+    style Persist fill:#ffcc99
+    style Frontend fill:#fff3e0
+    style Display fill:#fff3e0
+    style Action fill:#e1f5ff
+    style End2 fill:#f1f8e9
+    style End3 fill:#f1f8e9
+    style End4 fill:#f1f8e9
+    style End5 fill:#f1f8e9
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> Anomaly detection compares expenses to 90-day baselines. Two thresholds trigger alerts: 
+                    15-50% above baseline (WARNING) and >50% above baseline (CRITICAL). Users can dismiss alerts or drill into related transactions.
+                </div>
+            </div>
+            
+            <!-- DIAGRAM 5 -->
+            <div class="diagram-section" id="diagram5">
+                <h2><span class="diagram-number">5</span> Math Engine Scenarios</h2>
+                <p class="description">
+                    Flow diagram showing scenario simulation engine. Starting from current financial state, branches through three scenarios 
+                    (hiring, revenue growth, cost reduction), calculates impacts using math engine, and displays results for decision-making.
+                </p>
+                <div class="diagram-controls">
+                    <button class="download-btn" onclick="downloadDiagram('diagram5-svg', '05_math_engine_scenarios')">📥 Download as PNG</button>
+                    <button class="copy-btn" onclick="copySVG('diagram5-svg')">📋 Copy SVG</button>
+                </div>
+                <div class="diagram-wrapper" id="diagram5-svg">
+                    <div class="mermaid">
+graph TD
+    Input["📊 INPUT PARAMETERS<br/>Current State:<br/>Cash: $2M<br/>Revenue: $500k/month<br/>Expenses: $600k/month<br/>Runway: 20 months"]
+    
+    Input -->|Branch 1| Hire["👥 Scenario: Hire 5 Engineers<br/>Salary: $120k/year each<br/>Additional burn: $50k/month"]
+    
+    Input -->|Branch 2| Revenue["📈 Scenario: +25% Revenue Growth<br/>New revenue: $625k/month<br/>Expenses: unchanged $600k"]
+    
+    Input -->|Branch 3| CostCut["💰 Scenario: Cut $100k/month<br/>Negotiate vendor rates<br/>Shut down office"]
+    
+    Hire --> HireCalc["CALC: Net Burn<br/>New = $600k + $50k - $500k<br/>= $150k/month"]
+    
+    Revenue --> RevCalc["CALC: Net Burn<br/>New = $600k - $625k<br/>= -$25k/month PROFIT!"]
+    
+    CostCut --> CostCalc["CALC: Net Burn<br/>New = $500k - $500k<br/>= $0 BREAK-EVEN!"]
+    
+    HireCalc --> HireRunway["Runway Calc:<br/>$2M ÷ $150k = 13.3 months<br/>Impact: -6.7 months LOST"]
+    
+    RevCalc --> RevRunway["Runway Calc:<br/>-$25k = NEGATIVE burn<br/>= INFINITE runway<br/>Impact: +13.3 months GAINED"]
+    
+    CostCalc --> CostRunway["Runway Calc:<br/>Break-even point<br/>= INFINITE runway<br/>Impact: +20 months GAINED"]
+    
+    HireRunway --> Output1["❌ SCENARIO RESULT<br/>Hiring reduces runway<br/>Critical ⚠️"]
+    
+    RevRunway --> Output2["✅ SCENARIO RESULT<br/>Revenue growth makes profitable<br/>Recommended ✓"]
+    
+    CostRunway --> Output3["✅ SCENARIO RESULT<br/>Cost cutting achieves profitability<br/>Recommended ✓"]
+    
+    Output1 --> Dashboard["📊 DASHBOARD OUTPUT<br/>Display in Scenarios page<br/>Side-by-side comparison<br/>Show runway impact chart"]
+    
+    Output2 --> Dashboard
+    Output3 --> Dashboard
+    
+    Dashboard --> Agent["🤖 AGENT OUTPUT<br/>Communicate findings in chat<br/>Suggest optimal scenario<br/>Provide recommendations"]
+    
+    style Input fill:#e1f5ff
+    style Hire fill:#fff3e0
+    style Revenue fill:#fff3e0
+    style CostCut fill:#fff3e0
+    style HireCalc fill:#e8f5e9
+    style RevCalc fill:#e8f5e9
+    style CostCalc fill:#e8f5e9
+    style HireRunway fill:#fce4ec
+    style RevRunway fill:#fce4ec
+    style CostRunway fill:#fce4ec
+    style Output1 fill:#ffebee
+    style Output2 fill:#e8f5e9
+    style Output3 fill:#e8f5e9
+    style Dashboard fill:#f1f8e9
+    style Agent fill:#f3e5f5
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> The scenario engine lets founders model what-if decisions. Starting from current cash and burn rates, 
+                    it calculates the impact of hiring, revenue changes, or cost cuts on runway and profitability.
+                </div>
+            </div>
+            
+            <!-- DIAGRAM 6 -->
+            <div class="diagram-section" id="diagram6">
+                <h2><span class="diagram-number">6</span> Database Schema ER Diagram</h2>
+                <p class="description">
+                    Entity-relationship diagram showing the complete PostgreSQL schema. 12 tables with relationships: 
+                    Companies (root tenant), Accounts, Contacts, Invoices, Expenses, Metrics, Anomalies, Budgets, Forecasts, Users, and Sessions.
+                </p>
+                <div class="diagram-controls">
+                    <button class="download-btn" onclick="downloadDiagram('diagram6-svg', '06_database_schema_er')">📥 Download as PNG</button>
+                    <button class="copy-btn" onclick="copySVG('diagram6-svg')">📋 Copy SVG</button>
+                </div>
+                <div class="diagram-wrapper" id="diagram6-svg">
+                    <div class="mermaid">
+erDiagram
+    COMPANIES {
+        uuid id PK
+        string name UK
+        string stage
+        numeric initial_cash
+        date founding_date
+    }
+    
+    ACCOUNTS {
+        uuid id PK
+        string remote_id UK
+        uuid company_id FK
+        string name
+        string classification
+        numeric current_balance
+    }
+    
+    CONTACTS {
+        uuid id PK
+        string remote_id UK
+        uuid company_id FK
+        string name
+        string type
+        string email
+        string tax_number
+    }
+    
+    INVOICES {
+        uuid id PK
+        string remote_id UK
+        uuid company_id FK
+        uuid contact_id FK
+        string invoice_number
+        date issue_date
+        numeric total_amount
+        numeric tax_amount
+        string status
+        string type
+    }
+    
+    EXPENSES {
+        uuid id PK
+        string remote_id UK
+        uuid company_id FK
+        uuid account_id FK
+        uuid contact_id FK
+        date transaction_date
+        numeric total_amount
+        string category
+        numeric tax_amount
+    }
+    
+    MONTHLY_METRICS {
+        uuid id PK
+        uuid company_id FK
+        date metric_month UK
+        numeric total_revenue
+        numeric total_expenses
+        numeric burn_rate
+        numeric runway_months
+        numeric ending_cash
+    }
+    
+    ANOMALIES {
+        uuid id PK
+        uuid company_id FK
+        date anomaly_date
+        string severity
+        string type
+        text description
+        numeric expected_value
+        numeric actual_value
+        string status
+    }
+    
+    BUDGETS {
+        uuid id PK
+        uuid company_id FK
+        date period_start
+        date period_end
+    }
+    
+    BUDGET_LINES {
+        uuid id PK
+        uuid budget_id FK
+        string category
+        numeric budgeted_amount
+        numeric actual_amount
+    }
+    
+    FORECASTS {
+        uuid id PK
+        uuid company_id FK
+        date forecast_month
+        numeric forecast_cash
+        numeric forecast_revenue
+        numeric confidence_interval
+    }
+    
+    USERS {
+        uuid id PK
+        string username UK
+        string email UK
+        string password_hash
+        string role
+        boolean is_active
+    }
+    
+    CHAT_SESSIONS {
+        string session_id PK
+        uuid company_id FK
+        uuid user_id FK
+        jsonb messages
+        timestamp last_message_at
+    }
+    
+    COMPANIES ||--o{ ACCOUNTS : "has"
+    COMPANIES ||--o{ CONTACTS : "has"
+    COMPANIES ||--o{ INVOICES : "has"
+    COMPANIES ||--o{ EXPENSES : "has"
+    COMPANIES ||--o{ MONTHLY_METRICS : "generates"
+    COMPANIES ||--o{ ANOMALIES : "triggers"
+    COMPANIES ||--o{ BUDGETS : "tracks"
+    COMPANIES ||--o{ FORECASTS : "produces"
+    COMPANIES ||--o{ CHAT_SESSIONS : "owns"
+    
+    CONTACTS ||--o{ INVOICES : "appears on"
+    CONTACTS ||--o{ EXPENSES : "paid to"
+    
+    ACCOUNTS ||--o{ EXPENSES : "categorizes"
+    
+    BUDGETS ||--o{ BUDGET_LINES : "contains"
+    
+    USERS ||--o{ CHAT_SESSIONS : "starts"
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> Multi-tenant design with Companies as root entity. All data is company-scoped through foreign key relationships. 
+                    Monthly metrics provide performance-optimized snapshot, while Anomalies, Budgets, and Forecasts support analytics and monitoring.
+                </div>
+            </div>
+            
+            <!-- FILE INFORMATION -->
+            <div class="file-section">
+                <h3>📁 Diagram Files Location</h3>
+                <p>All Mermaid diagram source files are located in:</p>
+                <div class="file-code">
+c:\Users\yagna\OneDrive\Desktop\My Proj\CAPSTONE\vireon\diagrams\
+                </div>
+                <p style="margin-top: 15px;"><strong>Files included:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>01_system_architecture_overview.mmd</li>
+                    <li>02_ai_agent_query_flow.mmd</li>
+                    <li>03_erpnext_sync_flow.mmd</li>
+                    <li>04_anomaly_detection_flow.mmd</li>
+                    <li>05_math_engine_scenarios.mmd</li>
+                    <li>06_database_schema_er.mmd</li>
+                    <li>07_use_case_diagram.mmd</li>
+                    <li>08_user_personas_workflows.mmd</li>
+                    <li>09_user_stories.mmd</li>
+                    <li>10_domain_model.mmd</li>
+                    <li>11_high_level_design.mmd</li>
+                    <li>12_low_level_design.mmd</li>
+                    <li>13_end_to_end_flow.mmd</li>
+                    <li>14_api_design.mmd</li>
+                    <li>15_interactive_user_flow.mmd</li>
+                    <li>16_deployment_architecture.mmd</li>
+                    <li>17_data_pipeline.mmd</li>
+                </ul>
+                <div class="location-info">
+                    <strong>📍 Master Documentation:</strong> All diagrams are also embedded in VIREON_MASTER_DOCUMENTATION.md
+                </div>
+            </div>
+            
+            <!-- DIAGRAM 7 -->
+            <div class="diagram-section" id="diagram7">
+                <h2><span class="diagram-number">7</span> Use Case Diagram</h2>
+                <p class="description">
+                    Shows primary actors (Founder, CFO, Accountant) and their interactions with key use cases: 
+                    Monitor cash flow, analyze expenses, simulate scenarios, and manage ERP sync.
+                </p>
+                <div class="diagram-controls">
+                    <button class="download-btn" onclick="downloadDiagram('diagram7-svg', '07_use_case_diagram')">📥 Download as PNG</button>
+                    <button class="copy-btn" onclick="copySVG('diagram7-svg')">📋 Copy SVG</button>
+                </div>
+                <div class="diagram-wrapper" id="diagram7-svg">
+                    <div class="mermaid">
+graph TB
+    Founder["👨‍💼 Founder"]
+    CFO["📊 CFO"]
+    Accountant["📝 Accountant"]
+    System["🤖 VIREON System"]
+    
+    Founder --> Monitor["Monitor Cash Flow<br/>& Runway"]
+    Founder --> Alert["Receive Spending<br/>Anomaly Alerts"]
+    Founder --> Simulate["Run 'What-If'<br/>Scenarios"]
+    Founder --> Ask["Ask AI Copilot<br/>Financial Questions"]
+    
+    CFO --> Monitor
+    CFO --> Analyze["Analyze Monthly<br/>Metrics & Trends"]
+    CFO --> Simulate
+    CFO --> Budget["Create & Track<br/>Budgets"]
+    
+    Accountant --> Sync["Manage ERPNext<br/>Data Sync"]
+    Accountant --> Validate["Validate Imported<br/>Financial Data"]
+    
+    Monitor --> System
+    Alert --> System
+    Simulate --> System
+    Ask --> System
+    Analyze --> System
+    Budget --> System
+    Sync --> System
+    Validate --> System
+    
+    System --> Dashboard["📊 Dashboard"]
+    System --> AI["🤖 AI Chat"]
+    System --> Alerts["🚨 Alerts"]
+    System --> Scenarios["📈 Scenarios"]
+    System --> ERP["🔗 ERP Link"]
+    
+    style Founder fill:#e3f2fd
+    style CFO fill:#e3f2fd
+    style Accountant fill:#e3f2fd
+    style System fill:#f3e5f5
+    style Dashboard fill:#fff3e0
+    style AI fill:#fff3e0
+    style Alerts fill:#fff3e0
+    style Scenarios fill:#fff3e0
+    style ERP fill:#fff3e0
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> Three primary actor personas interact with VIREON:
+                    Founder focuses on cash monitoring and scenarios, CFO on metrics and budgeting, Accountant on sync and validation.
+                </div>
+            </div>
+            
+            <!-- DIAGRAM 8 -->
+            <div class="diagram-section" id="diagram8">
+                <h2><span class="diagram-number">8</span> User Personas & Workflows</h2>
+                <p class="description">
+                    Three key personas and their typical workflows: Founder (daily monitoring), CFO (weekly analysis), 
+                    Accountant (monthly reconciliation and sync management).
+                </p>
+                <div class="diagram-controls">
+                    <button class="download-btn" onclick="downloadDiagram('diagram8-svg', '08_user_personas_workflows')">📥 Download as PNG</button>
+                    <button class="copy-btn" onclick="copySVG('diagram8-svg')">📋 Copy SVG</button>
+                </div>
+                <div class="diagram-wrapper" id="diagram8-svg">
+                    <div class="mermaid">
+graph TD
+    subgraph Founder["👨‍💼 FOUNDER - Daily Financial Pulse"]
+        F1["Morning:<br/>Check cash balance<br/>review alerts"]
+        F2["Mid-day:<br/>Ask AI any Qs"]
+        F3["EOD:<br/>Review metrics"]
+        F1 --> F2 --> F3
+    end
+    
+    subgraph CFO["📊 CFO - Strategic Planning"]
+        C1["Weekly:<br/>Analyze trends<br/>revenue/expenses"]
+        C2["Financial modelling<br/>run scenarios"]
+        C3["Review budgets<br/>vs actuals"]
+        C4["Month-end:<br/>Update forecasts"]
+        C1 --> C2 --> C3 --> C4
+    end
+    
+    subgraph Accountant["📝 ACCOUNTANT - Reconciliation"]
+        A1["Weekly:<br/>Trigger ERP sync<br/>check alerts"]
+        A2["Validate data<br/>integrity"]
+        A3["Month-end:<br/>Run full sync<br/>reconcile metrics"]
+        A1 --> A2 --> A3
+    end
+    
+    F1 --> Dashboard["📊 VIREON<br/>Dashboard"]
+    F2 --> AI["🤖 AI Chat"]
+    F3 --> Analytics["📈 Analytics"]
+    
+    C1 --> Analytics
+    C2 --> Scenarios["📊 Scenarios"]
+    C3 --> Dashboard
+    C4 --> Analytics
+    
+    A1 --> Sync["🔗 ERP Sync"]
+    A2 --> Dashboard
+    A3 --> Sync
+    
+    Dashboard --> Data["💾 Financial<br/>Data"]
+    AI --> Data
+    Analytics --> Data
+    Scenarios --> Data
+    Sync --> Data
+    
+    style Founder fill:#e3f2fd
+    style CFO fill:#f1f8e9
+    style Accountant fill:#fff3e0
+    style Data fill:#f3e5f5
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> Each persona has distinct workflows: Founder (daily check-ins), CFO (weekly planning), 
+                    Accountant (sync and reconciliation). All converge on central financial data platform.
+                </div>
+            </div>
+            
+            <!-- DIAGRAM 9 -->
+            <div class="diagram-section" id="diagram9">
+                <h2><span class="diagram-number">9</span> User Stories & Acceptance Criteria</h2>
+                <p class="description">
+                    Key user stories mapped to system features. Each story includes acceptance criteria 
+                    and connects to underlying technical capabilities.
+                </p>
+                <div class="diagram-controls">
+                    <button class="download-btn" onclick="downloadDiagram('diagram9-svg', '09_user_stories')">📥 Download as PNG</button>
+                    <button class="copy-btn" onclick="copySVG('diagram9-svg')">📋 Copy SVG</button>
+                </div>
+                <div class="diagram-wrapper" id="diagram9-svg">
+                    <div class="mermaid">
+graph TB
+    Story1["📖 Story 1<br/>As a Founder<br/>I want to know my cash runway<br/>So I can plan hiring"]
+    
+    AC1["✓ AC1: Display runway in months<br/>✓ AC2: Show cash balance<br/>✓ AC3: Show burn rate<br/>✓ AC4: Update daily"]
+    
+    Story2["📖 Story 2<br/>As a CFO<br/>I want to simulate hiring impact<br/>So I can forecast financials"]
+    
+    AC2a["✓ AC1: Model salary impact<br/>✓ AC2: Show runway delta<br/>✓ AC3: Compare scenarios<br/>✓ AC4: Export results"]
+    
+    Story3["📖 Story 3<br/>As an Accountant<br/>I want to sync ERPNext data<br/>So financials stay current"]
+    
+    AC3a["✓ AC1: Auto daily sync<br/>✓ AC2: Handle failures<br/>✓ AC3: Alert on errors<br/>✓ AC4: Validate data"]
+    
+    Story4["📖 Story 4<br/>As any user<br/>I want to ask AI questions<br/>So I get instant insights"]
+    
+    AC4a["✓ AC1: Natural language Q&A<br/>✓ AC2: Multi-turn chat<br/>✓ AC3: Show data sources<br/>✓ AC4: Explain calculations"]
+    
+    Story5["📖 Story 5<br/>As a Founder<br/>I want anomaly alerts<br/>So I catch spending issues"]
+    
+    AC5a["✓ AC1: Alert on spikes<br/>✓ AC2: Show severity<br/>✓ AC3: Compare to baseline<br/>✓ AC4: Drill down details"]
+    
+    Story1 --> AC1 --> Feature1["🎯 Runway Calculation<br/>Math Engine"]
+    Story2 --> AC2a --> Feature2["🎯 Scenario Simulation<br/>LangChain Tools"]
+    Story3 --> AC3a --> Feature3["🎯 ERPNext Sync<br/>Circuit Breaker"]
+    Story4 --> AC4a --> Feature4["🎯 AI Chat Agent<br/>LangGraph"]
+    Story5 --> AC5a --> Feature5["🎯 Anomaly Detection<br/>Threshold Algorithm"]
+    
+    style Story1 fill:#e3f2fd
+    style Story2 fill:#e3f2fd
+    style Story3 fill:#e3f2fd
+    style Story4 fill:#e3f2fd
+    style Story5 fill:#e3f2fd
+    style Feature1 fill:#fff3e0
+    style Feature2 fill:#fff3e0
+    style Feature3 fill:#fff3e0
+    style Feature4 fill:#fff3e0
+    style Feature5 fill:#fff3e0
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> All user stories map to acceptance criteria and then to specific technical features. 
+                    This ensures requirements traceability from business need to implementation.
+                </div>
+            </div>
+            
+            <!-- DIAGRAM 10 -->
+            <div class="diagram-section" id="diagram10">
+                <h2><span class="diagram-number">10</span> Domain Model & Class Relationships</h2>
+                <p class="description">
+                    Core domain entities and their relationships. Shows how Companies, Users, Accounts, 
+                    and Transactions form the financial data model.
+                </p>
+                <div class="diagram-controls">
+                    <button class="download-btn" onclick="downloadDiagram('diagram10-svg', '10_domain_model')">📥 Download as PNG</button>
+                    <button class="copy-btn" onclick="copySVG('diagram10-svg')">📋 Copy SVG</button>
+                </div>
+                <div class="diagram-wrapper" id="diagram10-svg">
+                    <div class="mermaid">
+graph TD
+    Company["📊 Company<br/>id, name<br/>industry, country<br/>founded_date"]
+    
+    User["👤 User<br/>id, email, role<br/>is_active"]
+    
+    Account["💾 Account<br/>id, code, name<br/>type, balance"]
+    
+    Contact["🔗 Contact<br/>id, name, email<br/>type, tax_number"]
+    
+    Invoice["📄 Invoice<br/>id, number<br/>date, amount, status"]
+    
+    Expense["💸 Expense<br/>id, date, category<br/>amount, vendor_id"]
+    
+    Transaction["🔄 Transaction<br/>id, date<br/>debit, credit<br/>ref_id"]
+    
+    Monthly["📈 Monthly Metric<br/>id, month<br/>revenue, expenses<br/>runway_months"]
+    
+    Anomaly["⚠️ Anomaly Alert<br/>id, date, severity<br/>type, description"]
+    
+    Budget["📋 Budget<br/>id, start_date<br/>end_date"]
+    
+    Company --> User
+    Company --> Account
+    Company --> Contact
+    Company --> Invoice
+    Company --> Expense
+    Company --> Transaction
+    Company --> Monthly
+    Company --> Anomaly
+    Company --> Budget
+    
+    Account --> Transaction
+    Invoice --> Contact
+    Expense --> Contact
+    Expense --> Account
+    
+    Monthly --> Account
+    Monthly --> Invoice
+    Monthly --> Expense
+    
+    Anomaly --> Expense
+    Anomaly --> Account
+    
+    style Company fill:#e1f5fe
+    style User fill:#f3e5f5
+    style Account fill:#fff3e0
+    style Contact fill:#fff3e0
+    style Invoice fill:#e8f5e9
+    style Expense fill:#e8f5e9
+    style Transaction fill:#fce4ec
+    style Monthly fill:#f1f8e9
+    style Anomaly fill:#ffebee
+    style Budget fill:#ede7f6
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> Company is the root entity with multi-tenant isolation. All financial objects 
+                    (invoices, expenses, accounts) are scoped to company. Monthly metrics and anomalies are calculated metrics derived from transactions.
+                </div>
+            </div>
+            
+            <!-- DIAGRAM 11 -->
+            <div class="diagram-section" id="diagram11">
+                <h2><span class="diagram-number">11</span> High-Level Architecture Design</h2>
+                <p class="description">
+                    System architecture at component level showing separation of concerns: 
+                    Presentation, API, Business Logic, Data, and External Integrations.
+                </p>
+                <div class="diagram-controls">
+                    <button class="download-btn" onclick="downloadDiagram('diagram11-svg', '11_high_level_design')">📥 Download as PNG</button>
+                    <button class="copy-btn" onclick="copySVG('diagram11-svg')">📋 Copy SVG</button>
+                </div>
+                <div class="diagram-wrapper" id="diagram11-svg">
+                    <div class="mermaid">
+graph TB
+    subgraph Presentation["🎨 PRESENTATION LAYER"]
+        Web["Web UI<br/>Next.js<br/>React/Tailwind"]
+        Mobile["Mobile Client<br/>future"]
+    end
+    
+    subgraph API["🔌 API GATEWAY LAYER"]
+        Gateway["FastAPI Router<br/>JWT Auth<br/>Rate Limiting"]
+        Endpoints["25+ Endpoints<br/>8 Resource Groups"]
+    end
+    
+    subgraph Business["💼 BUSINESS LOGIC LAYER"]
+        AI["AI Agent<br/>LangGraph<br/>10 Tools"]
+        Math["Math Engine<br/>Calculations<br/>Scenarios"]
+        Anomaly["Anomaly Detection<br/>Alerting<br/>Thresholds"]
+        ERP["ERPNext Client<br/>Circuit Breaker<br/>Retry Logic"]
+    end
+    
+    subgraph Data["💾 DATA LAYER"]
+        PostgreSQL["PostgreSQL<br/>SQLAlchemy ORM<br/>12 Tables"]
+        Cache["Redis Cache<br/>Session Data<br/>Rate Limits"]
+    end
+    
+    subgraph External["🌐 EXTERNAL SYSTEMS"]
+        ERPNext2["ERPNext<br/>ERP System"]
+        LLM["LLM providers<br/>Claude, Qwen3<br/>Ollama"]
+    end
+    
+    subgraph Jobs["⚙️ JOB SCHEDULER"]
+        Celery["Celery + Redis<br/>Distributed Tasks"]
+        Beat["Celery Beat<br/>Scheduled Jobs<br/>Anomaly scan<br/>Daily Sync"]
+    end
+    
+    Web --> API
+    Mobile --> API
+    
+    API --> Gateway --> Endpoints
+    
+    Endpoints --> Business
+    
+    AI --> Math
+    AI --> Anomaly
+    AI --> ERP
+    Math --> Data
+    Anomaly --> Data
+    AI --> Data
+    
+    ERP --> PostgreSQL
+    ERP --> External
+    
+    PostgreSQL --> Cache
+    
+    Gateway --> Cache
+    
+    External --> ERPNext2
+    External --> LLM
+    
+    Jobs --> Celery
+    Celery --> Beat
+    Beat --> Business
+    
+    style Presentation fill:#e1f5fe
+    style API fill:#e3f2fd
+    style Business fill:#f3e5f5
+    style Data fill:#fff3e0
+    style External fill:#fff8e1
+    style Jobs fill:#f1f8e9
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> 6-layer architecture: Presentation (UI) → API Gateway (routing) → Business Logic (AI/Math/Anomaly) 
+                    → Data (PostgreSQL/Redis) → External (ERPNext/LLMs) → Jobs (Celery scheduler). Clear separation of concerns enables independent scaling.
+                </div>
+            </div>
+            
+            <!-- DIAGRAM 12 -->
+            <div class="diagram-section" id="diagram12">
+                <h2><span class="diagram-number">12</span> Low-Level System Design</h2>
+                <p class="description">
+                    Detailed design showing key modules, state machines, and processing pipelines. 
+                    Focuses on LangGraph state machine, math engine formulas, and data flow patterns.
+                </p>
+                <div class="diagram-controls">
+                    <button class="download-btn" onclick="downloadDiagram('diagram12-svg', '12_low_level_design')">📥 Download as PNG</button>
+                    <button class="copy-btn" onclick="copySVG('diagram12-svg')">📋 Copy SVG</button>
+                </div>
+                <div class="diagram-wrapper" id="diagram12-svg">
+                    <div class="mermaid">
+graph TB
+    subgraph LangGraph["🤖 LANGGRAPH STATE MACHINE"]
+        Classify["NODE: Classify<br/>Extract intent<br/>route query"]
+        Agent["NODE: Agent<br/>LLM with tools<br/>streaming"]
+        Tools["NODE: Tools<br/>Execute requests<br/>gather data"]
+        Analyze["NODE: Analyze<br/>Check validity<br/>format output"]
+        ClassifyOut["Output: classified"]
+        AgentOut["Output: tool_calls"]
+        ToolsOut["Output: results"]
+        AnalyzeOut["Output: response"]
+        
+        Classify --> ClassifyOut
+        ClassifyOut --> Agent
+        Agent --> AgentOut
+        AgentOut --> Tools
+        Tools --> ToolsOut
+        ToolsOut --> Agent
+        Agent --> Analyze
+        Analyze --> AnalyzeOut
+    end
+    
+    subgraph Math["📐 MATH ENGINE"]
+        Runway["runway = cash / burn_rate"]
+        Burn["burn_rate = monthly_expenses"]
+        Scenario["scenario_result = apply_model(params)"]
+        Cashflow["cashflow = revenue - expenses"]
+    end
+    
+    subgraph Anomaly["🔍 ANOMALY DETECTOR"]
+        Baseline["baseline = mean(90d_history)"]
+        Threshold["breach = actual > baseline × factor"]
+        Classify_A["classify: CRITICAL|WARNING|NORMAL"]
+    end
+    
+    subgraph ETL["🔄 ETL PIPELINE"]
+        Extract["Extract:<br/>ERPNext API calls<br/>with retries"]
+        Transform["Transform:<br/>Map schemas<br/>normalize data"]
+        Load["Load:<br/>Bulk insert<br/>to PostgreSQL"]
+    end
+    
+    LangGraph --> Math
+    Math --> Data_Store["💾 Query Results<br/>store to cache"]
+    Data_Store --> Dashboard["📊 Dashboard"]
+    
+    Anomaly --> Alerts["🚨 Alert Queue"]
+    Alerts --> Dashboard
+    
+    ETL --> PostgreSQL["PostgreSQL<br/>Transactions"]
+    PostgreSQL --> Math
+    
+    style LangGraph fill:#e3f2fd
+    style Math fill:#e8f5e9
+    style Anomaly fill:#ffebee
+    style ETL fill:#f3e5f5
+    style Data_Store fill:#fff3e0
+    style PostgreSQL fill:#fce4ec
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> LowLevel design shows 4 key subsystems: (1) LangGraph 4-node state machine for query processing, 
+                    (2) Math engine formulas for calculations, (3) Anomaly detector with thresholds, (4) ETL pipeline for data transformation.
+                </div>
+            </div>
+            
+            <!-- DIAGRAM 13 -->
+            <div class="diagram-section" id="diagram13">
+                <h2><span class="diagram-number">13</span> Complete End-to-End Flow</h2>
+                <p class="description">
+                    Full flow from user action through multiple systems to result display. 
+                    Shows data transformation as it moves through the system layers.
+                </p>
+                <div class="diagram-controls">
+                    <button class="download-btn" onclick="downloadDiagram('diagram13-svg', '13_end_to_end_flow')">📥 Download as PNG</button>
+                    <button class="copy-btn" onclick="copySVG('diagram13-svg')">📋 Copy SVG</button>
+                </div>
+                <div class="diagram-wrapper" id="diagram13-svg">
+                    <div class="mermaid">
+graph TD
+    UserAction["👤 USER<br/>Types: 'How much runway<br/>if I hire 3 people?'<br/>In ChatDrawer"]
+    
+    Frontend["🎨 FRONTEND<br/>Capture message<br/>Dispatch to store<br/>Show typing indicator"]
+    
+    API["🔌 API<br/>POST /agent/chat<br/>with context"]
+    
+    Auth["🔐 AUTHENTICATED<br/>Verify JWT<br/>Load company_id"]
+    
+    Classify["1️⃣ CLASSIFY<br/>Extract keywords<br/>hiring → complex<br/>route to Claude"]
+    
+    LLM["🤖 LLM CALL<br/>Claude 3.5<br/>thinking budget 10k<br/>prompt + context"]
+    
+    ToolCall["🔧 TOOL CALL<br/>LLM triggers:<br/>get_cash_balance()<br/>get_burn_rate<br/>get_employees<br/>simulate_hire"]
+    
+    ToolExec["⚙️ TOOL EXECUTION<br/>Query PostgreSQL<br/>Call math engine<br/>for each tool"]
+    
+    MathEngine["📐 MATH ENGINE<br/>salary_impact = 3 × 150k<br/>new_burn = old + 450k<br/>new_runway = cash/new_burn"]
+    
+    Results["📊 GATHER RESULTS<br/>ToolMessage[<br/>{cash: 2.35M}<br/>{burn: 125k → 575k}<br/>{employees: 5 → 8}<br/>{runway: 18.8 → 4.1 months}"]
+    
+    Response["✍️ FORMAT RESPONSE<br/>LLM generates natural<br/>language answer with<br/>data, reasoning, warnings"]
+    
+    Check["✓ VALIDITY CHECK<br/>No errors<br/>Response coherent<br/>Numbers make sense"]
+    
+    Send["📤 SEND TO FRONTEND<br/{response_text<br/>session_id<br/>timestamp}"]
+    
+    Display["🎨 DISPLAY<br/>ChatDrawer renders<br/>Markdown formatting<br/>Show numbers highlighted"]
+    
+    Store["💾 PERSIST<br/>Save to CHAT_SESSIONS<br/>Zustand store updates<br/>Session history"]
+    
+    UserReads["👤 USER SEES<br/>Runway impact:<br/>18.8 months → 4.1 months<br/>Warning: major risk!<br/>Recommendation: reconsider"]
+    
+    UserAction --> Frontend
+    Frontend --> API
+    API --> Auth
+    Auth --> Classify
+    Classify --> LLM
+    LLM --> ToolCall
+    ToolCall --> ToolExec
+    ToolExec --> MathEngine
+    MathEngine --> Results
+    Results --> Response
+    Response --> Check
+    Check --> Send
+    Send --> Display
+    Display --> Store
+    Store --> UserReads
+    
+    style UserAction fill:#e1f5ff
+    style Frontend fill:#fff3e0
+    style API fill:#e3f2fd
+    style Auth fill:#f3e5f5
+    style Classify fill:#e8f5e9
+    style LLM fill:#e8f5e9
+    style ToolCall fill:#e8f5e9
+    style ToolExec fill:#fffde7
+    style MathEngine fill:#fffde7
+    style Results fill:#e8f5e9
+    style Response fill:#e8f5e9
+    style Check fill:#e8f5e9
+    style Send fill:#e3f2fd
+    style Display fill:#fff3e0
+    style Store fill:#f3e5f5
+    style UserReads fill:#e1f5ff
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> Complete journey: User types question → Classified as complex → Claude LLM called with context → 
+                    Tools fetch data and math engine simulates scenario → Results formatted as natural language → User sees impact analysis with recommendations.
+                </div>
+            </div>
+            
+            <!-- DIAGRAM 14 -->
+            <div class="diagram-section" id="diagram14">
+                <h2><span class="diagram-number">14</span> API Design & Endpoint Hierarchy</h2>
+                <p class="description">
+                    REST API structure with 25+ endpoints across 8 resource groups. 
+                    Shows request/response patterns and authentication flows.
+                </p>
+                <div class="diagram-controls">
+                    <button class="download-btn" onclick="downloadDiagram('diagram14-svg', '14_api_design')">📥 Download as PNG</button>
+                    <button class="copy-btn" onclick="copySVG('diagram14-svg')">📋 Copy SVG</button>
+                </div>
+                <div class="diagram-wrapper" id="diagram14-svg">
+                    <div class="mermaid">
+graph TD
+    API["🔌 VIREON API<br/>FastAPI<br/>base: /api/v1"]
+    
+    Auth_Router["🔐 AUTH<br/>/auth<br/>2 endpoints"]
+    Auth1["POST /auth/login"]
+    Auth2["POST /auth/logout"]
+    
+    Agent_Router["🤖 AGENT<br/>/agent<br/>3 endpoints"]
+    Agent1["POST /agent/chat"]
+    Agent2["GET /agent/history"]
+    Agent3["DELETE /agent/session"]
+    
+    Alert_Router["🚨 ALERTS<br/>/alerts<br/>5 endpoints"]
+    Alert1["GET /alerts?company_id"]
+    Alert2["POST /alerts/scan-now"]
+    Alert3["PATCH /alerts/{id}"]
+    Alert4["GET /alerts/{id}"]
+    Alert5["DELETE /alerts/{id}"]
+    
+    Analytics_Router["📊 ANALYTICS<br/>/analytics<br/>4 endpoints"]
+    Analytics1["GET /analytics/metrics"]
+    Analytics2["GET /analytics/forecasts"]
+    Analytics3["POST /analytics/scenarios"]
+    Analytics4["GET /analytics/trends"]
+    
+    Company_Router["🏢 COMPANIES<br/>/companies<br/>4 endpoints"]
+    Company1["GET /companies"]
+    Company2["POST /companies"]
+    Company3["GET /companies/{id}"]
+    Company4["PATCH /companies/{id}"]
+    
+    ERP_Router["🔗 ERP INTEGRATION<br/>/erpnext<br/>3 endpoints"]
+    ERP1["GET /erpnext/status"]
+    ERP2["POST /erpnext/sync"]
+    ERP3["GET /erpnext/logs"]
+    
+    Health_Router["💓 HEALTH<br/>/health<br/>2 endpoints"]
+    Health1["GET /health"]
+    Health2["GET /health/db"]
+    
+    Auth_Props["Headers:<br/>Authorization: Bearer {token}<br/>Content-Type: application/json"]
+    
+    Request_Pattern["REQUEST<br/>{<br/>  company_id: uuid<br/>  user_id: uuid<br/>  data: {}<br/>}"]
+    
+    Response_Pattern["RESPONSE<br/>{<br/>  status: success<br/>  data: {}<br/>  timestamp: ISO<br/>  request_id: UUID<br/>}"]
+    
+    Error_Pattern["ERROR<br/>{<br/>  status: error<br/>  error_code: 400<br/>  message: string<br/>  details: {}<br/>}"]
+    
+    API --> Auth_Router
+    API --> Agent_Router
+    API --> Alert_Router
+    API --> Analytics_Router
+    API --> Company_Router
+    API --> ERP_Router
+    API --> Health_Router
+    
+    Auth_Router --> Auth1
+    Auth_Router --> Auth2
+    
+    Agent_Router --> Agent1
+    Agent_Router --> Agent2
+    Agent_Router --> Agent3
+    
+    Alert_Router --> Alert1
+    Alert_Router --> Alert2
+    Alert_Router --> Alert3
+    Alert_Router --> Alert4
+    Alert_Router --> Alert5
+    
+    Analytics_Router --> Analytics1
+    Analytics_Router --> Analytics2
+    Analytics_Router --> Analytics3
+    Analytics_Router --> Analytics4
+    
+    Company_Router --> Company1
+    Company_Router --> Company2
+    Company_Router --> Company3
+    Company_Router --> Company4
+    
+    ERP_Router --> ERP1
+    ERP_Router --> ERP2
+    ERP_Router --> ERP3
+    
+    Health_Router --> Health1
+    Health_Router --> Health2
+    
+    Auth1 --> Auth_Props
+    Auth_Props --> Request_Pattern
+    Request_Pattern --> Response_Pattern
+    Response_Pattern --> Error_Pattern
+    
+    style API fill:#e3f2fd
+    style Auth_Router fill:#f3e5f5
+    style Agent_Router fill:#e8f5e9
+    style Alert_Router fill:#ffebee
+    style Analytics_Router fill:#f1f8e9
+    style Company_Router fill:#fce4ec
+    style ERP_Router fill:#fff3e0
+    style Health_Router fill:#e0f2f1
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> API organized into 8 resource routers: Auth (login/logout), Agent (chat), Alerts (anomalies), 
+                    Analytics (metrics/scenarios), Companies (multi-tenant), ERPNext (sync), Health (status). All responses follow consistent 
+                    {status, data, timestamp, request_id} pattern with standard error handling.
+                </div>
+            </div>
+            
+            <!-- DIAGRAM 15 -->
+            <div class="diagram-section" id="diagram15">
+                <h2><span class="diagram-number">15</span> Interactive User Flow</h2>
+                <p class="description">
+                    User interaction flow from dashboard to results. Shows UI states, user decisions, 
+                    and how each action triggers different backend processes.
+                </p>
+                <div class="diagram-controls">
+                    <button class="download-btn" onclick="downloadDiagram('diagram15-svg', '15_interactive_user_flow')">📥 Download as PNG</button>
+                    <button class="copy-btn" onclick="copySVG('diagram15-svg')">📋 Copy SVG</button>
+                </div>
+                <div class="diagram-wrapper" id="diagram15-svg">
+                    <div class="mermaid">
+graph TD
+    Start["🏠 DASHBOARD<br/>Show KPI cards<br/>Cash balance<br/>Burn rate<br/>Runway"]
+    
+    Choice1{User<br/>Action?}
+    
+    Choice1 -->|Asks Question| ChatFlow["💬 CHAT FLOW<br/>Type in ChatDrawer<br/>Query processed by AI<br/>Results streamed"]
+    
+    Choice1 -->|Reviews Alerts| AlertFlow["🚨 ALERT FLOW<br/>View anomalies<br/>Red=Critical<br/>Yellow=Warning<br/>Drill into details"]
+    
+    Choice1 -->|Runs Scenario| ScenarioFlow["📈 SCENARIO FLOW<br/>Select base case<br/>Choose variables<br/>Run simulation<br/>Compare results"]
+    
+    Choice1 -->|Checks Analytics| AnalyticsFlow["📊 ANALYTICS FLOW<br/>View monthly trends<br/>Revenue/Expense charts<br/>Forecasts and budgets<br/>Export reports"]
+    
+    ChatFlow --> Q1{Question<br/>Type?}
+    Q1 -->|Simple| Simple["Fast response<br/>Qwen3 model<br/>< 2 seconds"]
+    Q1 -->|Complex| Complex["Thinking response<br/>Claude model<br/>< 10 seconds"]
+    Simple --> ChatRes["Display answer<br/>with data and chart"]
+    Complex --> ChatRes
+    ChatRes --> ChatChoice{User<br/>Satisfied?}
+    ChatChoice -->|Yes| Done["✓ Done<br/>Save in history"]
+    ChatChoice -->|No| ChatFlow
+    
+    AlertFlow --> AlertAction{Alert<br/>Action?}
+    AlertAction -->|View Details| AlertDetail["Drill down:<br/>Show transactions<br/>Category baseline<br/>Comparison"]
+    AlertAction -->|Dismiss| AlertDone["Marked as done<br/>No longer shown"]
+    AlertAction -->|Export| AlertExport["Export to CSV<br/>Share with team"]
+    
+    AlertDetail --> Done
+    AlertDone --> Done
+    AlertExport --> Done
+    
+    ScenarioFlow --> SetParams["Set parameters:<br/>Salary increase<br/>New revenue<br/>Cost reduction"]
+    SetParams --> Simulate["Run simulation<br/>Math engine<br/>calculates impact"]
+    Simulate --> ScenarioRes["Show results:<br/>Cash impact<br/>Runway change<br/>Payback period"]
+    ScenarioRes --> ScenarioChoice{Save<br/>Scenario?}
+    ScenarioChoice -->|Yes| SaveScenario["Save for later<br/>Track versions"]
+    ScenarioChoice -->|No| ScenarioFlow
+    SaveScenario --> Done
+    
+    AnalyticsFlow --> AnalyticsChoice{View<br/>What?}
+    AnalyticsChoice -->|Trends| Trends["Show monthly<br/>revenue/expenses<br/>16 month history"]
+    AnalyticsChoice -->|Forecast| Forecast["Show AI forecast<br/>Next 12 months<br/>Confidence bands"]
+    AnalyticsChoice -->|Budget| Budget["Show budget<br/>actuals vs budget<br/>variance analysis"]
+    
+    Trends --> AnalyticsEnd["Export or Share"]
+    Forecast --> AnalyticsEnd
+    Budget --> AnalyticsEnd
+    AnalyticsEnd --> Done
+    
+    Done --> Return["↻ Return to<br/>Dashboard"]
+    
+    Return --> Choice2{More<br/>Actions?}
+    Choice2 -->|Yes| Choice1
+    Choice2 -->|No| Logout["👋 Logout<br/>Session ended"]
+    
+    style Start fill:#e1f5ff
+    style ChatFlow fill:#e8f5e9
+    style AlertFlow fill:#ffebee
+    style ScenarioFlow fill:#f1f8e9
+    style AnalyticsFlow fill:#fff3e0
+    style Done fill:#c8e6c9
+    style Logout fill:#f1f8e9
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> User dashboard is hub for 4 main flows: Chat (AI questions), Alerts (anomalies), 
+                    Scenarios (what-if simulations), Analytics (trends). Each flow has sub-actions and can loop until user is satisfied.
+                </div>
+            </div>
+            
+            <!-- DIAGRAM 16 -->
+            <div class="diagram-section" id="diagram16">
+                <h2><span class="diagram-number">16</span> Deployment Architecture</h2>
+                <p class="description">
+                    Target deployment on AWS with ECS, RDS, ElastiCache, and Lambda functions. 
+                    Shows infrastructure components, scaling strategies, and monitoring.
+                </p>
+                <div class="diagram-controls">
+                    <button class="download-btn" onclick="downloadDiagram('diagram16-svg', '16_deployment_architecture')">📥 Download as PNG</button>
+                    <button class="copy-btn" onclick="copySVG('diagram16-svg')">📋 Copy SVG</button>
+                </div>
+                <div class="diagram-wrapper" id="diagram16-svg">
+                    <div class="mermaid">
+graph TB
+    subgraph CDN["☁️ CDN / GLOBAL"]
+        CF["CloudFront<br/>Static assets<br/>Frontend bundle<br/>Gzip compression"]
+    end
+    
+    subgraph LB["🔀 LOAD BALANCING"]
+        ALB["AWS Application<br/>Load Balancer<br/>Health check: /health<br/>HTTP → HTTPS"]
+    end
+    
+    subgraph Compute["🖥️ COMPUTE - ECS"]
+        FrontendCluster["Frontend Cluster<br/>Fargate<br/>2 tasks min<br/>4 max auto-scale<br/>Port 3000"]
+        BackendCluster["Backend Cluster<br/>Fargate<br/>3 tasks min<br/>10 max auto-scale<br/>Port 8000"]
+        CeleryCluster["Celery Workers<br/>Fargate<br/>2 tasks min<br/>5 max auto-scale<br/>With Celery Beat"]
+    end
+    
+    subgraph Data["💾 DATA"]
+        RDS["AWS RDS PostgreSQL<br/>Multi-AZ<br/>30 GB storage<br/>Auto backup daily"]
+        ElastiCache["ElastiCache Redis<br/>cache.t3.small<br/>Session store<br/>Rate limit store<br/>Auto failover"]
+    end
+    
+    subgraph Queue["📦 MESSAGE QUEUE"]
+        SQS["Amazon SQS<br/>Async tasks<br/>Long polling<br/>DLQ for failures"]
+    end
+    
+    subgraph External["🌐 EXTERNAL SERVICES"]
+        ERPNext_AWS["ERPNext<br/>Customer's server"]
+        LLM_API["Claude / Groq<br/>LLM API"]
+    end
+    
+    subgraph Monitoring["📊 MONITORING"]
+        CloudWatch["CloudWatch Logs<br/>& Metrics<br/>Custom alarms"]
+        XRay["X-Ray Tracing<br/>Request flow<br/>Latency analysis"]
+    end
+    
+    subgraph Backup["💾 BACKUP"]
+        S3["AWS S3<br/>Daily snapshots<br/>Logs archive<br/>Disaster recovery"]
+    end
+    
+    subgraph Lambda["⚡ SERVERLESS"]
+        Scheduler["Lambda Functions<br/>Sync scheduler<br/>Report generator<br/>Webhook handlers"]
+    end
+    
+    CF --> ALB
+    ALB --> FrontendCluster
+    ALB --> BackendCluster
+    
+    BackendCluster --> RDS
+    BackendCluster --> ElastiCache
+    BackendCluster --> SQS
+    BackendCluster --> External
+    
+    CeleryCluster --> RDS
+    CeleryCluster --> ElastiCache
+    CeleryCluster --> SQS
+    CeleryCluster --> External
+    
+    FrontendCluster --> ElastiCache
+    
+    BackendCluster --> Monitoring
+    CeleryCluster --> Monitoring
+    FrontendCluster --> Monitoring
+    
+    BackendCluster --> S3
+    CeleryCluster --> S3
+    RDS --> S3
+    
+    Lambda --> Scheduler
+    Scheduler --> SQS
+    Scheduler --> External
+    
+    style CDN fill:#e1f5ff
+    style LB fill:#e3f2fd
+    style Compute fill:#e8f5e9
+    style Data fill:#fff3e0
+    style Queue fill:#f3e5f5
+    style External fill:#fff8e1
+    style Monitoring fill:#fce4ec
+    style Backup fill:#f1f8e9
+    style Lambda fill:#e0f2f1
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> AWS deployment with CloudFront CDN → ALB → ECS clusters (Frontend/Backend/Celery) with auto-scaling, 
+                    RDS PostgreSQL + ElastiCache Redis for data, SQS for async tasks, Lambda for scheduled jobs, CloudWatch/X-Ray for observability, 
+                    S3 for backup and logging.
+                </div>
+            </div>
+            
+            <!-- DIAGRAM 17 -->
+            <div class="diagram-section" id="diagram17">
+                <h2><span class="diagram-number">17</span> Data Pipeline & ETL Flow</h2>
+                <p class="description">
+                    Complete data movement from ERPNext through transformation to analytics display. 
+                    Shows extraction, transformation, loading, aggregation, and presentation layers.
+                </p>
+                <div class="diagram-controls">
+                    <button class="download-btn" onclick="downloadDiagram('diagram17-svg', '17_data_pipeline')">📥 Download as PNG</button>
+                    <button class="copy-btn" onclick="copySVG('diagram17-svg')">📋 Copy SVG</button>
+                </div>
+                <div class="diagram-wrapper" id="diagram17-svg">
+                    <div class="mermaid">
+graph LR
+    subgraph Sources["🔗 DATA SOURCES"]
+        ERP1["ERPNext<br/>Companies<br/>Invoices<br/>Expenses"]
+        Upload["Manual Upload<br/>CSV files<br/>Bank statements"]
+    end
+    
+    subgraph Extract["📥 EXTRACT"]
+        ERPSync["ERPNext Sync<br/>Daily at midnight<br/>With circuit breaker<br/>Retry logic"]
+        ERPSync_Cache["Cache results<br/>5 min TTL<br/>Dedup"]
+    end
+    
+    subgraph Raw["🗂️ RAW STORAGE"]
+        RawDB["Raw data layer<br/>PostgreSQL<br/>companies<br/>contacts<br/>invoices<br/>expenses<br/>accounts"]
+    end
+    
+    subgraph Transform["⚙️ TRANSFORM"]
+        Normalize["Normalize<br/>schemas<br/>fix formats<br/>add timestamps"]
+        Enrich["Enrich<br/>add company_id<br/>calculate amounts<br/>derive categories"]
+        Validate["Validate<br/>check integrity<br/>handle nulls<br/>flag errors"]
+    end
+    
+    subgraph Clean["🧹 CLEANED"]
+        CleanDB["Validated data<br/>Staging tables<br/>transactions<br/>contacts<br/>accounts"]
+    end
+    
+    subgraph Aggregate["📊 AGGREGATE"]
+        Monthly["Calculate monthly<br/>metrics<br/>revenue, expenses<br/>burn, runway"]
+        Baseline["Calculate baselines<br/>anomaly detection<br/>90-day rolling<br/>per category"]
+        Forecast["Generate forecast<br/>12 month ahead<br/>with confidence"]
+    end
+    
+    subgraph Analytics["📈 ANALYTICS"]
+        AnalyticsDB["Analytics views<br/>metrics<br/>trends<br/>forecasts<br/>anomalies"]
+    end
+    
+    subgraph Cache2["⚡ CACHE"]
+        Redis2["Redis cache<br/>Dashboard KPIs<br/>Top queries<br/>Auth sessions"]
+    end
+    
+    subgraph LLM["🤖 LLM LAYER"]
+        Context["Context builder<br/>Load company facts<br/>Recent transactions<br/>Metrics snapshot"]
+        Prompt["Prompt engineering<br/>Add relevant data<br/>Format for model"]
+    end
+    
+    subgraph Present["🎨 PRESENTATION"]
+        Dashboard["Dashboard KPIs<br/>cash, burn, runway"]
+        Chat["Chat Results<br/>AI answers with<br/>calculations shown"]
+        Reports["Reports & Exports<br/>CSV, PDF<br/>Email delivery"]
+    end
+    
+    ERP1 --> ERPSync
+    Upload --> ERPSync
+    ERPSync --> ERPSync_Cache
+    ERPSync_Cache --> RawDB
+    
+    RawDB --> Normalize
+    Normalize --> Enrich
+    Enrich --> Validate
+    Validate --> CleanDB
+    
+    CleanDB --> Monthly
+    CleanDB --> Baseline
+    CleanDB --> Forecast
+    
+    Monthly --> AnalyticsDB
+    Baseline --> AnalyticsDB
+    Forecast --> AnalyticsDB
+    
+    AnalyticsDB --> Cache2
+    AnalyticsDB --> LLM
+    
+    CleanDB --> Context
+    Context --> Prompt
+    Prompt --> LLM
+    
+    LLM --> Chat
+    Cache2 --> Dashboard
+    AnalyticsDB --> Reports
+    
+    Dashboard --> Present
+    Chat --> Present
+    Reports --> Present
+    
+    style Sources fill:#e1f5ff
+    style Extract fill:#e3f2fd
+    style Raw fill:#fff3e0
+    style Transform fill:#e8f5e9
+    style Clean fill:#fff3e0
+    style Aggregate fill:#f1f8e9
+    style Analytics fill:#ede7f6
+    style Cache2 fill:#fff8e1
+    style LLM fill:#f3e5f5
+    style Present fill:#e1f5ff
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>💡 Key Insight:</strong> End-to-end pipeline: Extract from ERPNext daily → Normalize and validate → Aggregate into 
+                    monthly metrics, baselines, forecasts → Cache for performance → Feed into LLM for smart answers → Present in dashboard, chat, and reports. 
+                    Multi-layer architecture ensures data quality, fast queries, and rich insights.
+                </div>
+            </div>
+            
+            
+        </div>
+        
+        <footer>
+            <p>🚀 VIREON - AI-Powered Financial Copilot for ERP Systems | Complete Architecture Documentation</p>
+            <p style="margin-top: 10px; opacity: 0.7;">All diagrams can be downloaded as PNG images | Last Updated: March 17, 2026</p>
+        </footer>
+    </div>
+    
+    <button class="download-all" onclick="downloadAllDiagrams()">⬇️ Download All Diagrams as ZIP</button>
+    
+    <script>
+        // Initialize Mermaid
+        mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+        
+        // Download diagram as PNG
+        async function downloadDiagram(elementId, filename) {
+            try {
+                const element = document.getElementById(elementId);
+                const canvas = await html2canvas(element, {
+                    backgroundColor: '#ffffff',
+                    scale: 2,
+                    logging: false
+                });
+                
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = filename + '.png';
+                link.click();
+                
+                showSuccessMessage();
+            } catch (error) {
+                console.error('Download failed:', error);
+                alert('Download failed. Please try again.');
+            }
+        }
+        
+        // Copy SVG to clipboard
+        async function copySVG(elementId) {
+            try {
+                const element = document.getElementById(elementId);
+                const svg = element.querySelector('svg');
+                
+                if (svg) {
+                    const svgString = new XMLSerializer().serializeToString(svg);
+                    await navigator.clipboard.writeText(svgString);
+                    showSuccessMessage('SVG copied to clipboard!');
+                } else {
+                    alert('SVG not found. Please wait for diagrams to load.');
+                }
+            } catch (error) {
+                console.error('Copy failed:', error);
+                alert('Copy failed. Please try again.');
+            }
+        }
+        
+        // Download all diagrams as ZIP (requires JSZip)
+        async function downloadAllDiagrams() {
+            try {
+                // Load JSZip library
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+                
+                script.onload = async () => {
+                    const JSZip = window.JSZip;
+                    const zip = new JSZip();
+                    
+                    const diagrams = [
+                        'diagram1-svg',
+                        'diagram2-svg',
+                        'diagram3-svg',
+                        'diagram4-svg',
+                        'diagram5-svg',
+                        'diagram6-svg'
+                    ];
+                    
+                    const filenames = [
+                        '01_system_architecture_overview',
+                        '02_ai_agent_query_flow',
+                        '03_erpnext_sync_flow',
+                        '04_anomaly_detection_flow',
+                        '05_math_engine_scenarios',
+                        '06_database_schema_er'
+                    ];
+                    
+                    for (let i = 0; i < diagrams.length; i++) {
+                        try {
+                            const element = document.getElementById(diagrams[i]);
+                            const canvas = await html2canvas(element, {
+                                backgroundColor: '#ffffff',
+                                scale: 2,
+                                logging: false
+                            });
+                            
+                            const png = canvas.toDataURL('image/png');
+                            const data = png.replace(/^data:image\/png;base64,/, '');
+                            zip.file(filenames[i] + '.png', data, { base64: true });
+                        } catch (error) {
+                            console.error('Failed to add diagram ' + i, error);
+                        }
+                    }
+                    
+                    const blob = await zip.generateAsync({ type: 'blob' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'VIREON_Diagrams.zip';
+                    link.click();
+                    URL.revokeObjectURL(url);
+                    
+                    showSuccessMessage('✓ All diagrams downloaded as ZIP!');
+                };
+                
+                document.head.appendChild(script);
+            } catch (error) {
+                console.error('ZIP download failed:', error);
+                alert('ZIP download not available. Use individual download buttons instead.');
+            }
+        }
+        
+        // Show success message
+        function showSuccessMessage(message = '✓ Downloaded successfully!') {
+            const msg = document.getElementById('successMessage');
+            msg.textContent = message;
+            msg.style.display = 'block';
+            
+            setTimeout(() => {
+                msg.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Scroll to section on hash change
+        window.addEventListener('hashchange', () => {
+            const section = document.querySelector(window.location.hash);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    </script>
+</body>
+</html>
