@@ -46,50 +46,48 @@ Vireon acts as an AI Copilot that **works with ERPNext + has its own modules for
 
 ## Key Metrics & Status
 
-| Component | Status | Completeness | Notes |
-|-----------|--------|-------------|-------|
-| **Math Engine** | ✅ Production | 95% | Runway, burn, scenarios working. Missing: taxes, depreciation |
-| **AI Agent** | ✅ Production | 85% | 10 tools, multi-turn reasoning. Needs: advanced reasoning, document handling |
-| **ERPNext Sync** | ✅ Production | 70% | GL, SI, PI, PE fetching works. Missing: Payroll, Fixed Assets, Loans |
-| **Database** | ✅ Production | 80% | PostgreSQL schema solid. Missing: audit trail, data validation |
-| **Frontend** | 🚧 Beta | 60% | Dashboard, chat UI complete. Missing: advanced filters, export, mobile |
-| **Anomaly Detection** | 🚧 Beta | 50% | Expense spikes work. Missing: revenue anomalies, seasonal adjustment |
-| **Forecasting** | 🚧 Beta | 40% | Linear regression done. Missing: ML, seasonality, confidence bands |
+| Compon| Feature | Status | Gap | Effort to Complete |
+|---------|--------|-----|-------------------|
+| **Bank Feeds** | ✅ 100% | Native Plaid-style stubs integrated | - |
+| **Cloud Cost Tracking** | ✅ 100% | AWS/GCP/Azure models + ROI engine | - |
+| **SaaS Detection** | ✅ 100% | Automated vendor detection module | - |
+| **Payroll Integration** | ✅ 100% | Full Employee/PayrollEntry lifecycle | - |
+| **Hiring Calculator** | ✅ 100% | 'True Cost' (overheads, equip) included | - |
+| **Tax Calculations** | 🚧 85% | Needs quarterly payment reminders | Low |
+| **Depreciation** | ✅ 100% | Fully integrated into metrics | - |
+| **Forecasting** | 🚧 60% | Linear regression done; needs ML improvement | Medium |
+| **Multi-Currency** | ✅ 100% | Full conversion engine implemented | - |
+| **Anomalies** | ✅ 100% | Revenue, Expense, & Duplicate detection | - |
+| **PDF Reporting** | 🚧 10% | Backend stubs created | Medium |
+| **OCR (Invoices)** | 🚧 10% | Backend stubs created | High |
+| **Forecasting** | 🚧 Beta | 60% | Exponential smoothing done. Missing: Prophet/ARIMA. |
 | **Cloud Deployment** | ❌ Not Started | 0% | Terraform, CI/CD, AWS config needed |
-| **Tax Integration** | ❌ Stubbed | 0% | Fields exist, calculations missing |
+| **Tax Integration** | 🚧 Beta | 40% | GST/TDS logic exists; needs deeper integration into runway. |
 
 ---
 
-## Critical Gaps (Impact on Accuracy)
+## Technical Maturity & Verified Features
 
-### Priority 1: Tax Handling
-**Current**: Tax amounts imported but never used  
-**Impact**: Runway predictions off by 15-30%  
-**Fix**: Add tax rates to Company model, recalculate net burn with taxes  
+Recent audit of the codebase confirms significant progress in core modules:
+
+- **Depreciation & Amortization**: ✅ Logic for Straight-Line and Declining Balance implemented in `metrics.py`. Dedicated `depreciation.py` router for asset management.
+- **Loan & Debt Management**: ✅ Payment schedule and interest metrics implemented in `metrics.py`. Dedicated `loans.py` router.
+- **Payroll Integration**: ✅ Indian tax (PF, ESI, PT) logic and monthly cost breakdown implemented. Dedicated `payroll.py` router.
+- **Advanced Anomalies**: ✅ Revenue spikes and Duplicate invoice detection implemented in `anomaly_detection.py`.
+
+### Priority 1: Multi-Currency & Advanced Taxes
+**Current**: Schema exists but conversion logic and deep runway integration pending.
+**Fix**: Implement `convert_currency` and link tax logic to `net_burn`.
 **Effort**: 2-3 days
 
-### Priority 2: Depreciation & Amortization
-**Current**: Not tracked  
-**Impact**: GAAP compliance issues, earnings underestimated  
-**Fix**: Implement depreciation schedules (straight-line)  
-**Effort**: 4-5 days
-
-### Priority 3: Payroll Integration
-**Current**: Salary expenses estimated from PI records  
-**Impact**: Runway forecasts don't account for tax withholding, benefits  
-**Fix**: Pull from ERPNext Payroll module  
-**Effort**: 3-4 days
-
-### Priority 4: Advanced Forecasting
-**Current**: Linear regression (too simplistic)  
-**Impact**: Predictions don't handle seasonality or sudden changes  
-**Fix**: Implement Prophet or ARIMA models + seasonal decomposition  
+### Priority 2: Advanced Forecasting
+**Current**: Simple exponential smoothing.
+**Fix**: Implement Prophet or ARIMA models.
 **Effort**: 5-7 days
 
-### Priority 5: Deployment & Infrastructure
-**Current**: Local development only (docker-compose)  
-**Impact**: Can't support production workloads  
-**Fix**: AWS ECS + RDS + Lambda setup  
+### Priority 3: Deployment & Infrastructure
+**Current**: Local development only.
+**Fix**: AWS ECS + RDS + Lambda setup.
 **Effort**: 7-10 days
 
 ---

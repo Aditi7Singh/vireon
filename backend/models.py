@@ -379,4 +379,65 @@ class ExchangeRate(Base):
     target_currency = Column(String(3), nullable=False) # e.g., "INR"
     exchange_rate = Column(Numeric(15, 6), nullable=False) # Exact conversion multiplier
     effective_date = Column(Date, nullable=False)
+    status = Column(String(50), default="active")
+    hire_date = Column(Date)
+    termination_date = Column(Date)
+    salary = Column(Numeric(15, 2))
+    pay_frequency = Column(String(20), default="monthly")
+    job_title = Column(String(100))
+    department = Column(String(100))
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+class CloudAccount(Base):
+    __tablename__ = "cloud_accounts"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"))
+    provider = Column(String(50)) # AWS, GCP, Azure
+    account_id = Column(String(100))
+    account_name = Column(String(255))
+    status = Column(String(20), default="active")
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    costs = relationship("CloudCostDetail", back_populates="account")
+
+class CloudCostDetail(Base):
+    __tablename__ = "cloud_cost_details"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    account_id = Column(UUID(as_uuid=True), ForeignKey("cloud_accounts.id", ondelete="CASCADE"))
+    service_name = Column(String(100)) # e.g., EC2, RDS, S3
+    amount = Column(Numeric(15, 2))
+    currency = Column(String(3), default="USD")
+    usage_date = Column(Date)
+    region = Column(String(50))
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    account = relationship("CloudAccount", back_populates="costs")
+
+class BankFeed(Base):
+    __tablename__ = "bank_feeds"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"))
+    bank_name = Column(String(100))
+    account_name = Column(String(255))
+    account_type = Column(String(50)) # checking, savings, credit_card
+    account_number_last4 = Column(String(4))
+    currency = Column(String(3), default="USD")
+    status = Column(String(20), default="active")
+    last_synced_at = Column(DateTime)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    transactions = relationship("BankingTransaction", back_populates="feed")
+
+class BankingTransaction(Base):
+    __tablename__ = "banking_transactions"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    feed_id = Column(UUID(as_uuid=True), ForeignKey("bank_feeds.id", ondelete="CASCADE"))
+    transaction_date = Column(Date)
+    amount = Column(Numeric(15, 2))
+    description = Column(String(255))
+    merchant_name = Column(String(255))
+    category = Column(String(100)) # e.g., Software, Travel, Food
+    is_saas = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    feed = relationship("BankFeed", back_populates="transactions")

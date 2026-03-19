@@ -11,7 +11,10 @@ import numpy as np
 from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
 from sqlalchemy import create_engine, text
+from sqlalchemy.orm import sessionmaker
 from config.settings import BACKEND_URL, DATABASE_URL
+import anomaly_detection
+import models
 
 
 # Alert threshold rules
@@ -341,11 +344,26 @@ def run_full_scan() -> Dict:
     # Combine all alerts
     all_alerts = spike_alerts + trend_alerts + duplicate_alerts
     
+    # Run additional detectors from anomaly_detection module
+    try:
+        engine = create_engine(DATABASE_URL)
+        SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+        db = SessionLocal()
+        
+        # These functions add to the DB directly (anomaly table)
+        anomaly_detection.detect_revenue_anomalies(db)
+        anomaly_detection.detect_duplicate_invoices(db)
+        
+        db.close()
+        print("[SCANNER] Ran supplemental detectors (Revenue, Duplicates)")
+    except Exception as e:
+        print(f"[SCANNER] Supplemental detectors failed: {e}")
+    
     # Count by severity
     critical_count = sum(1 for a in all_alerts if a["severity"] == "critical")
     warning_count = sum(1 for a in all_alerts if a["severity"] == "warning")
     
-    # Write to database
+    # Write to database (spike, trend, duplicate_payment alerts)
     written = write_alerts_to_db(all_alerts)
     
     duration = time.time() - start_time

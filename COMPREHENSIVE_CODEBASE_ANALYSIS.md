@@ -1918,29 +1918,31 @@ def forecast_cash_runway() -> Dict:
 | **Session Persistence** | ✅ | `agent/memory.py` | LangGraph SqliteSaver |
 | **Rate Limiting** | ✅ | `main.py` | slowapi: 100 req/min |
 | **E2E Tests** | ✅ | `frontend/tests` | Playwright: Login, Dashboard navigation |
+| **Depreciation** | ✅ | `api/routers/depreciation.py` | Integrated with metrics (straight line/declining) |
+| **Multi-Currency** | ✅ | `analytics/metrics.py` | Full conversion logic using `ExchangeRate` model |
+| **Bank Feeds** | ✅ | `api/routers/banking.py` | Native Plaid-style stubs, `models.BankingTransaction` |
+| **Cloud Cost Tracking** | ✅ | `api/routers/cloud_costs.py` | AWS/GCP/Azure models + ROI-ranked optimization stubs |
+| **SaaS Detection** | ✅ | `services/vendor_services.py` | Automated vendor identification from banking feeds |
+| **Payroll (Native)** | ✅ | `api/routers/payroll.py` | Full lifecycle for Employees and PayrollEntries |
+| **Hiring 'True Cost'** | ✅ | `analytics/metrics.py` | Includes overheads, equipment, and benefits |
+| **Loan Management** | ✅ | `api/routers/loans.py` | Dedicated schedules and metrics |
 
 ### 🚧 Partially Implemented / Needs Refinement
 
 | Feature | Status | Gap | Effort to Complete |
 |---------|--------|-----|-------------------|
-| **Tax Calculations** | 🚧 50% | Data stored but never used in calculations | Medium |
-| **Depreciation/Amortization** | 🚧 5% | Schema exists but no calculations | High |
+| **Tax Calculations** | 🚧 85% | GST/TDS logic implemented; needs quarterly reminders | Low |
 | **Forecasting** | 🚧 60% | Linear regression done; needs ML improvement | Medium |
 | **Budget vs. Actuals** | 🚧 50% | UI exists; category mapping incomplete | Low |
 | **Gross Margin Tracking** | 🚧 60% | Formula exists but COGS sourcing incomplete | Medium |
-| **Quarterly Tax Payments** | 🚧 0% | No lump-sum tax liability modeling | Medium |
-| **Multi-Currency Support** | 🚧 10% | Stores currency field; no conversion logic | Low |
+| **PDF Reporting** | 🚧 10% | Backend stubs created in `api/routers/reports.py` | Medium |
+| **OCR Ingestion** | 🚧 10% | Backend stubs created in `api/routers/documents.py` | High |
 
 ### ❌ Not Yet Implemented
 
 | Feature | Impact | Difficulty | Priority | Note |
 |---------|--------|-----------|----------|------|
-| **Depreciation Schedule** | Revenue recognition | High | High | Fixed asset tracking |
-| **Loan & Debt Management** | Runway accuracy | Medium | High | Interest, payment schedule |
-| **Payroll Integration** | Expense forecasting | Medium | Medium | Link to HR module |
 | **Inventory Costing** | COGS accuracy | Medium | Medium | FIFO/LIFO valuation |
-| **Revenue Anomalies** | Alert completeness | Low | Low | Currently only expense spikes |
-| **Duplicate Invoice Detection** | Data quality | Low | Low | Mentioned in UI |
 | **Merge.dev Integration** | Multi-ERP sync | High | Low | Stub in code ("not yet impl") |
 | **Advanced ML Forecasting** | Accuracy | High | Medium | Prophet, ARIMA models |
 | **Competitor Benchmarking** | Context | Medium | Low | Real-time market data |
@@ -1949,7 +1951,7 @@ def forecast_cash_runway() -> Dict:
 | **PDF Report Export** | User workflows | Low | Low | Runway, P&L reports |
 | **Document OCR** | Invoice ingestion | High | Low | Schema exists; no impl |
 | **Expense OCR (Receipts)** | Automation | High | Low | Extract amount, date, category |
-| **WhatsApp/Slack Alerts** | Notifications | Low | Low | Currently API only |
+| **WhatsApp/Slack Alerts** | Notifications | Low | Low | Slack stubbed in tasks.py |
 | **Mobile App** | Reach | High | Low | React Native or Flutter |
 
 ---

@@ -363,3 +363,103 @@ class FixedAsset(FixedAssetBase):
     book_value: Optional[float] = None
     depreciation_entries: List[DepreciationEntry] = []
     model_config = ConfigDict(from_attributes=True)
+
+
+# Document / OCR Schemas
+class DocumentBase(BaseModel):
+    filename: str
+    file_type: str
+    status: str = "pending" # pending, processing, completed, failed
+    ocr_text: Optional[str] = None
+    extracted_data: Optional[dict] = None
+
+class DocumentCreate(DocumentBase):
+    company_id: UUID
+
+class Document(DocumentBase):
+    id: UUID
+    company_id: UUID
+    upload_date: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+
+# Report Schemas
+class ReportRequest(BaseModel):
+    report_type: str # runway, profit_loss, balance_sheet
+    start_date: date
+    end_date: date
+    company_id: UUID
+
+class ReportResponse(BaseModel):
+    download_url: str
+    generated_at: datetime
+
+
+# Cloud Cost Schemas
+class CloudAccountBase(BaseModel):
+    provider: str
+    account_id: str
+    account_name: str
+    status: str = "active"
+
+class CloudAccountCreate(CloudAccountBase):
+    company_id: UUID
+
+class CloudAccount(CloudAccountBase):
+    id: UUID
+    company_id: UUID
+    created_at: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+class CloudCostDetailBase(BaseModel):
+    service_name: str
+    amount: float
+    currency: str = "USD"
+    usage_date: date
+    region: Optional[str] = None
+
+class CloudCostDetailCreate(CloudCostDetailBase):
+    account_id: UUID
+
+class CloudCostDetail(CloudCostDetailBase):
+    id: UUID
+    account_id: UUID
+    created_at: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+
+# Banking Schemas
+class BankFeedBase(BaseModel):
+    bank_name: str
+    account_name: str
+    account_type: str
+    account_number_last4: str
+    currency: str = "USD"
+    status: str = "active"
+
+class BankFeedCreate(BankFeedBase):
+    company_id: UUID
+
+class BankFeed(BankFeedBase):
+    id: UUID
+    company_id: UUID
+    last_synced_at: Optional[datetime] = None
+    created_at: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+class BankingTransactionBase(BaseModel):
+    transaction_date: date
+    amount: float
+    description: str
+    merchant_name: Optional[str] = None
+    category: Optional[str] = None
+    is_saas: bool = False
+
+class BankingTransactionCreate(BankingTransactionBase):
+    feed_id: UUID
+
+class BankingTransaction(BankingTransactionBase):
+    id: UUID
+    feed_id: UUID
+    created_at: datetime
+    model_config = ConfigDict(from_attributes=True)

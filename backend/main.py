@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import models
 import database
-from api.routers import auth, analytics, agent, ingest, erpnext, alerts, benchmarks, planning, loans, payroll, depreciation
+from api.routers import auth, analytics, agent, ingest, erpnext, alerts, benchmarks, planning, loans, payroll, depreciation, documents, reports, banking, cloud_costs
 
 # Basic generic logging config
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
@@ -63,6 +63,10 @@ app.include_router(planning.router, prefix="/api/v1")
 app.include_router(loans.router, prefix="/api/v1")
 app.include_router(payroll.router, prefix="/api/v1")
 app.include_router(depreciation.router, prefix="/api/v1")
+app.include_router(documents.router, prefix="/api/v1")
+app.include_router(reports.router, prefix="/api/v1")
+app.include_router(banking.router, prefix="/api/v1")
+app.include_router(cloud_costs.router, prefix="/api/v1")
 
 # Also include without prefix to match current frontend expectations
 app.include_router(auth.router)
@@ -76,4 +80,8 @@ app.include_router(planning.router)
 app.include_router(loans.router)
 app.include_router(payroll.router)
 app.include_router(depreciation.router)
+app.include_router(documents.router)
+app.include_router(reports.router)
+app.include_router(banking.router)
+app.include_router(cloud_costs.router)
 

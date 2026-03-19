@@ -115,16 +115,14 @@ def simulate_revenue_scenario(
         },
         "new_runway": result.get("new_runway", 0.0)
     }
-@router.get("/scorecard")
+@router.get("/scorecard/{company_id}")
 def get_scorecard(
-    db: Session = Depends(database.get_db)
+    company_id: UUID,
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user)
 ):
-    company = db.query(models.Company).first()
-    if not company:
-        return {}
-    
     latest_metric = db.query(models.MonthlyMetric).filter(
-        models.MonthlyMetric.company_id == company.id
+        models.MonthlyMetric.company_id == company_id
     ).order_by(models.MonthlyMetric.metric_month.desc()).first()
 
     if not latest_metric:
@@ -146,6 +144,7 @@ def get_scorecard(
     arr = metrics.calculate_arr(revenue)
     
     return {
+        "company_id": str(company_id),
         "total_cash": cash_balance,
         "monthly_revenue": revenue,
         "monthly_gross_burn": gross_burn,
@@ -155,16 +154,15 @@ def get_scorecard(
         "as_of": latest_metric.metric_month.isoformat()
     }
 
-@router.get("/burn-rate")
+@router.get("/burn-rate/{company_id}")
 def get_burn_rate(
+    company_id: UUID,
     period: int = 30,
-    db: Session = Depends(database.get_db)
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user)
 ):
-    company = db.query(models.Company).first()
-    if not company: return {"monthly_burn": 0, "breakdown_by_category": {}, "trend": 0}
-    
     # Simple mock/placeholder logic for category breakdown
-    expenses = db.query(models.Expense).filter(models.Expense.company_id == company.id).all()
+    expenses = db.query(models.Expense).filter(models.Expense.company_id == company_id).all()
     breakdown = {}
     total = 0
     for exp in expenses:
@@ -178,14 +176,13 @@ def get_burn_rate(
         "trend": -4.2
     }
 
-@router.get("/runway")
+@router.get("/runway/{company_id}")
 def get_runway(
-    db: Session = Depends(database.get_db)
+    company_id: UUID,
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user)
 ):
-    company = db.query(models.Company).first()
-    if not company: return {"runway_months": 0, "zero_date": "N/A", "confidence_interval": "Low"}
-    
-    latest_metric = db.query(models.MonthlyMetric).filter(models.MonthlyMetric.company_id == company.id).order_by(models.MonthlyMetric.metric_month.desc()).first()
+    latest_metric = db.query(models.MonthlyMetric).filter(models.MonthlyMetric.company_id == company_id).order_by(models.MonthlyMetric.metric_month.desc()).first()
     if not latest_metric: return {"runway_months": 0, "zero_date": "N/A", "confidence_interval": "Low"}
     
     runway = metrics.calculate_runway(float(latest_metric.ending_cash), metrics.calculate_net_burn(float(latest_metric.total_revenue), float(latest_metric.total_expenses)))
@@ -196,14 +193,13 @@ def get_runway(
         "confidence_interval": "High"
     }
 
-@router.get("/revenue")
+@router.get("/revenue/{company_id}")
 def get_revenue(
-    db: Session = Depends(database.get_db)
+    company_id: UUID,
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user)
 ):
-    company = db.query(models.Company).first()
-    if not company: return {"mrr": 0, "arr": 0, "growth_pct": 0, "churn_rate": 0, "nrr": 0}
-    
-    latest_metric = db.query(models.MonthlyMetric).filter(models.MonthlyMetric.company_id == company.id).order_by(models.MonthlyMetric.metric_month.desc()).first()
+    latest_metric = db.query(models.MonthlyMetric).filter(models.MonthlyMetric.company_id == company_id).order_by(models.MonthlyMetric.metric_month.desc()).first()
     if not latest_metric: return {"mrr": 0, "arr": 0, "growth_pct": 0, "churn_rate": 0, "nrr": 0}
     
     rev = float(latest_metric.total_revenue)
@@ -215,15 +211,14 @@ def get_revenue(
         "nrr": 105.0
     }
 
-@router.get("/expenses")
+@router.get("/expenses/{company_id}")
 def get_expenses(
+    company_id: UUID,
     months: int = 3,
-    db: Session = Depends(database.get_db)
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user)
 ):
-    company = db.query(models.Company).first()
-    if not company: return {"breakdown": {}, "trend": [], "movers": []}
-    
-    expenses = db.query(models.Expense).filter(models.Expense.company_id == company.id).all()
+    expenses = db.query(models.Expense).filter(models.Expense.company_id == company_id).all()
     breakdown = {}
     for exp in expenses:
         cat = exp.category or "Other"
@@ -235,14 +230,13 @@ def get_expenses(
         "movers": []
     }
 
-@router.get("/cash-balance")
+@router.get("/cash-balance/{company_id}")
 def get_cash_balance(
-    db: Session = Depends(database.get_db)
+    company_id: UUID,
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user)
 ):
-    company = db.query(models.Company).first()
-    if not company: return {"cash": 0, "ar": 0, "ap": 0, "net_cash": 0}
-    
-    latest_metric = db.query(models.MonthlyMetric).filter(models.MonthlyMetric.company_id == company.id).order_by(models.MonthlyMetric.metric_month.desc()).first()
+    latest_metric = db.query(models.MonthlyMetric).filter(models.MonthlyMetric.company_id == company_id).order_by(models.MonthlyMetric.metric_month.desc()).first()
     if not latest_metric: return {"cash": 0, "ar": 0, "ap": 0, "net_cash": 0}
     
     return {
@@ -312,3 +306,23 @@ def export_budget_variance_report_pdf(
         media_type="application/pdf",
         headers={"Content-Disposition": f"attachment; filename=budget_{budget_id}_report.pdf"}
     )
+
+
+@router.get("/compliance/reminders/{company_id}")
+def get_compliance_reminders(
+    company_id: UUID,
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user)
+):
+    """Get upcoming tax compliance deadlines."""
+    return metrics.get_tax_compliance_reminders(db, company_id)
+
+
+@router.get("/metrics/vc/{company_id}")
+def get_vc_metrics_dashboard(
+    company_id: UUID,
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user)
+):
+    """Get high-level VC/Investor metrics."""
+    return metrics.get_vc_metrics(db, company_id)
