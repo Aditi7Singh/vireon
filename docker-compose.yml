@@ -1,6 +1,15 @@
-version: '3.8'
-
 services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: vireon
+      POSTGRES_USER: vireon
+      POSTGRES_PASSWORD: vireon123
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   redis:
     image: redis:alpine
     ports:
@@ -14,6 +23,8 @@ services:
     environment:
       - REDIS_URL=redis://redis:6379/0
       - BACKEND_URL=http://backend:8000
+      - USE_LOCAL_LLM=false
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
     env_file:
       - ./backend/.env
     volumes:
@@ -21,6 +32,7 @@ services:
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
       - redis
+      - postgres
 
   worker:
     build: 
@@ -35,6 +47,7 @@ services:
     command: celery -A anomaly.celery_app worker -l info
     depends_on:
       - redis
+      - postgres
 
   beat:
     build: 
@@ -49,6 +62,7 @@ services:
     command: celery -A anomaly.celery_app beat -l info
     depends_on:
       - redis
+      - postgres
 
   frontend:
     build: 
@@ -62,3 +76,6 @@ services:
       - /app/node_modules
     depends_on:
       - backend
+
+volumes:
+  postgres_data:

@@ -8,7 +8,7 @@ import schemas
 import database
 import auth
 from agent.cfo_agent import run_cfo_query, build_graph
-from agent.memory import build_config
+from agent.memory import build_config, build_enhanced_context
 from langchain_core.messages import HumanMessage, AIMessage
 
 router = APIRouter(prefix="/agent", tags=["agent"])
@@ -31,7 +31,7 @@ async def chat_with_cfo(
 
     company_context = None
     if latest_metric:
-        company_context = {
+        base_context = {
             "name": "SeedlingLabs",
             "cash": float(latest_metric.ending_cash),
             "monthly_burn": float(latest_metric.total_expenses),
@@ -40,6 +40,8 @@ async def chat_with_cfo(
             "arr": float(latest_metric.total_revenue) * 12,
             "last_updated": latest_metric.metric_month.strftime("%Y-%m-%d")
         }
+        # Enhance with additional financial metrics
+        company_context = build_enhanced_context(base_context)
 
     # Run the query through LangGraph CFO agent
     answer = run_cfo_query(

@@ -28,6 +28,18 @@ def ingest_sandbox_data(
                 company_id = db_company.id
                 db.query(models.Anomaly).filter(models.Anomaly.company_id == company_id).delete()
                 db.query(models.MonthlyMetric).filter(models.MonthlyMetric.company_id == company_id).delete()
+                db.query(models.DepreciationEntry).filter(models.DepreciationEntry.asset_id.in_(
+                    db.query(models.FixedAsset.id).filter(models.FixedAsset.company_id == company_id)
+                )).delete(synchronize_session=False)
+                db.query(models.FixedAsset).filter(models.FixedAsset.company_id == company_id).delete()
+                db.query(models.LoanPayment).filter(models.LoanPayment.loan_id.in_(
+                    db.query(models.Loan.id).filter(models.Loan.company_id == company_id)
+                )).delete(synchronize_session=False)
+                db.query(models.Loan).filter(models.Loan.company_id == company_id).delete()
+                db.query(models.PayrollEntry).filter(models.PayrollEntry.employee_id.in_(
+                    db.query(models.Employee.id).filter(models.Employee.company_id == company_id)
+                )).delete(synchronize_session=False)
+                db.query(models.Employee).filter(models.Employee.company_id == company_id).delete()
                 db.query(models.Invoice).filter(models.Invoice.company_id == company_id).delete()
                 db.query(models.Expense).filter(models.Expense.company_id == company_id).delete()
                 db.query(models.Contact).filter(models.Contact.company_id == company_id).delete()
@@ -123,7 +135,46 @@ def ingest_sandbox_data(
                 db_exp = models.Expense(**exp_dict)
                 db.add(db_exp)
 
-        # 6. Ingest Metrics
+        # 7. Ingest Employees
+        employee_map = {}
+        for emp_data in data.employees:
+            db_emp = db.query(models.Employee).filter(models.Employee.employee_id == emp_data.employee_id).first()
+            emp_dict = emp_data.dict()
+            emp_dict["company_id"] = company_id
+            if db_emp:
+                for key, value in emp_dict.items():
+                    setattr(db_emp, key, value)
+            else:
+                db_emp = models.Employee(**emp_dict)
+                db.add(db_emp)
+            db.flush()
+            employee_map[emp_data.employee_id] = db_emp.id
+
+        # 8. Ingest Payroll Entries
+        for pr_data in data.payroll_entries:
+            # Note: We assume the incoming employee_id is the company-specific string ID
+            # But the schema uses UUID for employee_id. We'll use a mapping if needed.
+            # For simplicity, we assume employee_id in PayrollEntryCreate is a UUID 
+            # OR we try to resolve it from the map if it's a string.
+            db_pr = models.PayrollEntry(**pr_data.dict())
+            db.add(db_pr)
+
+        # 9. Ingest Loans
+        loan_map = {}
+        for loan_data in data.loans:
+            db_loan = models.Loan(**loan_data.dict())
+            db_loan.company_id = company_id
+            db.add(db_loan)
+            db.flush()
+            loan_map[loan_data.loan_name] = db_loan.id
+
+        # 10. Ingest Fixed Assets
+        for asset_data in data.fixed_assets:
+            db_asset = models.FixedAsset(**asset_data.dict())
+            db_asset.company_id = company_id
+            db.add(db_asset)
+
+        # 11. Ingest Metrics
         for m in data.metrics:
             db_metric = db.query(models.MonthlyMetric).filter(
                 models.MonthlyMetric.company_id == company_id,
@@ -138,7 +189,7 @@ def ingest_sandbox_data(
                 db_metric.company_id = company_id
                 db.add(db_metric)
 
-        # 7. Ingest Anomalies
+        # 12. Ingest Anomalies
         for a in data.anomalies:
             db_anomaly = db.query(models.Anomaly).filter(models.Anomaly.remote_id == a.remote_id).first()
             if db_anomaly:
@@ -171,6 +222,8 @@ def ingest_sandbox_data(
     # Trigger Anomaly Detection after ingestion
     try:
         anomaly_detection.detect_expense_anomalies(db, company_id=company_id)
+        anomaly_detection.detect_revenue_anomalies(db, company_id=company_id)
+        anomaly_detection.detect_duplicate_invoices(db, company_id=company_id)
         logger.info(f"Anomaly detection completed for company_id: {company_id}")
     except Exception as eval_error:
         logger.warning(f"Anomaly detection failed: {eval_error}", exc_info=True)

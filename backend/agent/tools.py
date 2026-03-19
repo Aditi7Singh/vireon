@@ -492,6 +492,226 @@ def get_financial_scorecard() -> Dict[str, Any]:
         except: pass
 
 
+@tool
+def get_loan_metrics() -> Dict[str, Any]:
+    """
+    Get loan portfolio metrics: total debt, monthly payments, interest expense.
+    Includes breakdown by loan type and maturity analysis.
+
+    Returns:
+        Dictionary with total_debt, monthly_payments, interest_expense, breakdown
+    """
+    try:
+        import models
+        from analytics.metrics import calculate_loan_metrics
+        db = _get_db()
+        company = _get_first_company(db)
+        if not company:
+            return {"total_debt": 0, "monthly_payments": 0, "interest_expense": 0, "breakdown": []}
+
+        loans = db.query(models.Loan).filter(models.Loan.company_id == company.id).all()
+        if not loans:
+            return {"total_debt": 0, "monthly_payments": 0, "interest_expense": 0, "breakdown": []}
+
+        metrics = calculate_loan_metrics(db, company.id)
+        return metrics
+    except Exception as e:
+        return {"error": str(e), "tool": "get_loan_metrics"}
+    finally:
+        try: db.close()
+        except: pass
+
+
+@tool
+def get_payroll_costs() -> Dict[str, Any]:
+    """
+    Get payroll cost breakdown: salaries, taxes, benefits, total compensation.
+    Includes headcount and cost per employee metrics.
+
+    Returns:
+        Dictionary with total_payroll, employee_count, avg_salary, tax_breakdown
+    """
+    try:
+        import models
+        from analytics.metrics import calculate_monthly_payroll_cost
+        db = _get_db()
+        company = _get_first_company(db)
+        if not company:
+            return {"total_payroll": 0, "employee_count": 0, "avg_salary": 0, "tax_breakdown": {}}
+
+        employees = db.query(models.Employee).filter(models.Employee.company_id == company.id).all()
+        if not employees:
+            return {"total_payroll": 0, "employee_count": 0, "avg_salary": 0, "tax_breakdown": {}}
+
+        # Calculate current month payroll
+        from datetime import date
+        current_month = date.today().replace(day=1)
+        monthly_cost = calculate_monthly_payroll_cost(db, company.id, current_month)
+
+        employee_count = len(employees)
+        total_salary = sum(float(emp.salary) for emp in employees)
+        avg_salary = total_salary / employee_count if employee_count > 0 else 0
+
+        return {
+            "total_payroll": round(monthly_cost, 2),
+            "employee_count": employee_count,
+            "avg_salary": round(avg_salary, 2),
+            "annual_payroll_run_rate": round(monthly_cost * 12, 2),
+            "cost_per_employee": round(monthly_cost / employee_count, 2) if employee_count > 0 else 0
+        }
+    except Exception as e:
+        return {"error": str(e), "tool": "get_payroll_costs"}
+    finally:
+        try: db.close()
+        except: pass
+
+
+@tool
+def get_tax_liability() -> Dict[str, Any]:
+    """
+    Get tax liability breakdown: income tax, payroll tax, sales tax.
+    Includes quarterly payment schedule and year-to-date totals.
+
+    Returns:
+        Dictionary with total_tax_liability, quarterly_payments, breakdown_by_type
+    """
+    try:
+        import models
+        from analytics.metrics import calculate_tax_liability
+        db = _get_db()
+        company = _get_first_company(db)
+        if not company:
+            return {"total_tax_liability": 0, "quarterly_payments": [], "breakdown_by_type": {}}
+
+        # Get latest revenue data for tax calculation
+        metric = _get_latest_metric(db, company.id)
+        if not metric:
+            return {"total_tax_liability": 0, "quarterly_payments": [], "breakdown_by_type": {}}
+
+        annual_revenue = float(metric.revenue) * 12  # Estimate annual from monthly
+        tax_metrics = calculate_tax_liability(annual_revenue)
+
+        return tax_metrics
+    except Exception as e:
+        return {"error": str(e), "tool": "get_tax_liability"}
+    finally:
+        try: db.close()
+        except: pass
+
+
+@tool
+def get_depreciation_expense() -> Dict[str, Any]:
+    """
+    Get depreciation expense metrics: monthly depreciation, accumulated depreciation, asset book value.
+    Includes breakdown by asset category and remaining useful life.
+
+    Returns:
+        Dictionary with monthly_depreciation, accumulated_depreciation, asset_breakdown
+    """
+    try:
+        import models
+        from analytics.metrics import calculate_monthly_depreciation_expense
+        db = _get_db()
+        company = _get_first_company(db)
+        if not company:
+            return {"monthly_depreciation": 0, "accumulated_depreciation": 0, "asset_breakdown": []}
+
+        # Calculate current month depreciation
+        from datetime import date
+        current_month = date.today().replace(day=1)
+        monthly_dep = calculate_monthly_depreciation_expense(db, company.id, current_month)
+
+        # Get asset breakdown
+        assets = db.query(models.FixedAsset).filter(models.FixedAsset.company_id == company.id).all()
+        asset_breakdown = []
+        total_accumulated = 0
+
+        for asset in assets:
+            # Get latest depreciation entry for this asset
+            latest_dep = db.query(models.DepreciationEntry).filter(
+                models.DepreciationEntry.asset_id == asset.id
+            ).order_by(models.DepreciationEntry.depreciation_date.desc()).first()
+
+            if latest_dep:
+                total_accumulated += float(latest_dep.accumulated_depreciation)
+                asset_breakdown.append({
+                    "asset_name": asset.asset_name,
+                    "category": asset.asset_category,
+                    "book_value": round(float(latest_dep.book_value), 2),
+                    "monthly_depreciation": round(float(latest_dep.depreciation_amount), 2),
+                    "accumulated_depreciation": round(float(latest_dep.accumulated_depreciation), 2)
+                })
+
+        return {
+            "monthly_depreciation": round(monthly_dep, 2),
+            "accumulated_depreciation": round(total_accumulated, 2),
+            "asset_count": len(assets),
+            "asset_breakdown": asset_breakdown
+        }
+    except Exception as e:
+        return {"error": str(e), "tool": "get_depreciation_expense"}
+    finally:
+        try: db.close()
+        except: pass
+
+
+@tool
+def get_asset_utilization() -> Dict[str, Any]:
+    """
+    Get asset utilization metrics: asset turnover, return on assets, depreciation as % of revenue.
+    Helps assess capital efficiency and asset management effectiveness.
+
+    Returns:
+        Dictionary with asset_turnover, roa, depreciation_ratio, utilization_score
+    """
+    try:
+        import models
+        db = _get_db()
+        company = _get_first_company(db)
+        if not company:
+            return {"asset_turnover": 0, "roa": 0, "depreciation_ratio": 0, "utilization_score": 0}
+
+        # Get financial metrics
+        metric = _get_latest_metric(db, company.id)
+        if not metric:
+            return {"asset_turnover": 0, "roa": 0, "depreciation_ratio": 0, "utilization_score": 0}
+
+        revenue = float(metric.revenue)
+        net_income = revenue - float(metric.expenses)  # Simplified
+
+        # Get total assets (simplified - just fixed assets for now)
+        assets = db.query(models.FixedAsset).filter(models.FixedAsset.company_id == company.id).all()
+        total_asset_value = sum(float(asset.purchase_cost) for asset in assets)
+
+        # Get depreciation expense
+        from analytics.metrics import calculate_monthly_depreciation_expense
+        from datetime import date
+        current_month = date.today().replace(day=1)
+        monthly_dep = calculate_monthly_depreciation_expense(db, company.id, current_month)
+        annual_dep = monthly_dep * 12
+
+        # Calculate ratios
+        asset_turnover = revenue / total_asset_value if total_asset_value > 0 else 0
+        roa = (net_income / total_asset_value) * 100 if total_asset_value > 0 else 0
+        depreciation_ratio = (annual_dep / revenue) * 100 if revenue > 0 else 0
+
+        # Simple utilization score (higher is better)
+        utilization_score = min(100, (asset_turnover * 10) + (roa / 2) - depreciation_ratio)
+
+        return {
+            "asset_turnover": round(asset_turnover, 2),
+            "roa": round(roa, 2),
+            "depreciation_ratio": round(depreciation_ratio, 2),
+            "utilization_score": round(max(0, utilization_score), 1),
+            "total_asset_value": round(total_asset_value, 2)
+        }
+    except Exception as e:
+        return {"error": str(e), "tool": "get_asset_utilization"}
+    finally:
+        try: db.close()
+        except: pass
+
+
 # Export all tools as a list for LangGraph
 ALL_TOOLS = [
     get_cash_balance,
@@ -504,4 +724,9 @@ ALL_TOOLS = [
     get_expense_breakdown,
     get_revenue_metrics,
     get_financial_scorecard,
+    get_loan_metrics,
+    get_payroll_costs,
+    get_tax_liability,
+    get_depreciation_expense,
+    get_asset_utilization,
 ]

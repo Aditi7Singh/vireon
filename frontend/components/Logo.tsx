@@ -1,6 +1,5 @@
-"use client";
-
 import { cn } from "@/lib/utils";
+import { Hexagon } from "lucide-react";
 
 interface LogoProps {
   className?: string;
@@ -21,51 +20,17 @@ export function Logo({ className, size = "md", showText = true, variant = "gradi
   const sizeClasses = sizes[size];
 
   return (
-    <div className={cn("flex items-center gap-3 transition-all duration-300", className)}>
+    <div className={cn("flex items-center gap-3 transition-all duration-300 group/logo", className)}>
       {/* Icon */}
       <div className={cn(
-        "relative flex items-center justify-center rounded-xl",
+        "relative flex items-center justify-center rounded-xl transition-transform duration-500 group-hover/logo:scale-110",
         sizeClasses.icon,
-        variant === "gradient" && "bg-gradient-to-br from-indigo-500 via-purple-500 to-indigo-600 shadow-lg shadow-indigo-500/20",
+        variant === "gradient" && "bg-gradient-to-tr from-indigo-600 to-purple-600 shadow-lg shadow-indigo-600/20",
         variant === "white" && "bg-white/10 backdrop-blur-sm border border-white/20",
         variant === "dark" && "bg-slate-900 border border-slate-800"
       )}>
-        {/* V Letter with subtle animation */}
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          className={cn("w-full h-full", sizeClasses.p)}
-        >
-          <defs>
-            <linearGradient id="vireonGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="currentColor" stopOpacity="1" />
-              <stop offset="100%" stopColor="currentColor" stopOpacity="0.8" />
-            </linearGradient>
-          </defs>
-          <path
-            d="M4 6L12 20L20 6"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className={cn(
-              variant === "gradient" ? "text-white" : "text-white"
-            )}
-          />
-          {/* Inner accent line */}
-          <path
-            d="M7 8L12 18L17 8"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className={cn(
-              "opacity-40",
-              variant === "gradient" ? "text-white" : "text-white"
-            )}
-          />
-        </svg>
-        
+        <Hexagon className={cn("text-white", sizeClasses.p === "p-1" ? "w-4 h-4" : sizeClasses.p === "p-1.5" ? "w-5 h-5" : "w-6 h-6")} />
+
         {/* Subtle shine effect */}
         {variant === "gradient" && (
           <div className="absolute inset-0 rounded-xl bg-gradient-to-tr from-white/20 via-transparent to-transparent pointer-events-none" />
@@ -76,17 +41,17 @@ export function Logo({ className, size = "md", showText = true, variant = "gradi
       {showText && (
         <div className="flex flex-col">
           <span className={cn(
-            "font-bold tracking-tight font-outfit leading-none",
+            "font-black tracking-tighter font-outfit leading-none uppercase",
             sizeClasses.text,
             variant === "gradient" ? "text-slate-900 dark:text-white" : "text-white"
           )}>
             Vireon
           </span>
           <span className={cn(
-            "text-[10px] font-medium uppercase tracking-wider mt-1 hidden sm:block",
-            variant === "gradient" ? "text-slate-500" : "text-slate-400"
+            "text-[9px] font-black uppercase tracking-[0.2em] mt-1 hidden sm:block",
+            variant === "gradient" ? "text-slate-500" : "text-indigo-400"
           )}>
-            AI CFO
+            by SeedlingLabs
           </span>
         </div>
       )}

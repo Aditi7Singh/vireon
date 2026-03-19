@@ -25,6 +25,22 @@ DATABASE_URL = "postgresql://neondb_owner:npg_zoT29lPNSvtU@ep-fancy-cell-ai8o0gj
 
 HEADERS = {"Authorization": f"token {ERPNEXT_API_KEY}:{ERPNEXT_API_SECRET}"}
 
+# Currency conversion rates (to USD)
+EXCHANGE_RATES = {
+    "USD": 1.0,
+    "EUR": 1.1,
+    "GBP": 1.3,
+    "CAD": 0.8,
+    "AUD": 0.7,
+    "JPY": 0.009,
+    "INR": 0.012,
+}
+
+def convert_to_usd(amount: float, currency: str) -> float:
+    """Convert amount to USD using fixed rates."""
+    rate = EXCHANGE_RATES.get(currency, 1.0)
+    return amount * rate
+
 # ─── ERPNext Helpers ─────────────────────────────────────────────────────────
 def erp_get(endpoint: str) -> dict:
     url = f"{ERPNEXT_URL}{endpoint}"
@@ -301,13 +317,17 @@ def sync_monthly_metrics(conn, company_id: str, sales: list, purchases: list):
         d = safe_date(inv.get("posting_date"))
         if d:
             key = d.strftime("%Y-%m-01")
-            monthly_revenue[key] += safe_float(inv.get("grand_total"))
+            amount = safe_float(inv.get("grand_total"))
+            currency = inv.get("currency", "USD")
+            monthly_revenue[key] += convert_to_usd(amount, currency)
 
     for inv in purchases:
         d = safe_date(inv.get("posting_date"))
         if d:
             key = d.strftime("%Y-%m-01")
-            monthly_expenses[key] += safe_float(inv.get("grand_total"))
+            amount = safe_float(inv.get("grand_total"))
+            currency = inv.get("currency", "USD")
+            monthly_expenses[key] += convert_to_usd(amount, currency)
 
     all_months = sorted(set(list(monthly_revenue.keys()) + list(monthly_expenses.keys())))
 

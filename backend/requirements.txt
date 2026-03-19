@@ -18,5 +18,6 @@ pytest
 pytest-asyncio
 slowapi
 pydantic-settings
+reportlab
 pandas
 numpy

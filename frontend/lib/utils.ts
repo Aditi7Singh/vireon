@@ -6,19 +6,33 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(amount: number, currency: string = "USD"): string {
+  const numeric = Number(amount);
+  if (!Number.isFinite(numeric)) {
+    return "-";
+  }
+
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(amount);
+  }).format(numeric);
 }
 
 export function formatNumber(num: number): string {
-  return new Intl.NumberFormat("en-US").format(num);
+  const numeric = Number(num);
+  if (!Number.isFinite(numeric)) {
+    return "-";
+  }
+
+  return new Intl.NumberFormat("en-US").format(numeric);
 }
 
-export function formatCompactNumber(num: number): string {
+export function formatCompactNumber(num?: number | null): string {
+  if (num == null || Number.isNaN(num)) {
+    return "-";
+  }
+
   if (num >= 1000000) {
     return `${(num / 1000000).toFixed(1)}M`;
   }
@@ -29,7 +43,11 @@ export function formatCompactNumber(num: number): string {
 }
 
 export function formatPercentage(num: number, decimals: number = 1): string {
-  return `${num.toFixed(decimals)}%`;
+  const numeric = Number(num);
+  if (!Number.isFinite(numeric)) {
+    return "-";
+  }
+  return `${numeric.toFixed(decimals)}%`;
 }
 
 export function formatDate(date: Date | string): string {

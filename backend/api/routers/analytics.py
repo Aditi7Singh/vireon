@@ -1,12 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from uuid import UUID
+from fastapi.responses import StreamingResponse
+import io
 
 import models
 import schemas
 import database
 import auth
 from analytics import metrics, scenarios
+from pdf_utils import generate_runway_report_pdf, generate_budget_variance_report_pdf
+from services.planning import calculate_forecast, get_budget_variance
 
 router = APIRouter(prefix="", tags=["analytics", "scenarios"])
 
@@ -247,3 +251,64 @@ def get_cash_balance(
         "ap": 12000,
         "net_cash": float(latest_metric.ending_cash) + 45000 - 12000
     }
+
+
+@router.get("/reports/runway/pdf")
+def export_runway_report_pdf(
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user)
+):
+    """Export cash runway analysis as PDF report."""
+    company = db.query(models.Company).first()
+    if not company:
+        raise HTTPException(status_code=404, detail="No company found")
+    
+    # Get current metrics
+    latest_metric = db.query(models.MonthlyMetric).filter(
+        models.MonthlyMetric.company_id == company.id
+    ).order_by(models.MonthlyMetric.metric_month.desc()).first()
+    
+    if not latest_metric:
+        raise HTTPException(status_code=404, detail="No financial metrics found")
+    
+    metrics_data = {
+        "ending_cash": float(latest_metric.ending_cash),
+        "burn_rate": float(latest_metric.burn_rate),
+        "runway_months": float(latest_metric.runway_months),
+        "total_revenue": float(latest_metric.total_revenue),
+        "total_expenses": float(latest_metric.total_expenses),
+    }
+    
+    # Get forecasts
+    forecasts = calculate_forecast(db, str(company.id), months_ahead=12)
+    
+    # Generate PDF
+    pdf_content = generate_runway_report_pdf(metrics_data, forecasts)
+    
+    return StreamingResponse(
+        io.BytesIO(pdf_content),
+        media_type="application/pdf",
+        headers={"Content-Disposition": "attachment; filename=runway_report.pdf"}
+    )
+
+
+@router.get("/reports/budget/{budget_id}/pdf")
+def export_budget_variance_report_pdf(
+    budget_id: UUID,
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user)
+):
+    """Export budget vs actual analysis as PDF report."""
+    budget_data = get_budget_variance(db, budget_id)
+    
+    if not budget_data:
+        raise HTTPException(status_code=404, detail="Budget not found")
+    
+    # Generate PDF
+    pdf_content = generate_budget_variance_report_pdf(budget_data)
+    
+    return StreamingResponse(
+        io.BytesIO(pdf_content),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=budget_{budget_id}_report.pdf"}
+    )

@@ -1,13 +1,13 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { 
-  LayoutDashboard, 
-  AlertTriangle, 
-  TrendingUp, 
-  CreditCard, 
-  BarChart3, 
-  Settings, 
+import {
+  LayoutDashboard,
+  AlertTriangle,
+  TrendingUp,
+  CreditCard,
+  BarChart3,
+  Settings,
   MessageSquare,
   ChevronLeft,
   ChevronRight,
@@ -43,16 +43,16 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "bg-slate-950 border-r border-slate-800/50 flex flex-col transition-all duration-500 ease-in-out relative z-40 group/sidebar shadow-2xl shadow-indigo-500/5 h-screen sticky top-0",
-        sidebarExpanded ? "w-64" : "w-20"
+        "bg-[#020617]/80 backdrop-blur-3xl border-r border-white/5 flex flex-col transition-all duration-500 ease-in-out relative z-40 group/sidebar h-screen sticky top-0",
+        sidebarExpanded ? "w-72" : "w-24"
       )}
     >
       {/* Header / Logo */}
-      <div className="h-20 flex items-center px-6 border-b border-slate-800/50">
-        <Logo 
-          showText={sidebarExpanded} 
-          size={sidebarExpanded ? "md" : "sm"} 
-          variant="white"
+      <div className="h-24 flex items-center px-8 border-b border-white/5">
+        <Logo
+          showText={sidebarExpanded}
+          size={sidebarExpanded ? "md" : "sm"}
+          variant="gradient"
           className="transition-all duration-300"
         />
       </div>
@@ -60,16 +60,16 @@ export function Sidebar() {
       {/* Toggle Button - Float Style */}
       <button
         onClick={toggleSidebar}
-        className="absolute -right-3 top-24 w-6 h-6 bg-indigo-600 border border-indigo-500 rounded-full flex items-center justify-center text-white shadow-lg hover:scale-110 active:scale-95 transition-all z-50 opacity-0 group-hover/sidebar:opacity-100"
+        className="absolute -right-3 top-28 w-6 h-6 bg-indigo-600 border border-white/10 rounded-full flex items-center justify-center text-white shadow-xl shadow-indigo-600/20 hover:scale-110 active:scale-95 transition-all z-50 opacity-0 group-hover/sidebar:opacity-100"
       >
         {sidebarExpanded ? <ChevronLeft className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
       </button>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-8 space-y-2 overflow-y-auto no-scrollbar">
+      <nav className="flex-1 px-6 py-10 space-y-3 overflow-y-auto no-scrollbar">
         {sidebarExpanded && (
-          <p className="px-3 text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">
-            Main Intelligence
+          <p className="px-4 text-[9px] font-black uppercase tracking-[0.2em] text-slate-600 mb-6">
+            Core Intelligence
           </p>
         )}
         {navItems.map((item) => {
@@ -79,39 +79,25 @@ export function Sidebar() {
               key={item.name}
               href={item.path}
               className={cn(
-                "flex items-center gap-3 px-3.5 py-3 rounded-2xl transition-all duration-300 group font-medium relative",
+                "flex items-center gap-4 px-4 py-4 rounded-[20px] transition-all duration-500 group font-medium relative",
                 isActive
-                  ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/20"
-                  : "text-slate-400 hover:text-white hover:bg-slate-900"
+                  ? "bg-indigo-600/10 text-white shadow-[0_0_20px_rgba(99,102,241,0.1)] border border-indigo-500/20"
+                  : "text-slate-500 hover:text-white hover:bg-white/5 hover:border-white/5 border border-transparent"
               )}
             >
               <item.icon className={cn(
-                "w-5 h-5 transition-transform duration-300",
-                isActive ? "scale-110" : "group-hover:scale-110"
+                "w-5 h-5 transition-all duration-500",
+                isActive ? "text-indigo-400 scale-110" : "group-hover:scale-110 group-hover:text-indigo-400"
               )} />
-              
+
               {sidebarExpanded && (
-                <span className="text-sm font-bold tracking-tight">
+                <span className="text-xs font-black uppercase tracking-widest">
                   {item.name}
                 </span>
               )}
 
-              {/* Tooltip for collapsed state */}
-              {!sidebarExpanded && (
-                <div className="absolute left-full ml-4 px-3 py-1.5 bg-slate-900 border border-slate-700 text-white text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap shadow-xl z-50">
-                   {item.name}
-                </div>
-              )}
-
-              {/* Anomaly Badge */}
-              {item.name === "Anomalies" && alertCount > 0 && (
-                <span className={cn(
-                  "absolute flex items-center justify-center min-w-5 h-5 px-1.5 text-[10px] font-black rounded-full transition-all duration-300",
-                  sidebarExpanded ? "right-4" : "right-1.5 -top-1",
-                  isActive ? "bg-white text-indigo-600" : "bg-rose-500 text-white"
-                )}>
-                  {alertCount}
-                </span>
+              {isActive && (
+                <div className="absolute left-0 w-1 h-6 bg-indigo-500 rounded-r-full shadow-[0_0_15px_rgba(99,102,241,0.8)]" />
               )}
             </Link>
           );
@@ -119,42 +105,28 @@ export function Sidebar() {
       </nav>
 
       {/* User & Bottom Section */}
-      <div className="p-4 border-t border-slate-800/50 bg-slate-950/50 backdrop-blur-md space-y-4">
-        <Link
-          href="/settings"
-          className={cn(
-            "flex items-center gap-3 px-3.5 py-3 rounded-2xl transition-all duration-300 text-slate-400 hover:text-white hover:bg-slate-900 group relative",
-            pathname === "/settings" && "bg-slate-900 text-white"
-          )}
-        >
-          <Settings className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
-          {sidebarExpanded && <span className="text-sm font-bold tracking-tight">Settings</span>}
-          {!sidebarExpanded && (
-            <div className="absolute left-full ml-4 px-3 py-1.5 bg-slate-900 border border-slate-700 text-white text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap shadow-xl z-50">
-               Settings
-            </div>
-          )}
-        </Link>
-
+      <div className="p-6 border-t border-white/5 bg-black/40 backdrop-blur-3xl space-y-4">
         {/* User Card */}
         <div className={cn(
-          "flex items-center gap-3 p-3 rounded-2xl bg-slate-900/50 border border-slate-800 transition-all duration-300 hover:bg-slate-900 group/user relative",
+          "flex items-center gap-4 p-4 rounded-[24px] bg-white/[0.03] border border-white/5 transition-all duration-500 hover:bg-white/[0.07] group/user relative cursor-pointer",
           !sidebarExpanded && "justify-center px-2"
         )}>
           <div className="relative">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-black text-xs shadow-xl ring-2 ring-slate-800 ring-offset-2 ring-offset-slate-950 transition-transform group-hover/user:scale-105">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white font-black text-xs shadow-xl ring-1 ring-white/10 transition-transform group-hover/user:scale-105">
               {user?.name?.split(" ").map((n: string) => n[0]).join("") || "AD"}
             </div>
-            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 border-2 border-slate-950 rounded-full shadow-lg" />
+            <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-[#050505] rounded-full shadow-lg" />
           </div>
           {sidebarExpanded && (
             <div className="flex flex-col min-w-0 flex-1">
-              <span className="text-xs font-black text-white truncate font-outfit leading-none">
+              <span className="text-[11px] font-black text-white truncate font-outfit uppercase tracking-tighter">
                 {user?.name || "Aditi Singh"}
               </span>
-              <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest truncate mt-1">
-                {user?.role || "FOUNDER"}
-              </span>
+              <div className="flex items-center gap-1.5 mt-1">
+                <span className="text-[8px] font-black text-indigo-400 uppercase tracking-widest truncate bg-indigo-400/10 px-1.5 py-0.5 rounded-md">
+                  {user?.role || "FOUNDER"}
+                </span>
+              </div>
             </div>
           )}
         </div>

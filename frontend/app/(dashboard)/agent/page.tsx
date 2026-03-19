@@ -11,14 +11,25 @@ import {
     Lightbulb,
     MessageSquare,
     ChevronRight,
-    Search
+    Search,
+    Wallet,
+    TrendingUp,
+    AlertTriangle,
+    Hexagon,
+    Shield,
+    ShieldCheck,
+    Target,
+    RefreshCw,
 } from "lucide-react";
 
 import { useAppStore } from "@/lib/store";
 import api, { AgentMessage } from "@/lib/api";
+import { cn } from "@/lib/utils";
+
+import TopBar from "@/components/TopBar";
 
 export default function AgentPage() {
-    const { chatSessionId, setChatSessionId } = useAppStore();
+    const { chatSessionId, setChatSessionId, openChat } = useAppStore();
     const [messages, setMessages] = useState<any[]>([]);
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -59,7 +70,7 @@ export default function AgentPage() {
                 setMessages([
                     {
                         role: "assistant",
-                        content: "Hello! I'm Vireon, your AI CFO. I've analyzed your financial data and I'm ready to help you understanding your runway, detect anomalies, and answer questions about your business finances. \n\nHow can I help you today?",
+                        content: "Hello! I'm your Vireon AI CFO. I've mapped your institutional data feeds and I'm ready to conduct a deep survival audit or growth projection. \n\nWhat high-level vector should we analyze today?",
                         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                     }
                 ]);
@@ -70,10 +81,10 @@ export default function AgentPage() {
     };
 
     const suggestions = [
-        "What is our current runway?",
-        "Why did cloud costs spike?",
-        "Explain Net Revenue Retention",
-        "How much could we save by cutting SaaS by 10%?"
+        { text: "Survival Path Audit", icon: Wallet },
+        { text: "Growth Vector Analysis", icon: TrendingUp },
+        { text: "GL Anomaly Detection", icon: AlertTriangle },
+        { text: "Capital Scenario Modeling", icon: Sparkles }
     ];
 
     const handleSend = async (text?: string) => {
@@ -88,7 +99,7 @@ export default function AgentPage() {
 
         try {
             const response = await api.chat(query, chatSessionId || undefined);
-            
+
             const assistantNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             setMessages(prev => [...prev, {
                 role: "assistant",
@@ -98,7 +109,7 @@ export default function AgentPage() {
         } catch (error) {
             setMessages(prev => [...prev, {
                 role: "assistant",
-                content: "I encountered an error while processing your financial data. Please ensure the backend is running and try again.",
+                content: "I encountered a protocol error. Ensure the intelligence node is online and try again.",
                 timestamp: now
             }]);
         } finally {
@@ -107,99 +118,138 @@ export default function AgentPage() {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-160px)] max-w-5xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                    <div className="p-2 bg-indigo-100 dark:bg-indigo-500/20 rounded-lg">
-                        <Bot className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+        <div className="min-h-screen bg-slate-950 flex flex-col">
+            <TopBar title="Vireon AI Assistant" />
+
+            <div className="flex-1 p-6 flex flex-col max-w-[1400px] mx-auto w-full overflow-hidden">
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+                    <div className="space-y-4">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-bold uppercase tracking-wider">
+                            <Bot className="w-3.5 h-3.5" />
+                            Financial Intelligence Core
+                        </div>
+                        <h1 className="text-4xl font-black text-white tracking-tight font-outfit">
+                            Vireon <span className="text-slate-500">Assistant</span>
+                        </h1>
                     </div>
-                    <div>
-                        <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">AI CFO Agent</h1>
-                        <div className="flex items-center gap-2 mt-0.5">
-                            <span className="flex h-2 w-2 rounded-full bg-emerald-500"></span>
-                            <span className="text-xs text-zinc-500 font-medium font-sans">System Ready • Connected to ERPNext</span>
+                </div>
+
+                <div className="flex-1 flex gap-8 min-h-0">
+                    {/* Main Chat Interface */}
+                    <div className="flex-1 flex flex-col bg-slate-900 border border-white/10 rounded-3xl overflow-hidden relative shadow-2xl">
+                        {/* Messages Area */}
+                        <div className="flex-1 overflow-y-auto p-8 space-y-10 no-scrollbar scroll-smooth">
+                            {messages.map((msg, idx) => (
+                                <div key={idx} className={cn("flex w-full", msg.role === "user" ? "justify-end" : "justify-start")}>
+                                    <div className={cn("flex gap-4 max-w-[85%]", msg.role === "user" ? "flex-row-reverse" : "flex-row")}>
+                                        <div className={cn(
+                                            "w-10 h-10 rounded-xl shrink-0 flex items-center justify-center shadow-lg transition-transform",
+                                            msg.role === "user"
+                                                ? "bg-slate-800 border border-white/10 text-white"
+                                                : "bg-indigo-600 text-white"
+                                        )}>
+                                            {msg.role === "user" ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
+                                        </div>
+                                        <div className={cn("flex flex-col space-y-2", msg.role === "user" ? "items-end" : "items-start")}>
+                                            <div className={cn(
+                                                "px-6 py-4 rounded-2xl text-sm leading-relaxed",
+                                                msg.role === "user"
+                                                    ? "bg-indigo-600 text-white rounded-tr-none"
+                                                    : "bg-slate-800 border border-white/5 text-slate-200 rounded-tl-none"
+                                            )}>
+                                                <p className="whitespace-pre-wrap">{msg.content}</p>
+                                            </div>
+                                            <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">{msg.timestamp}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                            <div ref={messagesEndRef} />
+                        </div>
+
+                        {/* Input Area */}
+                        <div className="p-8 bg-slate-950/50 border-t border-white/5">
+                            {/* suggestions */}
+                            <div className="flex flex-wrap gap-3 mb-6">
+                                {suggestions.map((s, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => handleSend(s.text)}
+                                        className="btn-secondary text-[11px]"
+                                    >
+                                        <s.icon className="w-4 h-4 text-indigo-500 shrink-0" />
+                                        {s.text}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <form
+                                onSubmit={(e) => { e.preventDefault(); handleSend(); }}
+                                className="relative flex items-center gap-4"
+                            >
+                                <div className="relative flex-1 group/input">
+                                    <MessageSquare className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within/input:text-indigo-400" />
+                                    <input
+                                        className="w-full pl-14 pr-6 py-4 bg-slate-800 border border-white/10 rounded-2xl text-sm focus:outline-none focus:border-indigo-500/50 transition-all text-white placeholder-slate-500 shadow-inner"
+                                        placeholder="Type your financial query..."
+                                        value={input}
+                                        onChange={(e) => setInput(e.target.value)}
+                                        disabled={isLoading}
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    disabled={isLoading || !input.trim()}
+                                    className="btn-primary p-4 shrink-0 flex items-center justify-center"
+                                >
+                                    {isLoading ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    {/* Sidebar Strategic Intel */}
+                    <div className="hidden lg:flex w-80 flex-col gap-8">
+                        <div className="bg-slate-900 border border-white/10 rounded-3xl p-8 shadow-xl">
+                            <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-6">Capacities</h3>
+                            <div className="space-y-4">
+                                {[
+                                    { title: "Forensic Audit", desc: "Institutional GL Anomaly Detection", icon: Shield },
+                                    { title: "Vector Modeling", desc: "Scenario-based Runway Projection", icon: Target },
+                                    { title: "Compliance Core", desc: "Automated Tax Matrix Optimization", icon: ShieldCheck }
+                                ].map((cap, i) => (
+                                    <div key={i} className="p-4 bg-white/[0.03] border border-white/5 rounded-xl hover:border-white/10 transition-colors">
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-indigo-400 mb-1 flex items-center gap-2">
+                                            {cap.icon && <cap.icon className="w-3.5 h-3.5" />}
+                                            {cap.title}
+                                        </p>
+                                        <p className="text-xs text-slate-400 leading-snug">{cap.desc}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="bg-slate-900 border border-white/10 rounded-3xl p-8 shadow-xl">
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-6 flex items-center gap-2">
+                                <History className="w-4 h-4" />
+                                Recent Analysis
+                            </h3>
+                            <div className="space-y-4">
+                                {[
+                                    "Stripe Volatility Alert: MAR 18",
+                                    "Infrastructure Nodes Synced",
+                                    "Runway Matrix Overhaul Complete"
+                                ].map((insight, i) => (
+                                    <div key={i} className="flex items-start gap-3 group cursor-pointer">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-slate-700 group-hover:bg-indigo-500 transition-colors mt-1.5" />
+                                        <span className="text-[11px] font-medium text-slate-500 group-hover:text-slate-300 transition-colors">{insight}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div className="flex-1 flex gap-6 overflow-hidden">
-                <Card className="flex-1 flex flex-col p-0 overflow-hidden ring-1 ring-zinc-200 dark:ring-zinc-800 shadow-sm border-0 rounded-2xl bg-white dark:bg-zinc-950">
-                    <div className="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-hide">
-                        {messages.map((msg, idx) => (
-                            <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
-                                <div className={`flex gap-4 max-w-[85%] ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                                    <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${msg.role === "user"
-                                            ? "bg-zinc-100 dark:bg-zinc-800"
-                                            : "bg-indigo-600 shadow-md shadow-indigo-200 dark:shadow-none"
-                                        }`}>
-                                        {msg.role === "user"
-                                            ? <User className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
-                                            : <Bot className="w-4 h-4 text-white" />
-                                        }
-                                    </div>
-                                    <div className="flex flex-col space-y-1.5 min-w-0">
-                                        <div className={`px-5 py-3.5 rounded-2xl text-sm leading-relaxed shadow-sm ${msg.role === "user"
-                                                ? "bg-zinc-900 text-white dark:bg-zinc-800 rounded-tr-sm"
-                                                : "bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-tl-sm"
-                                            }`}>
-                                            <p className="whitespace-pre-wrap">{msg.content}</p>
-                                        </div>
-                                        <span className={`text-[10px] font-medium text-zinc-400 px-1 ${msg.role === "user" ? "text-right" : "text-left"}`}>
-                                            {msg.timestamp}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                        {isLoading && (
-                            <div className="flex justify-start animate-in fade-in duration-300">
-                                <div className="bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 rounded-2xl rounded-tl-sm px-5 py-3.5 shadow-sm">
-                                    <span className="flex space-x-1.5 py-1">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce"></span>
-                                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce delay-75"></span>
-                                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce delay-150"></span>
-                                    </span>
-                                </div>
-                            </div>
-                        )}
-                        <div ref={messagesEndRef} />
-                    </div>
-
-                    <div className="p-6 bg-white dark:bg-zinc-950 border-t border-zinc-100 dark:border-zinc-900">
-                        <div className="flex flex-wrap gap-2 mb-4">
-                            {suggestions.map((s, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => handleSend(s)}
-                                    className="px-3 py-1.5 rounded-full text-xs font-medium bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all flex items-center gap-1.5 shadow-sm"
-                                >
-                                    <MessageSquare className="w-3 h-3" />
-                                    {s}
-                                </button>
-                            ))}
-                        </div>
-                        <form
-                            onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-                            className="relative"
-                        >
-                            <input
-                                className="w-full pl-5 pr-14 py-4 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-zinc-900 dark:text-white placeholder-zinc-400 shadow-inner"
-                                placeholder="Ask your AI CFO anything..."
-                                value={input}
-                                onChange={(e) => setInput(e.target.value)}
-                                disabled={isLoading}
-                            />
-                            <button
-                                type="submit"
-                                disabled={isLoading || !input.trim()}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-indigo-600 text-white disabled:opacity-50 transition-all shadow-md shadow-indigo-100 dark:shadow-none hover:bg-indigo-500 active:scale-95"
-                            >
-                                <Send className="w-4 h-4" />
-                            </button>
-                        </form>
-                    </div>
-                </Card>
             </div>
         </div>
     );

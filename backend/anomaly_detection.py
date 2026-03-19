@@ -46,3 +46,90 @@ def detect_expense_anomalies(db: Session, company_id=None):
                 db.add(anomaly)
     
     db.commit()
+
+
+def detect_revenue_anomalies(db: Session, company_id=None):
+    """Detect revenue anomalies: significant drops or unusual spikes."""
+    ninety_days_ago = datetime.datetime.utcnow() - datetime.timedelta(days=90)
+    
+    # Calculate average monthly revenue for the last 90 days
+    query = db.query(
+        func.avg(models.MonthlyMetric.total_revenue).label("avg_revenue")
+    ).filter(models.MonthlyMetric.metric_month >= ninety_days_ago)
+    
+    if company_id:
+        query = query.filter(models.MonthlyMetric.company_id == company_id)
+        
+    avg_result = query.first()
+    if not avg_result or not avg_result.avg_revenue:
+        return
+    
+    avg_revenue = float(avg_result.avg_revenue)
+    
+    # Check recent months for anomalies
+    recent_metrics = db.query(models.MonthlyMetric).filter(
+        models.MonthlyMetric.metric_month >= ninety_days_ago
+    )
+    
+    if company_id:
+        recent_metrics = recent_metrics.filter(models.MonthlyMetric.company_id == company_id)
+        
+    recent_metrics = recent_metrics.order_by(models.MonthlyMetric.metric_month.desc()).limit(3).all()
+    
+    for metric in recent_metrics:
+        revenue = float(metric.total_revenue)
+        variance_pct = ((revenue - avg_revenue) / avg_revenue) * 100
+        
+        if abs(variance_pct) > 15:  # 15% threshold
+            anomaly_type = "revenue_spike" if variance_pct > 0 else "revenue_drop"
+            severity = "high" if abs(variance_pct) > 50 else "medium"
+            
+            anomaly = models.Anomaly(
+                company_id=metric.company_id,
+                anomaly_date=metric.metric_month,
+                type=anomaly_type,
+                severity=severity,
+                description=f"Revenue { 'increased' if variance_pct > 0 else 'decreased' } by {abs(variance_pct):.1f}% compared to 90-day average.",
+                expected_value=avg_revenue,
+                actual_value=revenue,
+                status="open"
+            )
+            db.add(anomaly)
+    
+    db.commit()
+
+
+def detect_duplicate_invoices(db: Session, company_id=None):
+    """Detect potential duplicate invoices based on amount, date, and vendor."""
+    # Group invoices by amount, date, and contact_id, count occurrences
+    query = db.query(
+        models.Invoice.total_amount,
+        models.Invoice.posting_date,
+        models.Invoice.contact_id,
+        func.count(models.Invoice.id).label("count")
+    ).filter(models.Invoice.total_amount > 0)
+    
+    if company_id:
+        query = query.filter(models.Invoice.company_id == company_id)
+        
+    duplicates = query.group_by(
+        models.Invoice.total_amount,
+        models.Invoice.posting_date,
+        models.Invoice.contact_id
+    ).having(func.count(models.Invoice.id) > 1).all()
+    
+    for dup in duplicates:
+        # Create anomaly for duplicates
+        anomaly = models.Anomaly(
+            company_id=company_id,
+            anomaly_date=dup.posting_date,
+            type="duplicate_invoice",
+            severity="medium",
+            description=f"Potential duplicate invoices: {dup.count} invoices with amount ${dup.total_amount} on {dup.posting_date}",
+            expected_value=1,  # Expected 1 invoice
+            actual_value=dup.count,
+            status="open"
+        )
+        db.add(anomaly)
+    
+    db.commit()

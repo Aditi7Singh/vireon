@@ -19,6 +19,31 @@
 
 ---
 
+## Pitch Highlights
+
+✅ **AI-powered financial analysis** with conversational interface (chat + agent tools)
+✅ **Real-time anomaly detection** with statistical rigor
+✅ **Complete loan amortization & depreciation calculations**
+✅ **Payroll tax calculations** with federal bracket support
+✅ **Scenario simulation** for “what-if” planning
+✅ **PDF report generation**
+✅ **ERPNext integration ready**
+
+### ERPNext Data Coverage & Positioning
+
+Vireon acts as an AI Copilot that **works with ERPNext + has its own modules for what's missing**. For an MVP pitch, ERPNext provides sufficient data for core metrics (cash, burn, runway, revenue, expenses). However, specific gaps in standard ERPNext are handled natively by Vireon:
+- **Payroll/HR data** must come from Vireon's own `Employee` and `PayrollEntry` tables (unless the user has the ERPNext HR module).
+- **Loans and custom depreciation** are Vireon-native.
+- **Multi-currency and advanced tax reporting** need additional work.
+
+### Honest gaps (what to call out)
+
+⚠️ Multi-currency support (roadmap item)
+⚠️ Advanced ML forecasting (currently basic exponential smoothing)
+⚠️ OCR/document ingestion (not built yet)
+
+---
+
 ## Key Metrics & Status
 
 | Component | Status | Completeness | Notes |

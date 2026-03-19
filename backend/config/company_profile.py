@@ -6,7 +6,7 @@ Financial context for SeedlingLabs that's injected into every agent prompt.
 
 import httpx
 from typing import Dict, Optional
-from config.settings import BACKEND_URL, COMPANY_NAME
+from .settings import BACKEND_URL, COMPANY_NAME
 
 
 # Fallback company profile when backend is unreachable

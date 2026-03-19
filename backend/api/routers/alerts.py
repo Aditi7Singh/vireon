@@ -7,7 +7,7 @@ import models
 import schemas
 import database
 import auth
-from anomaly_detection import detect_expense_anomalies
+from anomaly_detection import detect_expense_anomalies, detect_revenue_anomalies, detect_duplicate_invoices
 
 router = APIRouter(prefix="/alerts", tags=["alerts"])
 
@@ -90,4 +90,6 @@ def trigger_scan(
         raise HTTPException(status_code=404, detail="No company found to scan")
     
     detect_expense_anomalies(db, company_id=company.id)
+    detect_revenue_anomalies(db, company_id=company.id)
+    detect_duplicate_invoices(db, company_id=company.id)
     return {"task_id": "immediate_scan_task"}

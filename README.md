@@ -6,6 +6,11 @@
 
 Instead of building a simulated financial database from scratch, this system integrates directly with **ERPNext**, an open-source enterprise resource planning system used by real companies for accounting, financial management, and operations.
 
+### ERPNext Data Coverage & Positioning
+Vireon acts as an AI Copilot that **works with ERPNext + has its own modules for what's missing**. Core metrics (cash, burn, runway, revenue, expenses, and GL anomalies) are derived directly from ERPNext data. However, specific gaps in standard ERPNext are handled natively by Vireon's own tables, including:
+- **Payroll/HR data** (`Employee` and `PayrollEntry` tables)
+- **Loans and custom depreciation** (`Loan` and `FixedAsset` tables)
+
 The AI agent operates as a financial analyst and decision-support tool. It retrieves financial data from ERPNext, processes it using a deterministic analytics engine, and communicates insights through a conversational interface and interactive dashboards.
 
 This architecture ensures that financial calculations remain deterministic and auditable while still enabling natural language interaction through a large language model.
@@ -49,6 +54,14 @@ graph TD
 - **Natural Language Financial Queries**: Ask "Why did expenses increase last month?" and get drivers identified from GL entries.
 - **Scenario Simulation**: "What if we hire 3 engineers?" — simulate payroll increases and calculate impact on runway.
 - **Financial Forecasting**: Deterministic models for ARR, MRR, Gross Margin, and operating cash flow.
+
+## Current Limitations
+
+While Vireon provides robust financial intelligence, here are some areas that are still in development:
+
+- **Multi-currency support** (roadmap item)
+- **Advanced ML forecasting** (currently basic exponential smoothing)
+- **OCR/document ingestion** (not built yet)
 
 ## Implementation Phases
 

@@ -25,6 +25,7 @@ import api, { AgentMessage } from "@/lib/api";
 
 export function ChatDrawer() {
   const { chatOpen, closeChat, chatSessionId, setChatSessionId, chatContext } = useAppStore();
+  const normalizedChatContext = typeof chatContext === "string" ? chatContext : "";
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -42,44 +43,44 @@ export function ChatDrawer() {
 
   // Handle proactive messages when context changes specifically
   useEffect(() => {
-    if (chatOpen && chatContext && chatContext !== lastTriggeredContext.current) {
+    if (chatOpen && normalizedChatContext && normalizedChatContext !== lastTriggeredContext.current) {
       triggerProactiveMessage();
-      lastTriggeredContext.current = chatContext;
+      lastTriggeredContext.current = normalizedChatContext;
     }
-  }, [chatContext, chatOpen]);
+  }, [normalizedChatContext, chatOpen]);
 
   const triggerProactiveMessage = () => {
     // Only trigger if history is empty (optional but safer)
     if (messages.length > 5) return; 
 
     // Specific anomaly, proactively explain it
-    if (chatContext?.startsWith("Anomaly Analysis:")) {
-       const anomalyDesc = chatContext.replace("Anomaly Analysis:", "").trim();
+    if (normalizedChatContext.startsWith("Anomaly Analysis:")) {
+       const anomalyDesc = normalizedChatContext.replace("Anomaly Analysis:", "").trim();
        setTimeout(() => {
          handleSend(`Explain this anomaly in detail and its impact: "${anomalyDesc}"`);
        }, 500);
-    } else if (chatContext?.startsWith("Anomaly:")) {
-       const anomalyDesc = chatContext.replace("Anomaly:", "").trim();
+    } else if (normalizedChatContext.startsWith("Anomaly:")) {
+       const anomalyDesc = normalizedChatContext.replace("Anomaly:", "").trim();
        setTimeout(() => {
          handleSend(`What can you tell me about the anomaly: "${anomalyDesc}"?`);
        }, 500);
-    } else if (chatContext === "Revenue Expansion Opportunity") {
+    } else if (normalizedChatContext === "Revenue Expansion Opportunity") {
        setTimeout(() => {
          handleSend("Help me model different revenue tiers. I notice usage-based revenue is growing fast.");
        }, 500);
-    } else if (chatContext === "Expense Leakage Audit") {
+    } else if (normalizedChatContext === "Expense Leakage Audit") {
        setTimeout(() => {
          handleSend("Perform an audit on our expense leakage and operational inefficiencies.");
        }, 500);
-    } else if (chatContext === "Expense Audit: AWS Spike") {
+    } else if (normalizedChatContext === "Expense Audit: AWS Spike") {
        setTimeout(() => {
          handleSend("Analyze the recent AWS cost spike and suggest optimization strategies.");
        }, 500);
-    } else if (chatContext === "Predictive Modeling") {
+    } else if (normalizedChatContext === "Predictive Modeling") {
        setTimeout(() => {
          handleSend("Help me model some scenarios. I want to see how hiring or revenue changes affect our runway.");
        }, 500);
-    } else if (chatContext === "Revenue Intelligence") {
+    } else if (normalizedChatContext === "Revenue Intelligence") {
        setTimeout(() => {
          handleSend("Give me a strategic growth audit of our revenue performance.");
        }, 500);
@@ -98,8 +99,8 @@ export function ChatDrawer() {
         })));
       } else {
         // Initial greeting
-        const greeting = chatContext 
-          ? `Hello! I'm your AI CFO. I've analyzed the financial data for this ${chatContext} view. How can I help you?`
+        const greeting = normalizedChatContext 
+          ? `Hello! I'm your AI CFO. I've analyzed the financial data for this ${normalizedChatContext} view. How can I help you?`
           : "Hello! I'm your AI CFO. I've analyzed your financial data and I'm ready to help you understand your runway, detect anomalies, and answer questions about your business finances.";
         
         setMessages([
@@ -150,7 +151,7 @@ export function ChatDrawer() {
       // If we have a context, we can prepend it or send it as part of the query if the backend supports it.
       // Currently the backend takes 'query' and 'company_id'. 
       // I'll update the backend to take 'context' or just include it in the query for now.
-      const fullQuery = chatContext ? `[Context: ${chatContext}] ${query}` : query;
+      const fullQuery = normalizedChatContext ? `[Context: ${normalizedChatContext}] ${query}` : query;
       
       const response = await api.chat(fullQuery, chatSessionId || undefined);
       

@@ -1927,7 +1927,7 @@ def forecast_cash_runway() -> Dict:
 | **Depreciation/Amortization** | 🚧 5% | Schema exists but no calculations | High |
 | **Forecasting** | 🚧 60% | Linear regression done; needs ML improvement | Medium |
 | **Budget vs. Actuals** | 🚧 50% | UI exists; category mapping incomplete | Low |
-| **Gross Margin Tracking** | 🚧 40% | Formula exists but COGS not well-sourced | Medium |
+| **Gross Margin Tracking** | 🚧 60% | Formula exists but COGS sourcing incomplete | Medium |
 | **Quarterly Tax Payments** | 🚧 0% | No lump-sum tax liability modeling | Medium |
 | **Multi-Currency Support** | 🚧 10% | Stores currency field; no conversion logic | Low |
 
@@ -1945,7 +1945,7 @@ def forecast_cash_runway() -> Dict:
 | **Advanced ML Forecasting** | Accuracy | High | Medium | Prophet, ARIMA models |
 | **Competitor Benchmarking** | Context | Medium | Low | Real-time market data |
 | **Tax Compliance Reports** | Audit trail | High | Low | Country-specific formats |
-| **Webhook from ERPNext** | Real-time sync | Medium | Low | Currently manual/scheduled |
+| **Webhook from ERPNext** | Real-time sync | High | Low | No webhook; only manual/scheduled sync |
 | **PDF Report Export** | User workflows | Low | Low | Runway, P&L reports |
 | **Document OCR** | Invoice ingestion | High | Low | Schema exists; no impl |
 | **Expense OCR (Receipts)** | Automation | High | Low | Extract amount, date, category |

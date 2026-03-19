@@ -35,21 +35,21 @@ export default function DashboardLayout({
   }, [setUser]);
 
   return (
-    <div className="flex h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden font-inter antialiased">
-      {/* Sidebar - Fixed width handled by component */}
+    <div className="flex h-screen bg-[#020617] overflow-hidden font-sans antialiased text-slate-200">
+      {/* Sidebar */}
       <Sidebar />
-      
+
       <div className="flex flex-col flex-1 min-w-0 transition-all duration-500 relative">
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto no-scrollbar bg-slate-50/50 dark:bg-slate-950/50">
-           <div className="relative">
-             {children}
-           </div>
+        <main className="flex-1 overflow-y-auto no-scrollbar relative z-10">
+          <div className="max-w-[1920px] mx-auto min-h-full">
+            {children}
+          </div>
         </main>
 
-        {/* Floating AI Background Element (Subtle) */}
-        <div className="absolute -bottom-48 -right-48 w-96 h-96 bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute -top-48 -left-48 w-96 h-96 bg-purple-500/5 blur-[120px] rounded-full pointer-events-none" />
+        {/* Cinematic Background Gradients */}
+        <div className="absolute top-0 right-0 w-[50%] h-[50%] bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none -z-0 opacity-50" />
+        <div className="absolute bottom-0 left-0 w-[50%] h-[50%] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none -z-0 opacity-50" />
       </div>
 
       {/* Persistent AI Interface */}

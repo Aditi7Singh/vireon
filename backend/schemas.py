@@ -172,6 +172,10 @@ class SandboxData(BaseModel):
     contacts: List[ContactCreate]
     invoices: List[InvoiceCreate]
     expenses: List[ExpenseCreate]
+    employees: List[EmployeeCreate] = []
+    payroll_entries: List[PayrollEntryCreate] = []
+    loans: List[LoanCreate] = []
+    fixed_assets: List[FixedAssetCreate] = []
     metrics: List[MonthlyMetricCreate] = []
     anomalies: List[AnomalyCreate] = []
 
@@ -244,4 +248,118 @@ class ForecastBase(BaseModel):
 
 class Forecast(ForecastBase):
     id: UUID
+    model_config = ConfigDict(from_attributes=True)
+
+
+# Loan Schemas
+class LoanPaymentBase(BaseModel):
+    payment_date: date
+    payment_amount: float
+    principal_paid: float
+    interest_paid: float
+    remaining_balance: float
+
+class LoanPayment(LoanPaymentBase):
+    id: UUID
+    loan_id: UUID
+    model_config = ConfigDict(from_attributes=True)
+
+class LoanBase(BaseModel):
+    loan_name: str
+    principal_amount: float
+    interest_rate: float
+    term_months: int
+    start_date: date
+    loan_type: str = "term_loan"
+    lender: Optional[str] = None
+    status: str = "active"
+    remaining_balance: Optional[float] = None
+
+class LoanCreate(LoanBase):
+    pass
+
+class Loan(LoanBase):
+    id: UUID
+    payments: List[LoanPayment] = []
+    model_config = ConfigDict(from_attributes=True)
+
+
+# Payroll Schemas
+class PayrollEntryBase(BaseModel):
+    pay_period_start: date
+    pay_period_end: date
+    gross_pay: float
+    federal_tax: float = 0
+    state_tax: float = 0
+    social_security: float = 0
+    medicare: float = 0
+    other_deductions: float = 0
+    net_pay: float
+    pay_date: date
+    status: str = "processed"
+
+class PayrollEntryCreate(PayrollEntryBase):
+    employee_id: UUID
+
+class PayrollEntry(PayrollEntryBase):
+    id: UUID
+    employee_id: UUID
+    model_config = ConfigDict(from_attributes=True)
+
+class EmployeeBase(BaseModel):
+    employee_id: str
+    first_name: str
+    last_name: str
+    email: str
+    hire_date: date
+    termination_date: Optional[date] = None
+    salary: float
+    pay_frequency: str = "monthly"
+    job_title: Optional[str] = None
+    department: Optional[str] = None
+    status: str = "active"
+
+class EmployeeCreate(EmployeeBase):
+    pass
+
+class Employee(EmployeeBase):
+    id: UUID
+    payroll_entries: List[PayrollEntry] = []
+    model_config = ConfigDict(from_attributes=True)
+
+
+# Depreciation Schemas
+class DepreciationEntryBase(BaseModel):
+    depreciation_date: date
+    depreciation_amount: float
+    accumulated_depreciation: float
+    book_value: float
+
+class DepreciationEntry(DepreciationEntryBase):
+    id: UUID
+    asset_id: UUID
+    model_config = ConfigDict(from_attributes=True)
+
+class FixedAssetBase(BaseModel):
+    asset_name: str
+    asset_category: Optional[str] = None
+    purchase_date: date
+    purchase_cost: float
+    salvage_value: float = 0
+    useful_life_years: int
+    depreciation_method: str = "straight_line"
+    location: Optional[str] = None
+    serial_number: Optional[str] = None
+    status: str = "active"
+    disposal_date: Optional[date] = None
+    disposal_value: Optional[float] = None
+
+class FixedAssetCreate(FixedAssetBase):
+    pass
+
+class FixedAsset(FixedAssetBase):
+    id: UUID
+    accumulated_depreciation: float = 0
+    book_value: Optional[float] = None
+    depreciation_entries: List[DepreciationEntry] = []
     model_config = ConfigDict(from_attributes=True)
