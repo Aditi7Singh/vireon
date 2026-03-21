@@ -16,7 +16,7 @@ app = Celery(
     "vireon_anomaly",
     broker=REDIS_URL,
     backend=REDIS_URL,
-    include=["anomaly.tasks"]
+    include=["anomaly.tasks", "tasks.alert_tasks", "tasks.document_tasks", "tasks.fx_tasks"]
 )
 
 # Configure Celery
@@ -55,6 +55,16 @@ app.conf.beat_schedule = {
     "weekly-cleanup": {
         "task": "anomaly.tasks.cleanup_old_alerts",
         "schedule": crontab(hour=3, minute=0, day_of_week=0),
+    },
+    # Daily runway alert check at 9:00 AM IST (03:30 UTC)
+    "daily-runway-alert-check": {
+        "task": "tasks.alert_tasks.check_runway_alerts_all_companies",
+        "schedule": crontab(hour=3, minute=30),
+    },
+    # Monthly FX revaluation snapshot on the 1st day of month at 01:00 UTC
+    "monthly-fx-revaluation": {
+        "task": "tasks.fx_tasks.run_monthly_fx_revaluation_all_companies",
+        "schedule": crontab(hour=1, minute=0, day_of_month=1),
     },
 }
 

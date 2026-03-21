@@ -59,9 +59,9 @@ graph TD
 
 While Vireon provides robust financial intelligence, here are some areas that are still in development:
 
-- **Multi-currency support** (roadmap item)
-- **Advanced ML forecasting** (currently basic exponential smoothing)
-- **OCR/document ingestion** (not built yet)
+- **Multi-currency support** (partially implemented: currency capture and INR normalization exist; live FX sync, revaluation workflows, and full UI controls are still in progress)
+- **Advanced ML forecasting** (implemented with SARIMA and Prophet fallbacks; next step is model monitoring and automated retraining)
+- **OCR/document ingestion** (backend upload/status pipeline exists; production-grade OCR extraction and workflow automation are still in progress)
 
 ## Implementation Phases
 

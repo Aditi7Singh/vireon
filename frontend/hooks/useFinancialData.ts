@@ -121,3 +121,35 @@ export function useCashBalance() {
   const { data, isLoading, error, mutate } = useApi(getCashBalance, initial);
   return { cashBalance: data, isLoading, error, mutate };
 }
+
+export function useFinancialData(companyId: string, month: string) {
+  const initial = {
+    dashboard: null as any,
+    recommendations: null as any,
+    alerts: [] as any[],
+  };
+
+  const rawApiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const apiBase = rawApiBase.replace(/\/$/, "").endsWith("/api/v1")
+    ? rawApiBase.replace(/\/$/, "")
+    : `${rawApiBase.replace(/\/$/, "")}/api/v1`;
+  const getData = useCallback(async () => {
+    if (!companyId) {
+      return initial;
+    }
+    const [dashboardRes, recommendationsRes, alertsRes] = await Promise.all([
+      fetch(`${apiBase}/burn/dashboard/${companyId}?month=${month}`),
+      fetch(`${apiBase}/recommendations/latest/${companyId}`),
+      fetch(`${apiBase}/alerts/active/${companyId}`),
+    ]);
+
+    const dashboard = await dashboardRes.json();
+    const recommendations = recommendationsRes.ok ? await recommendationsRes.json() : null;
+    const alerts = alertsRes.ok ? await alertsRes.json() : [];
+
+    return { dashboard, recommendations, alerts };
+  }, [apiBase, companyId, month]);
+
+  const { data, isLoading, error, mutate } = useApi(getData, initial);
+  return { data, isLoading, error, mutate };
+}

@@ -21,3 +21,5 @@ pydantic-settings
 reportlab
 pandas
 numpy
+statsmodels
+prophet

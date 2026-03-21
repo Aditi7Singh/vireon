@@ -1,0 +1,12 @@
+.env
+.env.local
+backend/.env
+backend/.env.local
+
+# Local Python environments
+backend/.venv/
+
+# Local SQLite and scheduler artifacts
+backend/*.db
+backend/celerybeat-schedule
+backend/celerybeat-schedule.db

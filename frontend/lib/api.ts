@@ -1,4 +1,7 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const RAW_API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE = RAW_API_BASE.replace(/\/$/, "").endsWith("/api/v1")
+  ? RAW_API_BASE.replace(/\/$/, "")
+  : `${RAW_API_BASE.replace(/\/$/, "")}/api/v1`;
 
 interface FetchOptions extends RequestInit {
   params?: Record<string, string | number | boolean>;
@@ -118,6 +121,23 @@ export interface AgentChatResponse {
   timestamp: string;
 }
 
+export interface StartupHealth {
+  status: "ok" | "warning";
+  default_company_id?: string | null;
+  checks: {
+    companies: number;
+    monthly_metrics: number;
+    ledger_entries: number;
+    exchange_rates: number;
+    fx_revaluation_snapshots?: number;
+    documents?: number;
+    ocr_pipeline: string;
+  };
+  table_readiness?: Record<string, boolean>;
+  issues: string[];
+  actions?: string[];
+}
+
 // API Functions
 export const api = {
   // Cash & Financials
@@ -150,6 +170,7 @@ export const api = {
   // Benchmarks
   getBenchmarks: () => fetchAPI<any>("/benchmarks/sass-health"),
   getMe: () => fetchAPI<any>("/users/me/"),
+  getStartupHealth: () => fetchAPI<StartupHealth>("/system/startup-health"),
 };
 
 export default api;

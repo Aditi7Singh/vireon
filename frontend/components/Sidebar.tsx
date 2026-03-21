@@ -43,12 +43,12 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "bg-[#020617]/80 backdrop-blur-3xl border-r border-white/5 flex flex-col transition-all duration-500 ease-in-out relative z-40 group/sidebar h-screen sticky top-0",
+        "bg-[#fcf8f2]/90 backdrop-blur-3xl border-r border-[#e3d6c7] flex flex-col transition-all duration-500 ease-in-out relative z-40 group/sidebar h-screen sticky top-0",
         sidebarExpanded ? "w-72" : "w-24"
       )}
     >
       {/* Header / Logo */}
-      <div className="h-24 flex items-center px-8 border-b border-white/5">
+      <div className="h-24 flex items-center px-8 border-b border-[#e3d6c7]">
         <Logo
           showText={sidebarExpanded}
           size={sidebarExpanded ? "md" : "sm"}
@@ -60,7 +60,7 @@ export function Sidebar() {
       {/* Toggle Button - Float Style */}
       <button
         onClick={toggleSidebar}
-        className="absolute -right-3 top-28 w-6 h-6 bg-indigo-600 border border-white/10 rounded-full flex items-center justify-center text-white shadow-xl shadow-indigo-600/20 hover:scale-110 active:scale-95 transition-all z-50 opacity-0 group-hover/sidebar:opacity-100"
+        className="absolute -right-3 top-28 w-6 h-6 bg-[#1f1a16] border border-[#d8cabc] rounded-full flex items-center justify-center text-[#fff7ef] shadow-lg hover:scale-110 active:scale-95 transition-all z-50 opacity-0 group-hover/sidebar:opacity-100"
       >
         {sidebarExpanded ? <ChevronLeft className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
       </button>
@@ -81,13 +81,13 @@ export function Sidebar() {
               className={cn(
                 "flex items-center gap-4 px-4 py-4 rounded-[20px] transition-all duration-500 group font-medium relative",
                 isActive
-                  ? "bg-indigo-600/10 text-white shadow-[0_0_20px_rgba(99,102,241,0.1)] border border-indigo-500/20"
-                  : "text-slate-500 hover:text-white hover:bg-white/5 hover:border-white/5 border border-transparent"
+                  ? "bg-[#f4e7d8] text-[#211d19] border border-[#d6c2ad]"
+                  : "text-[#6a6054] hover:text-[#1f1a16] hover:bg-white/60 hover:border-[#e4d7c9] border border-transparent"
               )}
             >
               <item.icon className={cn(
                 "w-5 h-5 transition-all duration-500",
-                isActive ? "text-indigo-400 scale-110" : "group-hover:scale-110 group-hover:text-indigo-400"
+                isActive ? "text-[#8d4f27] scale-110" : "group-hover:scale-110 group-hover:text-[#8d4f27]"
               )} />
 
               {sidebarExpanded && (
@@ -97,7 +97,7 @@ export function Sidebar() {
               )}
 
               {isActive && (
-                <div className="absolute left-0 w-1 h-6 bg-indigo-500 rounded-r-full shadow-[0_0_15px_rgba(99,102,241,0.8)]" />
+                <div className="absolute left-0 w-1 h-6 bg-[#b3622d] rounded-r-full" />
               )}
             </Link>
           );
@@ -105,25 +105,25 @@ export function Sidebar() {
       </nav>
 
       {/* User & Bottom Section */}
-      <div className="p-6 border-t border-white/5 bg-black/40 backdrop-blur-3xl space-y-4">
+      <div className="p-6 border-t border-[#e3d6c7] bg-white/55 backdrop-blur-3xl space-y-4">
         {/* User Card */}
         <div className={cn(
-          "flex items-center gap-4 p-4 rounded-[24px] bg-white/[0.03] border border-white/5 transition-all duration-500 hover:bg-white/[0.07] group/user relative cursor-pointer",
+          "flex items-center gap-4 p-4 rounded-[24px] bg-white/75 border border-[#e4d8cb] transition-all duration-500 hover:bg-white group/user relative cursor-pointer",
           !sidebarExpanded && "justify-center px-2"
         )}>
           <div className="relative">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white font-black text-xs shadow-xl ring-1 ring-white/10 transition-transform group-hover/user:scale-105">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#2c2520] to-[#4c3a2d] flex items-center justify-center text-[#fff7ef] font-black text-xs shadow-xl ring-1 ring-[#d9cab9] transition-transform group-hover/user:scale-105">
               {user?.name?.split(" ").map((n: string) => n[0]).join("") || "AD"}
             </div>
-            <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-[#050505] rounded-full shadow-lg" />
+            <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-[#ce6f35] border-2 border-[#fcf8f2] rounded-full shadow-lg" />
           </div>
           {sidebarExpanded && (
             <div className="flex flex-col min-w-0 flex-1">
-              <span className="text-[11px] font-black text-white truncate font-outfit uppercase tracking-tighter">
+              <span className="text-[11px] font-black text-[#1f1a16] truncate font-outfit uppercase tracking-tighter">
                 {user?.name || "Aditi Singh"}
               </span>
               <div className="flex items-center gap-1.5 mt-1">
-                <span className="text-[8px] font-black text-indigo-400 uppercase tracking-widest truncate bg-indigo-400/10 px-1.5 py-0.5 rounded-md">
+                <span className="text-[8px] font-black text-[#8d4f27] uppercase tracking-widest truncate bg-[#f6e7d7] px-1.5 py-0.5 rounded-md">
                   {user?.role || "FOUNDER"}
                 </span>
               </div>

@@ -1,313 +1,281 @@
 "use client";
 
-import { useEffect } from "react";
-import TopBar from "@/components/TopBar";
-import { KpiCard } from "@/components/kpi/KpiCard";
-import { useAppStore } from "@/lib/store";
-import { useScorecard, useAlerts, useBurnRate, useRevenue } from "@/hooks/useFinancialData";
-import { formatCurrency, formatCompactNumber, getRunwayStatus, formatRelativeTime, cn } from "@/lib/utils";
-import {
-   DollarSign,
-   TrendingUp,
-   Calendar,
-   Users,
-   ArrowUpRight,
-   ArrowDownRight,
-   AlertTriangle,
-   Zap,
-   Bot,
-   Plus,
-   Download,
-   MoreHorizontal,
-   ChevronRight,
-   Sparkles,
-   Target,
-   Clock,
-   ExternalLink,
-   Globe,
-   Hexagon,
-} from "lucide-react";
 import Link from "next/link";
+import { useMemo } from "react";
 import {
-   AreaChart,
-   Area,
-   XAxis,
-   YAxis,
-   CartesianGrid,
-   Tooltip,
-   ResponsiveContainer,
-   BarChart,
-   Bar,
-   Cell,
-} from "recharts";
+  ArrowUpRight,
+  BrainCircuit,
+  Building2,
+  CalendarClock,
+  ChevronRight,
+  CircleAlert,
+  Layers3,
+  Receipt,
+  ShieldCheck,
+  Sparkles,
+  Users,
+  Wallet,
+} from "lucide-react";
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-// Mock chart data for visualization
-const chartData = [
-   { date: "Oct", Revenue: 21000, Expenses: 18000 },
-   { date: "Nov", Revenue: 23500, Expenses: 19500 },
-   { date: "Dec", Revenue: 27000, Expenses: 22000 },
-   { date: "Jan", Revenue: 31000, Expenses: 24000 },
-   { date: "Feb", Revenue: 38000, Expenses: 28000 },
-   { date: "Mar", Revenue: 45000, Expenses: 32000 },
+const burnTrendData = [
+  { month: "Jan", burn: 1620000, revenue: 910000 },
+  { month: "Feb", burn: 1580000, revenue: 960000 },
+  { month: "Mar", burn: 1510000, revenue: 1040000 },
+  { month: "Apr", burn: 1490000, revenue: 1120000 },
+  { month: "May", burn: 1450000, revenue: 1240000 },
+  { month: "Jun", burn: 1410000, revenue: 1300000 },
 ];
 
-const recentTransactions = [
-   { id: 1, name: "Stripe Processing", amount: -1240, date: "Today, 2:45 PM", category: "saas" },
-   { id: 2, name: "Annual Retainer - Acme Corp", amount: 45000, date: "Yesterday, 10:15 AM", category: "revenue" },
-   { id: 3, name: "Amazon Web Services", amount: -4821, date: "Mar 14, 11:30 PM", category: "aws" },
-   { id: 4, name: "Gusto Payroll", amount: -28500, date: "Mar 12, 9:00 AM", category: "payroll" },
-   { id: 5, name: "Google Cloud Platform", amount: -3200, date: "Mar 10, 4:20 PM", category: "aws" },
+const priorityActions = [
+  {
+    title: "Optimize cloud spend in ML workloads",
+    impact: "Estimated monthly savings: $38,400",
+    owner: "CTO",
+    href: "/dashboard/expenses",
+  },
+  {
+    title: "Accelerate collections for enterprise invoices",
+    impact: "Improve runway by 1.2 months",
+    owner: "Finance",
+    href: "/dashboard/revenue",
+  },
+  {
+    title: "Recalibrate growth hiring for Q3",
+    impact: "Reduce burn multiple from 1.9 to 1.6",
+    owner: "CEO",
+    href: "/dashboard/runway",
+  },
 ];
 
-export default function DashboardPage() {
-   const { openChat, setAlertCount, setCriticalAlertCount } = useAppStore();
-   const { scorecard, isLoading: scorecardLoading } = useScorecard();
-   const { alerts, isLoading: alertsLoading } = useAlerts();
-   const { burnRate, isLoading: burnLoading } = useBurnRate();
-   const { revenue, isLoading: revenueLoading } = useRevenue();
+const moduleCards = [
+  {
+    title: "Runway Intelligence",
+    description: "Live runway projection with growth and hiring simulation overlays.",
+    icon: CalendarClock,
+    href: "/dashboard/runway",
+  },
+  {
+    title: "Expense Forensics",
+    description: "Vendor-level leakage discovery and spend concentration insights.",
+    icon: Receipt,
+    href: "/dashboard/expenses",
+  },
+  {
+    title: "Revenue Signal",
+    description: "MRR quality, cohort retention, and delayed collection watch.",
+    icon: Wallet,
+    href: "/dashboard/revenue",
+  },
+  {
+    title: "Scenario Engine",
+    description: "Compare base, conservative, and aggressive plans instantly.",
+    icon: Layers3,
+    href: "/dashboard/scenarios",
+  },
+];
 
-   // Update global state in useEffect
-   useEffect(() => {
-      if (alerts) {
-         setAlertCount(alerts.total);
-         setCriticalAlertCount(alerts.critical_count);
-      }
-   }, [alerts, setAlertCount, setCriticalAlertCount]);
-
-   const runwayStatus = getRunwayStatus(scorecard.runway_months);
-   const runwayMonths = Number(scorecard.runway_months);
-   const runwayLabel = Number.isFinite(runwayMonths) ? `${Math.round(runwayMonths)} MO` : "-";
-
-   const handleConsultAI = () => {
-      openChat("Financial Dashboard Analysis");
-   };
-
-   return (
-      <div className="min-h-screen bg-slate-950 pb-20">
-         <TopBar title="Financial Command Center" />
-
-         <div className="p-8 space-y-10 max-w-[1600px] mx-auto">
-            {/* Header Section */}
-            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-               <div className="space-y-4">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-bold uppercase tracking-wider">
-                     <Clock className="w-3.5 h-3.5" />
-                     Live Market Data Connected
-                  </div>
-                  <h1 className="text-4xl font-black text-white tracking-tight font-outfit uppercase">
-                     Financial <span className="text-slate-500">Overview</span>
-                  </h1>
-                  <div className="flex items-center gap-4 text-slate-500 font-bold text-[10px] uppercase tracking-widest">
-                     <div className="flex items-center gap-2">
-                        <Globe className="w-3.5 h-3.5" />
-                        <span>ERP Sync: ACTIVE</span>
-                     </div>
-                     <div className="w-1.5 h-1.5 rounded-full bg-slate-800" />
-                     <div className="text-slate-400">Node ID: 0xFF-70A</div>
-                  </div>
-               </div>
-
-               <div className="flex items-center gap-3">
-                  <button className="btn-secondary text-xs">
-                     <Download className="w-4 h-4" />
-                     Export CSV
-                  </button>
-                  <button
-                     onClick={handleConsultAI}
-                     className="btn-primary text-xs flex items-center gap-2"
-                  >
-                     <Bot className="w-4 h-4" />
-                     Run AI Audit
-                  </button>
-               </div>
-            </div>
-
-            {/* KPI Grid - Industrial Standard */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-               {[
-                  { title: "Total Liquidity", value: formatCurrency(scorecard.total_cash), icon: DollarSign, trend: "+2.4%", trendColor: "text-emerald-500" },
-                  { title: "Monthly Burn", value: formatCurrency(scorecard.monthly_gross_burn), icon: TrendingUp, trend: "-1.2%", trendColor: "text-emerald-500" },
-                  { title: "Projected Runway", value: runwayLabel, icon: Calendar, trend: "Stable", trendColor: "text-slate-400" },
-                  { title: "Core Revenue", value: formatCurrency(scorecard.monthly_revenue), icon: Target, trend: "+8.5%", trendColor: "text-emerald-500" },
-               ].map((kpi, i) => (
-                  <div key={i} className="bg-slate-900 border border-white/10 p-6 rounded-2xl shadow-lg group hover:border-indigo-500/30 transition-all">
-                     <div className="flex items-center justify-between mb-4">
-                        <div className="p-2 rounded-lg bg-white/5 text-slate-400 group-hover:text-indigo-400 transition-colors">
-                           <kpi.icon className="w-5 h-5" />
-                        </div>
-                        <span className={`text-[10px] font-bold uppercase tracking-wider ${kpi.trendColor}`}>{kpi.trend}</span>
-                     </div>
-                     <div className="space-y-1">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{kpi.title}</span>
-                        <div className="text-2xl font-black text-white font-outfit tracking-tight">{kpi.value}</div>
-                     </div>
-                  </div>
-               ))}
-            </div>
-
-            {/* Main Content Grid */}
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-               <div className="xl:col-span-8 space-y-8">
-                  {/* Chart Area */}
-                  <div className="bg-slate-900 border border-white/10 rounded-3xl p-8">
-                     <div className="flex items-center justify-between mb-8">
-                        <div>
-                           <h2 className="text-xl font-bold text-white font-outfit uppercase tracking-tighter">
-                              Cash Flow Intelligence
-                           </h2>
-                           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Revenue vs Expenditure Matrix</p>
-                        </div>
-                        <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-lg border border-white/5">
-                           <button className="px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-white rounded-md">6 Months</button>
-                           <button className="px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 hover:text-white transition-all">Yearly</button>
-                        </div>
-                     </div>
-
-                     <div className="h-[380px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                           <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                              <defs>
-                                 <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.15} />
-                                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-                                 </linearGradient>
-                              </defs>
-                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                              <XAxis
-                                 dataKey="date"
-                                 axisLine={false}
-                                 tickLine={false}
-                                 tick={{ fill: '#64748b', fontSize: 11, fontWeight: 700 }}
-                              />
-                              <YAxis
-                                 axisLine={false}
-                                 tickLine={false}
-                                 tick={{ fill: '#64748b', fontSize: 11, fontWeight: 700 }}
-                                 tickFormatter={(value) => `$${value / 1000}K`}
-                              />
-                              <Tooltip
-                                 contentStyle={{
-                                    backgroundColor: '#0f172a',
-                                    border: '1px solid rgba(255,255,255,0.1)',
-                                    borderRadius: '12px',
-                                    fontSize: '11px',
-                                    fontWeight: '700'
-                                 }}
-                              />
-                              <Area
-                                 type="monotone"
-                                 dataKey="Revenue"
-                                 stroke="#6366f1"
-                                 strokeWidth={3}
-                                 fillOpacity={1}
-                                 fill="url(#colorRevenue)"
-                                 animationDuration={1500}
-                              />
-                              <Area
-                                 type="monotone"
-                                 dataKey="Expenses"
-                                 stroke="#94a3b8"
-                                 strokeWidth={2}
-                                 strokeDasharray="4 4"
-                                 fill="transparent"
-                              />
-                           </AreaChart>
-                        </ResponsiveContainer>
-                     </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                     {/* Resource Velocity */}
-                     <div className="bg-slate-900 border border-white/10 rounded-2xl p-8 border-l-4 border-l-indigo-600">
-                        <h3 className="text-lg font-bold text-white font-outfit uppercase tracking-tight mb-6">Runway Sustainability</h3>
-                        <div className="space-y-6">
-                           <div className="flex justify-between items-end">
-                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Safety Margin</span>
-                              <span className="text-2xl font-black text-white font-outfit tracking-tight">{runwayLabel}</span>
-                           </div>
-                           <div className="h-2 bg-slate-950 rounded-full overflow-hidden border border-white/5">
-                              <div
-                                 className="h-full bg-indigo-500 transition-all duration-1000"
-                                 style={{ width: `${Math.min(100, (scorecard.runway_months / 24) * 100)}%` }}
-                              />
-                           </div>
-                           <div className="grid grid-cols-2 gap-4 pt-2">
-                              <div className="bg-slate-950 p-4 rounded-xl border border-white/5">
-                                 <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.15em] mb-1">Target</p>
-                                 <p className="text-base font-bold text-white">18.0 MO</p>
-                              </div>
-                              <div className="bg-slate-950 p-4 rounded-xl border border-white/5">
-                                 <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.15em] mb-1">Status</p>
-                                 <p className="text-base font-bold text-emerald-500 uppercase">Secure</p>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-
-                     {/* Allocation Logic */}
-                     <div className="bg-slate-900 border border-white/10 rounded-2xl p-8">
-                        <h3 className="text-lg font-bold text-white font-outfit uppercase tracking-tight mb-6">Capital Allocation</h3>
-                        <div className="space-y-5">
-                           {Object.entries(burnRate.breakdown_by_category).slice(0, 3).map(([cat, val]) => (
-                              <div key={cat} className="space-y-2">
-                                 <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
-                                    <span className="text-slate-500">{cat}</span>
-                                    <span className="text-white">{formatCurrency(val as number)}</span>
-                                 </div>
-                                 <div className="h-1.5 bg-slate-950 rounded-full overflow-hidden">
-                                    <div className="h-full bg-slate-700 w-[60%]" style={{ width: `${Math.min(100, (val as number / burnRate.monthly_burn) * 100)}%` }} />
-                                 </div>
-                              </div>
-                           ))}
-                        </div>
-                     </div>
-                  </div>
-               </div>
-
-               <div className="xl:col-span-4 space-y-8">
-                  {/* Executive Action */}
-                  <div className="bg-indigo-600 rounded-3xl p-8 text-white relative shadow-xl overflow-hidden group">
-                     <Hexagon className="absolute -right-8 -bottom-8 w-40 h-40 opacity-10 rotate-12" />
-                     <h3 className="text-xl font-black font-outfit uppercase tracking-tight mb-4">Vireon Intelligence</h3>
-                     <p className="text-sm font-medium text-indigo-100/90 leading-relaxed mb-8">
-                        Operational efficiency protocols identified. Optimization can reclaim 12% of infrastructure overhead.
-                     </p>
-                     <button
-                        onClick={() => openChat("Optimize infrastructure")}
-                        className="w-full py-4 bg-white text-indigo-700 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-slate-100 transition-all flex items-center justify-center gap-2"
-                     >
-                        <Zap className="w-4 h-4" />
-                        Review Recommendations
-                     </button>
-                  </div>
-
-                  {/* Recent Transactions */}
-                  <div className="bg-slate-900 border border-white/10 rounded-3xl p-8">
-                     <div className="flex items-center justify-between mb-8">
-                        <h3 className="text-lg font-bold text-white font-outfit uppercase tracking-tight">Ledger Feed</h3>
-                        <div className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-2 py-0.5 rounded">Real-time</div>
-                     </div>
-                     <div className="space-y-6">
-                        {recentTransactions.map(tx => (
-                           <div key={tx.id} className="flex items-center gap-4 group cursor-pointer">
-                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border border-white/5 transition-all ${tx.amount > 0 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-slate-800 text-slate-500'}`}>
-                                 {tx.amount > 0 ? <ArrowUpRight className="w-5 h-5" /> : <TrendingUp className="w-5 h-5 rotate-180" />}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                 <p className="text-[11px] font-bold text-white uppercase tracking-wider truncate">{tx.name}</p>
-                                 <p className="text-[9px] font-medium text-slate-600 uppercase tracking-widest mt-0.5">{tx.date}</p>
-                              </div>
-                              <span className={`text-xs font-bold ${tx.amount > 0 ? 'text-emerald-500' : 'text-slate-400'}`}>
-                                 {tx.amount > 0 ? '+' : ''}{formatCompactNumber(tx.amount)}
-                              </span>
-                           </div>
-                        ))}
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </div>
-   );
+function formatCurrencyShort(value: number): string {
+  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}M`;
+  if (value >= 1_000) return `$${(value / 1_000).toFixed(1)}K`;
+  return `$${value.toFixed(0)}`;
 }
 
+export default function DashboardHomePage() {
+  const metrics = useMemo(() => {
+    const latest = burnTrendData[burnTrendData.length - 1];
+    const runwayMonths = (18_900_000 / latest.burn).toFixed(1);
+    const burnMultiple = (latest.burn / latest.revenue).toFixed(2);
+
+    return [
+      {
+        label: "Net Burn",
+        value: formatCurrencyShort(latest.burn),
+        trend: "-4.1% vs last month",
+        positive: true,
+        icon: Building2,
+      },
+      {
+        label: "Burn Multiple",
+        value: `${burnMultiple}x`,
+        trend: "Target: 1.50x",
+        positive: Number(burnMultiple) <= 1.7,
+        icon: BrainCircuit,
+      },
+      {
+        label: "Runway",
+        value: `${runwayMonths} months`,
+        trend: "Threshold alert at 12 months",
+        positive: Number(runwayMonths) > 12,
+        icon: ShieldCheck,
+      },
+      {
+        label: "Team Cost Ratio",
+        value: "44%",
+        trend: "+1.3% QoQ",
+        positive: false,
+        icon: Users,
+      },
+    ];
+  }, []);
+
+  return (
+    <main className="min-h-screen w-full bg-[#f6f3ee] pb-14 text-[#1d1b17]">
+      <section className="mx-auto w-full max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-[2rem] border border-[#d7cdbc] bg-gradient-to-br from-[#fff8eb] via-[#f8f0df] to-[#f1e6d3] p-6 shadow-[0_20px_80px_rgba(70,55,20,0.12)] sm:p-8">
+          <div className="pointer-events-none absolute -right-12 -top-10 h-40 w-40 rounded-full bg-[#f5d07b]/40 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-16 left-8 h-40 w-40 rounded-full bg-[#dfb77f]/30 blur-3xl" />
+
+          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              <p className="inline-flex items-center gap-2 rounded-full border border-[#d2b687] bg-[#fff4de] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[#8a5d12]">
+                <Sparkles className="h-3.5 w-3.5" />
+                Executive Control Center
+              </p>
+              <h1 className="mt-4 text-3xl font-semibold leading-tight text-[#2b1f12] sm:text-4xl">
+                Your financial story, rendered as decisions not spreadsheets.
+              </h1>
+              <p className="mt-3 max-w-2xl text-sm text-[#5f5243] sm:text-base">
+                Unified ERP, payroll, cloud, and revenue telemetry with AI-generated priorities for CEO, CTO, and Finance leadership.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href="/dashboard/ceo"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#26201a] px-4 py-2.5 text-sm font-medium text-[#fef8ec] transition hover:bg-[#17130f]"
+              >
+                CEO View
+                <ChevronRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/dashboard/finance"
+                className="inline-flex items-center gap-2 rounded-xl border border-[#bca887] bg-[#fff8ea] px-4 py-2.5 text-sm font-medium text-[#4a3720] transition hover:bg-[#f6ebd5]"
+              >
+                Finance View
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto mt-6 grid w-full max-w-7xl gap-4 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
+        {metrics.map((metric) => {
+          const Icon = metric.icon;
+          return (
+            <article
+              key={metric.label}
+              className="rounded-2xl border border-[#ddd3c5] bg-[#fffdf8] p-5 shadow-[0_14px_35px_rgba(60,45,25,0.06)]"
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-xs uppercase tracking-[0.12em] text-[#7b705f]">{metric.label}</p>
+                <Icon className="h-4 w-4 text-[#8f6b34]" />
+              </div>
+              <p className="mt-2 text-2xl font-semibold text-[#2d241b]">{metric.value}</p>
+              <p className={`mt-1 text-xs ${metric.positive ? "text-[#256443]" : "text-[#91572e]"}`}>
+                {metric.trend}
+              </p>
+            </article>
+          );
+        })}
+      </section>
+
+      <section className="mx-auto mt-6 grid w-full max-w-7xl gap-4 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
+        <article className="rounded-2xl border border-[#ddd2c1] bg-[#fffdf9] p-5 shadow-[0_14px_35px_rgba(60,45,25,0.06)] lg:col-span-2">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-[#2a2118]">Burn vs Revenue Momentum</h2>
+              <p className="text-xs text-[#7e715f]">Last 6 months, normalized from unified ledger.</p>
+            </div>
+            <Link
+              href="/dashboard/runway"
+              className="inline-flex items-center gap-1 text-sm font-medium text-[#7d4f13] hover:text-[#603a08]"
+            >
+              Explore runway
+              <ChevronRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="h-[280px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={burnTrendData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="burnFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#bf7b1a" stopOpacity={0.42} />
+                    <stop offset="95%" stopColor="#bf7b1a" stopOpacity={0.05} />
+                  </linearGradient>
+                  <linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#2a7f5f" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#2a7f5f" stopOpacity={0.05} />
+                  </linearGradient>
+                </defs>
+                <XAxis axisLine={false} tickLine={false} dataKey="month" tick={{ fill: "#7f6f5e", fontSize: 12 }} />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(v) => `$${Math.round(v / 1000)}k`}
+                  tick={{ fill: "#7f6f5e", fontSize: 12 }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: 12,
+                    border: "1px solid #d8c9b3",
+                    background: "#fffaf0",
+                    color: "#2a2118",
+                  }}
+                  formatter={(value: number) => [formatCurrencyShort(value)]}
+                />
+                <Area type="monotone" dataKey="burn" stroke="#b96f12" strokeWidth={2.3} fill="url(#burnFill)" />
+                <Area type="monotone" dataKey="revenue" stroke="#2c805f" strokeWidth={2.3} fill="url(#revenueFill)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </article>
+
+        <article className="rounded-2xl border border-[#dccfbd] bg-[#fffdf8] p-5 shadow-[0_14px_35px_rgba(60,45,25,0.06)]">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-semibold text-[#2a2118]">Priority Actions</h2>
+            <CircleAlert className="h-4 w-4 text-[#9e6420]" />
+          </div>
+          <div className="mt-4 space-y-3">
+            {priorityActions.map((item) => (
+              <Link
+                key={item.title}
+                href={item.href}
+                className="block rounded-xl border border-[#e4d9c9] bg-[#fffcf5] p-3 transition hover:border-[#cbb79a] hover:bg-[#fff8e9]"
+              >
+                <p className="text-sm font-medium text-[#34281c]">{item.title}</p>
+                <p className="mt-1 text-xs text-[#6f624f]">{item.impact}</p>
+                <p className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-[#885114]">
+                  Owner: {item.owner}
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </p>
+              </Link>
+            ))}
+          </div>
+        </article>
+      </section>
+
+      <section className="mx-auto mt-6 grid w-full max-w-7xl gap-4 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
+        {moduleCards.map((module) => {
+          const Icon = module.icon;
+          return (
+            <Link
+              key={module.title}
+              href={module.href}
+              className="group rounded-2xl border border-[#ded3c5] bg-[#fffdf8] p-5 shadow-[0_14px_35px_rgba(60,45,25,0.06)] transition hover:-translate-y-0.5 hover:border-[#cbb191] hover:shadow-[0_20px_45px_rgba(60,45,25,0.12)]"
+            >
+              <Icon className="h-5 w-5 text-[#8d5f21]" />
+              <h3 className="mt-3 text-sm font-semibold text-[#2f251a]">{module.title}</h3>
+              <p className="mt-1 text-xs leading-relaxed text-[#6e6251]">{module.description}</p>
+              <p className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-[#8d5f21]">
+                Open module
+                <ChevronRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+              </p>
+            </Link>
+          );
+        })}
+      </section>
+    </main>
+  );
+}

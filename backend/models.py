@@ -60,10 +60,125 @@ class Company(Base):
     initial_cash = Column(Numeric(15, 2), nullable=True) # Changed to nullable
     founding_date = Column(Date)
     effective_tax_rate = Column(Numeric(5, 4), default=0.2500) # Decimals for fast percentage mapping (e.g. 25.00%)
+    notification_contacts = Column(JSON, nullable=True)
+    alert_thresholds = Column(JSON, nullable=False, default=lambda: {"critical_months": 3, "warning_months": 6})
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
     accounts = relationship("Account", back_populates="company")
+
+
+class LedgerEntryType(str, enum.Enum):
+    CREDIT = "credit"
+    DEBIT = "debit"
+
+
+class LedgerCategory(str, enum.Enum):
+    REVENUE = "revenue"
+    TECH_COST = "tech_cost"
+    NON_TECH_COST = "non_tech_cost"
+    OFFICE_EXPENSE = "office_expense"
+    MARKETING = "marketing"
+    PAYROLL = "payroll"
+    HIRING = "hiring"
+    LOAN_REPAYMENT = "loan_repayment"
+    MISC = "misc"
+
+
+class LedgerProductTag(str, enum.Enum):
+    ORCHARD = "orchard"
+    SPROUTS = "sprouts"
+    AI_LAB = "ai_lab"
+    SHARED = "shared"
+    UNALLOCATED = "unallocated"
+
+
+class LedgerOfficeTag(str, enum.Enum):
+    BENGALURU = "bengaluru"
+    GANGAVATHI = "gangavathi"
+    REMOTE = "remote"
+    NA = "na"
+
+
+class LedgerSource(str, enum.Enum):
+    ERPNEXT = "erpnext"
+    MANUAL_CTO = "manual_cto"
+    MANUAL_MARKETING = "manual_marketing"
+    MANUAL_FINANCE = "manual_finance"
+    BANK_FEED = "bank_feed"
+    AWS_BILLING = "aws_billing"
+    SANDBOX = "sandbox"
+
+
+class LedgerEnteredByRole(str, enum.Enum):
+    CEO = "ceo"
+    CTO = "cto"
+    CSO = "cso"
+    MARKETING = "marketing"
+    FINANCE = "finance"
+    SYSTEM = "system"
+
+
+class RecommendationStatus(str, enum.Enum):
+    ACTIVE = "active"
+    ARCHIVED = "archived"
+
+
+class RunwayAlertLevel(str, enum.Enum):
+    WARNING = "warning"
+    CRITICAL = "critical"
+
+
+class FinancialLedgerEntry(Base):
+    __tablename__ = "financial_ledger_entries"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    transaction_date = Column(Date, nullable=False, index=True)
+    amount = Column(Numeric(15, 2), nullable=False)
+    currency = Column(String(3), nullable=False, default="INR")
+    amount_inr = Column(Numeric(15, 2), nullable=False)
+    entry_type = Column(Enum(LedgerEntryType), nullable=False, index=True)
+    category = Column(Enum(LedgerCategory), nullable=False, index=True)
+    product_tag = Column(Enum(LedgerProductTag), nullable=False, default=LedgerProductTag.UNALLOCATED, index=True)
+    office_tag = Column(Enum(LedgerOfficeTag), nullable=False, default=LedgerOfficeTag.NA)
+    source = Column(Enum(LedgerSource), nullable=False)
+    reference_id = Column(String(255), nullable=True)
+    reference_type = Column(String(100), nullable=True)
+    description = Column(Text, nullable=False)
+    entered_by_role = Column(Enum(LedgerEnteredByRole), nullable=False, default=LedgerEnteredByRole.SYSTEM)
+    is_recurring = Column(Boolean, nullable=False, default=False)
+    tags = Column(JSON, nullable=True)
+    department = Column(String(50), nullable=True)  # Added for Series B+ department-level P&L
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+
+class RecommendationReport(Base):
+    __tablename__ = "recommendation_reports"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    generated_at = Column(DateTime, default=datetime.datetime.utcnow)
+    month = Column(String(7), nullable=False)  # YYYY-MM
+    recommendations = Column(JSON, nullable=False)
+    runway_at_generation = Column(Numeric(8, 2), nullable=True)
+    status = Column(Enum(RecommendationStatus), nullable=False, default=RecommendationStatus.ACTIVE)
+
+
+class RunwayAlert(Base):
+    __tablename__ = "runway_alerts"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    alert_level = Column(Enum(RunwayAlertLevel), nullable=False)
+    runway_months = Column(Numeric(8, 2), nullable=False)
+    runway_date = Column(Date, nullable=False)
+    alert_data = Column(JSON, nullable=False)
+    sent_at = Column(DateTime, nullable=True)
+    acknowledged_at = Column(DateTime, nullable=True)
+    acknowledged_by = Column(String(255), nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
 class Account(Base):
     __tablename__ = "accounts"
@@ -147,6 +262,7 @@ class Expense(Base):
     category = Column(String(100))
     payment_method = Column(String(50))
     memo = Column(Text)
+    department = Column(String(50), nullable=True)  # Added for Series B+ department-level P&L
     remote_created_at = Column(DateTime)
     remote_modified_at = Column(DateTime)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
@@ -279,6 +395,7 @@ class PayrollEntry(Base):
     net_pay = Column(Numeric(15, 2), nullable=False)
     pay_date = Column(Date, nullable=False)
     status = Column(String(20), default="processed")  # pending, processed, cancelled
+    department = Column(String(50), nullable=True)  # Added for Series B+ department-level P&L (denormalized from employee)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     employee = relationship("Employee", back_populates="payroll_entries")
@@ -441,3 +558,122 @@ class BankingTransaction(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     
     feed = relationship("BankFeed", back_populates="transactions")
+
+
+# ─── SERIES B+ EXTENSIONS ────────────────────────────────────────────────────
+
+class Department(str, enum.Enum):
+    ENGINEERING = "engineering"
+    PRODUCT = "product"
+    MARKETING = "marketing"
+    SALES = "sales"
+    OPERATIONS = "operations"
+    FINANCE = "finance"
+    PEOPLE = "people"
+    DESIGN = "design"
+    SUPPORT = "support"
+
+
+class GLAccountCode(str, enum.Enum):
+    # Assets (1000-1999)
+    CASH = "1010"
+    ACCOUNTS_RECEIVABLE = "1200"
+    INVENTORY = "1300"
+    PREPAID_EXPENSES = "1400"
+    EQUIPMENT = "1500"
+    ACCUMULATED_DEPRECIATION = "1501"
+    
+    # Liabilities (2000-2999)
+    ACCOUNTS_PAYABLE = "2100"
+    ACCRUED_EXPENSES = "2200"
+    SHORT_TERM_DEBT = "2300"
+    LONG_TERM_DEBT = "2400"
+    
+    # Equity (3000-3999)
+    COMMON_STOCK = "3100"
+    RETAINED_EARNINGS = "3200"
+    
+    # Revenue (4000-4999)
+    PRODUCT_REVENUE = "4100"
+    SERVICE_REVENUE = "4200"
+    SUBSCRIPTION_REVENUE = "4300"
+    
+    # Expenses (5000-5999)
+    PAYROLL_EXPENSE = "5100"
+    TECH_COST_AWS = "5200"
+    TECH_COST_SAAS = "5210"
+    TECH_COST_INFRASTRUCTURE = "5220"
+    MARKETING_EXPENSE = "5300"
+    OFFICE_EXPENSE = "5400"
+    DEPRECIATION_EXPENSE = "5500"
+
+
+class GeneralLedger(Base):
+    __tablename__ = "general_ledger"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    account_code = Column(Enum(GLAccountCode), nullable=False, index=True)
+    account_name = Column(String(255), nullable=False)
+    transaction_date = Column(Date, nullable=False, index=True)
+    debit_amount = Column(Numeric(15, 2), default=0)
+    credit_amount = Column(Numeric(15, 2), default=0)
+    description = Column(Text, nullable=False)
+    
+    # Dimensional analysis
+    department = Column(Enum(Department), nullable=True, index=True)
+    product_tag = Column(Enum(LedgerProductTag), nullable=True)
+    office_tag = Column(Enum(LedgerOfficeTag), nullable=True)
+    
+    # Audit trail
+    source_ledger_id = Column(UUID(as_uuid=True), nullable=True)  # Links to FinancialLedgerEntry.id
+    source_type = Column(String(100), nullable=True)  # "financial_ledger", "payroll", "invoice", etc.
+    reference_id = Column(String(255), nullable=True)
+    
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+
+class CustomerCohort(Base):
+    __tablename__ = "customer_cohorts"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    cohort_name = Column(String(255), nullable=False)
+    cohort_type = Column(String(50), nullable=False)  # "acquisition_month", "product_line", "customer_segment", "geo"
+    cohort_value = Column(String(255), nullable=False)  # e.g., "2025-03", "orchard", "enterprise", "india"
+    product_tag = Column(Enum(LedgerProductTag), nullable=True)
+    
+    # Cohort metadata
+    customer_acquired_date = Column(Date, nullable=True)
+    customer_count = Column(Integer, default=0)
+    mrr_total = Column(Numeric(15, 2), default=0)
+    arr_total = Column(Numeric(15, 2), default=0)
+    churn_rate = Column(Numeric(5, 4), nullable=True)  # Monthly churn %
+    ltv_estimate = Column(Numeric(15, 2), nullable=True)  # Lifetime value
+    cac_estimate = Column(Numeric(15, 2), nullable=True)  # Customer acquisition cost
+    nrr = Column(Numeric(5, 2), nullable=True)  # Net revenue retention %
+    
+    # Financial health
+    gross_margin_pct = Column(Numeric(5, 2), nullable=True)
+    payback_months = Column(Numeric(5, 2), nullable=True)
+    health_score = Column(Numeric(3, 2), nullable=True)  # 0-10 scale
+    
+    tags = Column(JSON, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+
+class FxRevaluationSnapshot(Base):
+    __tablename__ = "fx_revaluation_snapshots"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    snapshot_month = Column(String(7), nullable=False, index=True)  # YYYY-MM
+    base_currency = Column(String(3), nullable=False, index=True)
+    exposure_amount = Column(Numeric(15, 2), nullable=False, default=0)
+    previous_rate = Column(Numeric(15, 6), nullable=True)
+    current_rate = Column(Numeric(15, 6), nullable=False)
+    revalued_amount_inr = Column(Numeric(15, 2), nullable=False, default=0)
+    gain_loss_inr = Column(Numeric(15, 2), nullable=False, default=0)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)

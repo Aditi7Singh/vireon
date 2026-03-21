@@ -1,129 +1,171 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Bot, Zap, Shield, TrendingUp, Globe, Cpu, Hexagon } from "lucide-react";
+import { ArrowRight, Cpu, ShieldCheck, Sparkles, TrendingUp } from "lucide-react";
+import { Logo } from "@/components/Logo";
+
+const pillars = [
+  {
+    title: "Deterministic Finance Core",
+    description: "Metric computation stays auditable and math-backed, even when questions are asked in natural language.",
+    icon: Cpu,
+  },
+  {
+    title: "Early Risk Detection",
+    description: "Anomaly scans surface unusual spend patterns before they materially affect runway and operating tempo.",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Strategic Scenario Layer",
+    description: "Model hiring, cloud cost, and growth choices with concrete INR impact and timeline sensitivity.",
+    icon: TrendingUp,
+  },
+];
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-200 font-sans selection:bg-indigo-500/30 overflow-hidden relative">
-      {/* Cinematic Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/5 blur-[120px] rounded-full animate-pulse-slow" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full animate-pulse-slow" />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150" />
+    <div className="min-h-screen bg-[#f6f3ee] text-[#1d1b19] overflow-hidden">
+      <div className="pointer-events-none fixed inset-0">
+        <div className="absolute -top-32 -left-24 h-[28rem] w-[28rem] rounded-full bg-[#f8caa8]/35 blur-3xl" />
+        <div className="absolute top-[18%] right-[-10rem] h-[30rem] w-[30rem] rounded-full bg-[#f0d9bc]/45 blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_10%,rgba(255,255,255,0.8),transparent_42%),radial-gradient(circle_at_90%_20%,rgba(254,245,236,0.95),transparent_40%)]" />
       </div>
 
-      <header className="relative z-50 flex items-center justify-between px-8 py-8 lg:px-12 max-w-[1800px] mx-auto">
-        <div className="flex items-center gap-3 group cursor-pointer">
-          <div className="relative">
-            <div className="w-10 h-10 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500">
-              <Hexagon className="w-6 h-6 text-white" />
-            </div>
-            <div className="absolute inset-0 bg-indigo-500 blur-xl opacity-0 group-hover:opacity-40 transition-opacity" />
-          </div>
-          <span className="text-2xl font-black tracking-tighter text-white font-outfit uppercase">SeedlingLabs</span>
-        </div>
+      <header className="relative z-20 mx-auto flex w-full max-w-[1280px] items-center justify-between px-6 py-8 lg:px-12">
+        <Logo size="sm" />
 
-        <nav className="hidden md:flex items-center gap-10">
-          {["Intelligence", "Security", "Infrastructure", "Vision"].map((item) => (
-            <Link key={item} href="#" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-colors">{item}</Link>
+        <nav className="hidden items-center gap-10 md:flex">
+          {[
+            { label: "Platform", href: "#platform" },
+            { label: "Intelligence", href: "#capabilities" },
+            { label: "Security", href: "#security" },
+            { label: "Pricing", href: "#pricing" },
+          ].map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className="text-sm text-[#4d463f] transition-colors hover:text-[#1f1a16]"
+            >
+              {item.label}
+            </Link>
           ))}
         </nav>
 
         <Link
           href="/dashboard"
-          className="px-6 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-[10px] font-black uppercase tracking-widest text-white transition-all hover:border-white/20 backdrop-blur-md"
+          className="rounded-full border border-[#d7c9b9] bg-white/70 px-5 py-2.5 text-sm font-medium text-[#201c18] shadow-sm transition-all hover:border-[#c7b3a0] hover:bg-white"
         >
-          Access Portal
+          Open Dashboard
         </Link>
       </header>
 
-      <main className="relative z-10 flex flex-col items-center justify-center px-6 pt-20 lg:pt-32 pb-40">
-        <div className="text-center space-y-8 max-w-5xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest animate-in fade-in slide-in-from-bottom-4 duration-1000">
-            <Cpu className="w-3.5 h-3.5" />
-            Strategic Growth Intelligence
-          </div>
-
-          <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-white font-outfit tracking-tight leading-[0.9] animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100">
-            Building the <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500">Financial Future.</span>
-          </h1>
-
-          <p className="mt-8 text-lg md:text-xl text-slate-400 max-w-3xl mx-auto font-medium leading-relaxed animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
-            SeedlingLabs pioneers the next generation of business intelligence.
-            Through our flagship platform, <span className="text-white font-bold">Vireon</span>, we bridge the gap between complex ERP data and strategic executive decisions.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-12 animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-300">
-            <Link
-              href="/dashboard"
-              className="group relative px-10 py-5 bg-indigo-600 rounded-2xl overflow-hidden hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-indigo-600/40"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-400 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative flex items-center gap-3">
-                <span className="text-[12px] font-black uppercase tracking-[0.2em] text-white">Enter Vireon Portal</span>
-                <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Link>
-
-            <Link href="#intel" className="px-10 py-5 rounded-2xl border border-white/10 hover:border-white/20 transition-all text-[12px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-white backdrop-blur-md">
-              Our Vision
-            </Link>
-          </div>
-        </div>
-
-        {/* Feature Grid - Cinematic Cards */}
-        <div id="intel" className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-40 max-w-[1400px] w-full animate-in fade-in slide-in-from-bottom-20 duration-1000 delay-500">
-          {[
-            {
-              title: "Autonomous Analytics",
-              desc: "Vireon's core engine detects financial leakage and anomalies with machine-grade precision.",
-              icon: Bot,
-              color: "text-indigo-400",
-              bg: "bg-indigo-500/5",
-            },
-            {
-              title: "Unified Resilience",
-              desc: "Strategic runway modeling derived from real-time ERP data integration.",
-              icon: Shield,
-              color: "text-emerald-400",
-              bg: "bg-emerald-500/5",
-            },
-            {
-              title: "Capital Velocity",
-              desc: "Accelerating the flow of capital intelligence for high-performance scale-ups.",
-              icon: TrendingUp,
-              color: "text-purple-400",
-              bg: "bg-purple-500/5",
-            },
-          ].map((feature, i) => (
-            <div key={i} className="group glass-card p-10 rounded-[40px] hover:bg-white/[0.05] transition-all duration-700 hover:-translate-y-2">
-              <div className={`w-14 h-14 ${feature.bg} rounded-[20px] flex items-center justify-center mb-8 border border-white/5 transition-transform group-hover:scale-110 duration-500`}>
-                <feature.icon className={`h-7 w-7 ${feature.color}`} />
-              </div>
-              <h3 className="text-2xl font-black text-white font-outfit mb-4">{feature.title}</h3>
-              <p className="text-slate-500 font-medium leading-relaxed group-hover:text-slate-300 transition-colors">
-                {feature.desc}
-              </p>
+      <main className="relative z-10 mx-auto flex w-full max-w-[1280px] flex-col px-6 pb-20 pt-6 lg:px-12 lg:pt-10">
+        <section id="platform" className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#d9cbbd] bg-white/70 px-4 py-1.5 text-xs font-medium uppercase tracking-[0.16em] text-[#735d48]">
+              <Sparkles className="h-3.5 w-3.5" />
+              AI CFO for operational teams
             </div>
+
+            <h1 className="mt-7 max-w-3xl text-5xl font-semibold leading-[0.96] tracking-tight text-[#1d1b19] md:text-7xl">
+              Financial clarity that feels
+              <span className="bg-gradient-to-r from-[#cc6d2b] via-[#a95a29] to-[#6f3f1f] bg-clip-text text-transparent"> immediate</span>.
+            </h1>
+
+            <p className="mt-7 max-w-2xl text-base leading-relaxed text-[#5a5148] md:text-lg">
+              Vireon turns ERP complexity into plain-language financial decisions.
+              From burn diagnostics to runway projections, every insight is traceable,
+              explainable, and ready for leadership action.
+            </p>
+
+            <p className="mt-4 text-sm font-semibold uppercase tracking-[0.14em] text-[#8a603e]">
+              Always watching your runway.
+            </p>
+
+            <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#1f1a16] px-7 py-4 text-sm font-medium text-[#fff6ee] shadow-[0_14px_40px_rgba(34,20,10,0.22)] transition-all hover:translate-y-[-1px] hover:bg-[#151210]"
+              >
+                Launch Vireon
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="#capabilities"
+                className="inline-flex items-center justify-center rounded-2xl border border-[#d3c3b2] bg-white/65 px-7 py-4 text-sm font-medium text-[#2c2722] transition-colors hover:bg-white"
+              >
+                Explore capabilities
+              </Link>
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-[#dbcfc1] bg-[linear-gradient(160deg,#fffdf9_0%,#f7eee3_100%)] p-7 shadow-[0_20px_60px_rgba(70,42,18,0.12)]">
+            <p className="text-xs font-medium uppercase tracking-[0.15em] text-[#7a664f]">Live Snapshot</p>
+            <div className="mt-4 space-y-4">
+              {[
+                ["Current runway", "9.4 months"],
+                ["Net burn", "INR 12.4L / month"],
+                ["Burn multiple", "1.8x"],
+              ].map(([label, value]) => (
+                <div key={label} className="flex items-center justify-between rounded-xl border border-[#eadfce] bg-white/80 px-4 py-3">
+                  <span className="text-sm text-[#6f655a]">{label}</span>
+                  <span className="text-sm font-semibold text-[#221f1b]">{value}</span>
+                </div>
+              ))}
+            </div>
+            <p className="mt-6 text-xs leading-relaxed text-[#6f655a]">
+              Unified view across ERP, payroll, cloud spend, and manual team inputs.
+              Built for founders, finance leads, and operating partners.
+            </p>
+          </div>
+        </section>
+
+        <section id="capabilities" className="mt-24 grid gap-5 md:grid-cols-3">
+          {pillars.map((item) => (
+            <article
+              key={item.title}
+              className="rounded-[1.6rem] border border-[#ddd1c3] bg-white/70 p-6 shadow-[0_10px_35px_rgba(72,44,23,0.08)] backdrop-blur"
+            >
+              <div className="mb-5 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#f8eee3] text-[#8c4d24]">
+                <item.icon className="h-5 w-5" />
+              </div>
+              <h3 className="text-xl font-semibold tracking-tight text-[#201c18]">{item.title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-[#5e554b]">{item.description}</p>
+            </article>
           ))}
-        </div>
+        </section>
+
+        <section id="security" className="mt-10 rounded-[1.8rem] border border-[#d9ccbc] bg-white/65 p-8 shadow-[0_10px_30px_rgba(70,42,18,0.06)]">
+          <h2 className="text-2xl font-semibold tracking-tight text-[#201c18]">Security by default</h2>
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[#5e554b]">
+            Role-aware access, deterministic calculation paths, and auditable financial outputs are built into the platform baseline.
+            Designed for teams that need speed without sacrificing trust.
+          </p>
+        </section>
+
+        <section id="pricing" className="mt-6 rounded-[1.8rem] border border-[#d9ccbc] bg-[linear-gradient(160deg,#fffdf8_0%,#f5ebde_100%)] p-8 shadow-[0_14px_34px_rgba(70,42,18,0.08)]">
+          <h2 className="text-2xl font-semibold tracking-tight text-[#201c18]">Built for operator-led teams</h2>
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[#5e554b]">
+            Start with core runway intelligence and scale into deep planning, anomaly operations, and role-specific finance workflows.
+          </p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <Link href="/dashboard" className="inline-flex items-center justify-center rounded-xl bg-[#1f1a16] px-5 py-3 text-sm font-medium text-[#fff6ee]">
+              Start Product Tour
+            </Link>
+            <Link href="#" className="inline-flex items-center justify-center rounded-xl border border-[#cebda8] bg-white/70 px-5 py-3 text-sm font-medium text-[#2c2722]">
+              Request Demo Access
+            </Link>
+          </div>
+        </section>
       </main>
 
-      <footer className="relative z-10 border-t border-white/5 bg-black/40 backdrop-blur-3xl py-12">
-        <div className="max-w-[1400px] mx-auto px-8 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex items-center gap-2 opacity-50 grayscale hover:grayscale-0 transition-all cursor-pointer">
-            <Hexagon className="w-5 h-5 text-indigo-500" />
-            <span className="text-xs font-black uppercase tracking-widest text-slate-400">© 2026 SeedlingLabs Intelligence</span>
-          </div>
-          <div className="flex items-center gap-8">
-            {["Privacy", "Security", "Scale", "ERP Connect"].map(l => (
-              <Link key={l} href="#" className="text-[10px] font-black uppercase tracking-widest text-slate-600 hover:text-indigo-400 transition-all">{l}</Link>
-            ))}
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Vireon Status: Online</span>
+      <footer className="relative z-10 border-t border-[#dccfbe] bg-white/55">
+        <div className="mx-auto flex w-full max-w-[1280px] flex-col items-center justify-between gap-4 px-6 py-7 text-sm text-[#665d54] md:flex-row lg:px-12">
+          <span>© 2026 SeedlingLabs. Built with financial discipline.</span>
+          <div className="flex items-center gap-6">
+            <Link href="#" className="hover:text-[#2a241f]">Privacy</Link>
+            <Link href="#" className="hover:text-[#2a241f]">Security</Link>
+            <Link href="#" className="hover:text-[#2a241f]">Status</Link>
           </div>
         </div>
       </footer>

@@ -1,7 +1,61 @@
+from __future__ import annotations
+
 from pydantic import BaseModel, ConfigDict
 from typing import List, Optional, Union
 from datetime import datetime, date
 from uuid import UUID
+from enum import Enum
+
+
+class LedgerEntryType(str, Enum):
+    credit = "credit"
+    debit = "debit"
+
+
+class LedgerCategory(str, Enum):
+    revenue = "revenue"
+    tech_cost = "tech_cost"
+    non_tech_cost = "non_tech_cost"
+    office_expense = "office_expense"
+    marketing = "marketing"
+    payroll = "payroll"
+    hiring = "hiring"
+    loan_repayment = "loan_repayment"
+    misc = "misc"
+
+
+class LedgerProductTag(str, Enum):
+    orchard = "orchard"
+    sprouts = "sprouts"
+    ai_lab = "ai_lab"
+    shared = "shared"
+    unallocated = "unallocated"
+
+
+class LedgerOfficeTag(str, Enum):
+    bengaluru = "bengaluru"
+    gangavathi = "gangavathi"
+    remote = "remote"
+    na = "na"
+
+
+class LedgerSource(str, Enum):
+    erpnext = "erpnext"
+    manual_cto = "manual_cto"
+    manual_marketing = "manual_marketing"
+    manual_finance = "manual_finance"
+    bank_feed = "bank_feed"
+    aws_billing = "aws_billing"
+    sandbox = "sandbox"
+
+
+class LedgerEnteredByRole(str, Enum):
+    ceo = "ceo"
+    cto = "cto"
+    cso = "cso"
+    marketing = "marketing"
+    finance = "finance"
+    system = "system"
 
 class CompanyBase(BaseModel):
     name: str
@@ -367,7 +421,7 @@ class FixedAsset(FixedAssetBase):
 
 # Document / OCR Schemas
 class DocumentBase(BaseModel):
-    filename: str
+    file_name: str
     file_type: str
     status: str = "pending" # pending, processing, completed, failed
     ocr_text: Optional[str] = None
@@ -379,7 +433,7 @@ class DocumentCreate(DocumentBase):
 class Document(DocumentBase):
     id: UUID
     company_id: UUID
-    upload_date: datetime
+    created_at: datetime
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -463,3 +517,171 @@ class BankingTransaction(BankingTransactionBase):
     feed_id: UUID
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
+
+
+class LedgerEntryCreate(BaseModel):
+    company_id: UUID
+    transaction_date: date
+    amount: float
+    currency: str = "INR"
+    amount_inr: Optional[float] = None
+    entry_type: LedgerEntryType
+    category: LedgerCategory
+    product_tag: LedgerProductTag = LedgerProductTag.unallocated
+    office_tag: LedgerOfficeTag = LedgerOfficeTag.na
+    source: LedgerSource = LedgerSource.manual_finance
+    reference_id: Optional[str] = None
+    reference_type: Optional[str] = None
+    description: str
+    entered_by_role: LedgerEnteredByRole = LedgerEnteredByRole.system
+    is_recurring: bool = False
+    tags: Optional[dict] = None
+
+
+class LedgerEntryRead(LedgerEntryCreate):
+    id: UUID
+    created_at: datetime
+    updated_at: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+
+class StandardWriteResponse(BaseModel):
+    success: bool
+    ledger_entry_id: str
+    message: str
+
+
+class DocumentWriteResponse(BaseModel):
+    success: bool
+    document_id: str
+    message: str
+
+
+class HiringImpactRequest(BaseModel):
+    company_id: UUID
+    annual_ctc_inr: float
+    join_month: str
+
+
+class NotificationContactsUpdate(BaseModel):
+    ceo: Optional[str] = None
+    founders: Optional[List[str]] = None
+    finance: Optional[List[str]] = None
+    cto: Optional[str] = None
+    slack_webhook: Optional[str] = None
+
+
+class AlertThresholdsUpdate(BaseModel):
+    critical_months: int
+    warning_months: int
+
+
+# ─── SERIES B+ SCHEMAS ──────────────────────────────────────────────────────
+
+class GLAccountCodeEnum(str, Enum):
+    CASH = "1010"
+    ACCOUNTS_RECEIVABLE = "1200"
+    INVENTORY = "1300"
+    PREPAID_EXPENSES = "1400"
+    EQUIPMENT = "1500"
+    ACCUMULATED_DEPRECIATION = "1501"
+    ACCOUNTS_PAYABLE = "2100"
+    ACCRUED_EXPENSES = "2200"
+    SHORT_TERM_DEBT = "2300"
+    LONG_TERM_DEBT = "2400"
+    COMMON_STOCK = "3100"
+    RETAINED_EARNINGS = "3200"
+    PRODUCT_REVENUE = "4100"
+    SERVICE_REVENUE = "4200"
+    SUBSCRIPTION_REVENUE = "4300"
+    PAYROLL_EXPENSE = "5100"
+    TECH_COST_AWS = "5200"
+    TECH_COST_SAAS = "5210"
+    TECH_COST_INFRASTRUCTURE = "5220"
+    MARKETING_EXPENSE = "5300"
+    OFFICE_EXPENSE = "5400"
+    DEPRECIATION_EXPENSE = "5500"
+
+
+class DepartmentEnum(str, Enum):
+    ENGINEERING = "engineering"
+    PRODUCT = "product"
+    MARKETING = "marketing"
+    SALES = "sales"
+    OPERATIONS = "operations"
+    FINANCE = "finance"
+    PEOPLE = "people"
+    DESIGN = "design"
+    SUPPORT = "support"
+
+
+class GeneralLedgerCreate(BaseModel):
+    company_id: UUID
+    account_code: GLAccountCodeEnum
+    account_name: str
+    transaction_date: date
+    debit_amount: float = 0
+    credit_amount: float = 0
+    description: str
+    department: Optional[DepartmentEnum] = None
+    product_tag: Optional[LedgerProductTag] = None
+    office_tag: Optional[LedgerOfficeTag] = None
+    source_ledger_id: Optional[UUID] = None
+    source_type: Optional[str] = None
+    reference_id: Optional[str] = None
+
+
+class GeneralLedgerRead(GeneralLedgerCreate):
+    id: UUID
+    created_at: datetime
+    updated_at: datetime
+    
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CustomerCohortCreate(BaseModel):
+    company_id: UUID
+    cohort_name: str
+    cohort_type: str  # "acquisition_month", "product_line", "customer_segment", "geo"
+    cohort_value: str  # e.g., "2025-03", "orchard", "enterprise", "india"
+    product_tag: Optional[LedgerProductTag] = None
+    customer_acquired_date: Optional[date] = None
+    customer_count: int = 0
+    mrr_total: float = 0
+    arr_total: float = 0
+    churn_rate: Optional[float] = None
+    ltv_estimate: Optional[float] = None
+    cac_estimate: Optional[float] = None
+    nrr: Optional[float] = None
+    gross_margin_pct: Optional[float] = None
+    payback_months: Optional[float] = None
+    health_score: Optional[float] = None
+    tags: Optional[dict] = None
+
+
+class CustomerCohortRead(CustomerCohortCreate):
+    id: UUID
+    created_at: datetime
+    updated_at: datetime
+    
+    model_config = ConfigDict(from_attributes=True)
+
+
+class DepartmentPLSummary(BaseModel):
+    department: str
+    total_revenue: float
+    total_expense: float
+    net_income: float
+    margin_pct: float
+    headcount: int
+    revenue_per_head: float
+
+
+class CohortHealthMetrics(BaseModel):
+    cohort_id: UUID
+    cohort_name: str
+    health_status: str  # "healthy", "at_risk", "churning"
+    nrr: float
+    ltv_cac_ratio: float  # LTV / CAC, >3 is good
+    payback_months: float
+    retention_health: str  # percentage of monthly cohort retained

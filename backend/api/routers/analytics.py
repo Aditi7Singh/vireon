@@ -14,6 +14,13 @@ from services.planning import calculate_forecast, get_budget_variance
 
 router = APIRouter(prefix="", tags=["analytics", "scenarios"])
 
+
+def _default_company_id(db: Session) -> UUID:
+    company_row = db.query(models.Company.id).order_by(models.Company.created_at.asc()).first()
+    if not company_row:
+        raise HTTPException(status_code=404, detail="No company found")
+    return company_row[0]
+
 @router.get("/metrics/financials/{company_id}")
 def get_financial_summary(
     company_id: UUID, 
@@ -154,6 +161,14 @@ def get_scorecard(
         "as_of": latest_metric.metric_month.isoformat()
     }
 
+
+@router.get("/scorecard")
+def get_scorecard_default(
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user)
+):
+    return get_scorecard(_default_company_id(db), db, current_user)
+
 @router.get("/burn-rate/{company_id}")
 def get_burn_rate(
     company_id: UUID,
@@ -162,19 +177,33 @@ def get_burn_rate(
     current_user: str = Depends(auth.get_current_user)
 ):
     # Simple mock/placeholder logic for category breakdown
-    expenses = db.query(models.Expense).filter(models.Expense.company_id == company_id).all()
+    expenses = (
+        db.query(models.Expense.category, models.Expense.total_amount)
+        .filter(models.Expense.company_id == company_id)
+        .all()
+    )
     breakdown = {}
     total = 0
     for exp in expenses:
         cat = exp.category or "Other"
-        breakdown[cat] = breakdown.get(cat, 0) + float(exp.total_amount)
-        total += float(exp.total_amount)
+        amount = float(exp.total_amount or 0)
+        breakdown[cat] = breakdown.get(cat, 0) + amount
+        total += amount
     
     return {
         "monthly_burn": total / 3 if total > 0 else 0, # Avg over 3 months if simulated
         "breakdown_by_category": breakdown,
         "trend": -4.2
     }
+
+
+@router.get("/burn-rate")
+def get_burn_rate_default(
+    period: int = 30,
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user)
+):
+    return get_burn_rate(_default_company_id(db), period, db, current_user)
 
 @router.get("/runway/{company_id}")
 def get_runway(
@@ -192,6 +221,14 @@ def get_runway(
         "zero_date": "2027-04-01",
         "confidence_interval": "High"
     }
+
+
+@router.get("/runway")
+def get_runway_default(
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user)
+):
+    return get_runway(_default_company_id(db), db, current_user)
 
 @router.get("/revenue/{company_id}")
 def get_revenue(
@@ -211,6 +248,14 @@ def get_revenue(
         "nrr": 105.0
     }
 
+
+@router.get("/revenue")
+def get_revenue_default(
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user)
+):
+    return get_revenue(_default_company_id(db), db, current_user)
+
 @router.get("/expenses/{company_id}")
 def get_expenses(
     company_id: UUID,
@@ -218,17 +263,30 @@ def get_expenses(
     db: Session = Depends(database.get_db),
     current_user: str = Depends(auth.get_current_user)
 ):
-    expenses = db.query(models.Expense).filter(models.Expense.company_id == company_id).all()
+    expenses = (
+        db.query(models.Expense.category, models.Expense.total_amount)
+        .filter(models.Expense.company_id == company_id)
+        .all()
+    )
     breakdown = {}
     for exp in expenses:
         cat = exp.category or "Other"
-        breakdown[cat] = breakdown.get(cat, 0) + float(exp.total_amount)
+        breakdown[cat] = breakdown.get(cat, 0) + float(exp.total_amount or 0)
         
     return {
         "breakdown": breakdown,
         "trend": [],
         "movers": []
     }
+
+
+@router.get("/expenses")
+def get_expenses_default(
+    months: int = 3,
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user)
+):
+    return get_expenses(_default_company_id(db), months, db, current_user)
 
 @router.get("/cash-balance/{company_id}")
 def get_cash_balance(
@@ -245,6 +303,14 @@ def get_cash_balance(
         "ap": 12000,
         "net_cash": float(latest_metric.ending_cash) + 45000 - 12000
     }
+
+
+@router.get("/cash-balance")
+def get_cash_balance_default(
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user)
+):
+    return get_cash_balance(_default_company_id(db), db, current_user)
 
 
 @router.get("/reports/runway/pdf")

@@ -23,6 +23,7 @@ spec.loader.exec_module(config_module)
 from dataclasses import dataclass
 from datetime import datetime, timezone
 import uuid
+from uuid import UUID
 import models
 
 def convert_currency(

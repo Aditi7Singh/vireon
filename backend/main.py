@@ -9,7 +9,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import models
 import database
-from api.routers import auth, analytics, agent, ingest, erpnext, alerts, benchmarks, planning, loans, payroll, depreciation, documents, reports, banking, cloud_costs
+import bootstrap
+from api.routers import auth, analytics, agent, ingest, erpnext, alerts, benchmarks, planning, loans, payroll, depreciation, documents, reports, banking, cloud_costs, ledger, inputs, forecasting, burn, recommendations, notifications, system, fx
 
 # Basic generic logging config
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
@@ -38,6 +39,7 @@ app.add_middleware(
 
 # Create tables if they don't exist
 models.Base.metadata.create_all(bind=database.engine)
+bootstrap.run_bootstrap()
 
 @app.get("/")
 def read_root():
@@ -67,21 +69,14 @@ app.include_router(documents.router, prefix="/api/v1")
 app.include_router(reports.router, prefix="/api/v1")
 app.include_router(banking.router, prefix="/api/v1")
 app.include_router(cloud_costs.router, prefix="/api/v1")
+app.include_router(ledger.router, prefix="/api/v1")
+app.include_router(inputs.router, prefix="/api/v1")
+app.include_router(forecasting.router, prefix="/api/v1")
+app.include_router(burn.router, prefix="/api/v1")
+app.include_router(recommendations.router, prefix="/api/v1")
+app.include_router(notifications.router, prefix="/api/v1")
+app.include_router(system.router, prefix="/api/v1")
+app.include_router(fx.router, prefix="/api/v1")
 
-# Also include without prefix to match current frontend expectations
-app.include_router(auth.router)
-app.include_router(ingest.router)
-app.include_router(analytics.router)
-app.include_router(agent.router)
-app.include_router(erpnext.router)
-app.include_router(alerts.router)
-app.include_router(benchmarks.router)
-app.include_router(planning.router)
-app.include_router(loans.router)
-app.include_router(payroll.router)
-app.include_router(depreciation.router)
-app.include_router(documents.router)
-app.include_router(reports.router)
-app.include_router(banking.router)
-app.include_router(cloud_costs.router)
+# API routes are intentionally versioned under /api/v1
 

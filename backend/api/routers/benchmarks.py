@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List, Dict
+from typing import List, Dict, Optional
+from uuid import UUID
 import models
 import database
 import auth
@@ -10,20 +11,51 @@ router = APIRouter(prefix="/benchmarks", tags=["benchmarks"])
 
 @router.get("/sass-health")
 async def get_sass_health(
-    company_id: str = "00000000-0000-0000-0000-000000000000",
+    company_id: Optional[UUID] = None,
     db: Session = Depends(database.get_db),
     current_user: models.User = Depends(auth.get_current_user)
 ):
     """
     Returns industry standard SaaS metrics and benchmarks.
     """
+    if company_id is None:
+        company_row = db.query(models.Company.id).order_by(models.Company.created_at.asc()).first()
+        if not company_row:
+            raise HTTPException(status_code=404, detail="No company found")
+        company_id = company_row[0]
+
     # Fetch latest monthly metrics
     all_metrics = db.query(models.MonthlyMetric).filter(
         models.MonthlyMetric.company_id == company_id
     ).order_by(models.MonthlyMetric.metric_month.desc()).limit(12).all()
 
     if not all_metrics:
-        raise HTTPException(status_code=404, detail="Incomplete financial data for benchmarking")
+        return {
+            "metrics": [
+                {
+                    "name": "Rule of 40",
+                    "value": "0.0%",
+                    "status": "Pending Data",
+                    "benchmark": "40.0%",
+                    "description": "Growth Rate + Profit Margin"
+                },
+                {
+                    "name": "Burn Multiple",
+                    "value": "0.00x",
+                    "status": "Pending Data",
+                    "benchmark": "< 1.5x",
+                    "description": "Efficiency of burning capital for growth"
+                },
+                {
+                    "name": "Net Revenue Retention",
+                    "value": "0%",
+                    "status": "Pending Data",
+                    "benchmark": "> 110%",
+                    "description": "LTM revenue from existing customers"
+                }
+            ],
+            "summary": "Benchmark card is ready. Add monthly metrics to see live SaaS health scoring."
+        }
 
     latest = all_metrics[0]
     
