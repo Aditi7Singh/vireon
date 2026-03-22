@@ -54,11 +54,26 @@ def get_net_burn(company_id: UUID, db: Session, month: str) -> dict:
     )
     mom_change_pct = ((net_burn - prev_net) / prev_net * 100) if prev_net else 0.0
 
+    # Include non-cash depreciation from GL
+    dep_total = 0.0
+    try:
+        dep_entries = db.query(models.GeneralLedger).filter(
+            models.GeneralLedger.company_id == company_id,
+            models.GeneralLedger.account_code == models.GLAccountCode.DEPRECIATION_EXPENSE,
+            models.GeneralLedger.transaction_date >= start,
+            models.GeneralLedger.transaction_date < end,
+        ).all()
+        dep_total = sum(float(e.debit_amount or 0) for e in dep_entries)
+    except Exception:
+        pass
+
     return {
         "total_credits": total_credits,
         "total_debits": total_debits,
         "net_burn": net_burn,
         "breakdown_by_category": breakdown,
+        "non_cash_depreciation": dep_total,
+        "cash_burn": net_burn - dep_total,
         "mom_change_pct": mom_change_pct,
     }
 

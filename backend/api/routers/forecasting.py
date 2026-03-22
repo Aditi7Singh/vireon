@@ -23,7 +23,15 @@ def get_runway(company_id: UUID, db: Session = Depends(database.get_db)):
 
 @router.post("/hiring-impact")
 def get_hiring_impact(payload: schemas.HiringImpactRequest, db: Session = Depends(database.get_db)):
-    return calculate_hiring_impact(payload.company_id, db, payload.annual_ctc_inr, payload.join_month)
+    return calculate_hiring_impact(
+        payload.company_id, 
+        db, 
+        payload.annual_ctc_inr, 
+        payload.join_month,
+        equipment_cost=payload.equipment_cost,
+        onboarding_cost=payload.onboarding_cost,
+        benefits_multiplier=payload.benefits_multiplier
+    )
 
 
 @router.get("/product/{company_id}/{product_tag}")

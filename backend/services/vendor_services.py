@@ -2,43 +2,125 @@ from typing import List, Dict, Any
 import models
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+import difflib
+from uuid import UUID
 
 COMMON_SAAS_VENDORS = {
+    # Infrastructure & Cloud
     "AWS": "Cloud Infrastructure",
     "Amazon Web Services": "Cloud Infrastructure",
-    "Slack": "Communication",
-    "Google Workspace": "Productivity",
-    "GitHub": "Development",
+    "Google Cloud": "Cloud Infrastructure",
+    "Azure": "Cloud Infrastructure",
+    "DigitalOcean": "Cloud Infrastructure",
     "Vercel": "Hosting",
+    "Heroku": "Hosting",
+    "Cloudflare": "Security/CDN",
+    "Netlify": "Hosting",
+    "Linode": "Cloud Infrastructure",
+    "Hetzner": "Cloud Infrastructure",
+    
+    # Communication & Collaboration
+    "Slack": "Communication",
+    "Microsoft Teams": "Communication",
     "Zoom": "Communication",
-    "Salesforce": "CRM",
-    "HubSpot": "Marketing",
+    "Google Workspace": "Productivity",
+    "Microsoft 365": "Productivity",
+    "Notion": "Collaboration",
+    "Asana": "Collaboration",
+    "ClickUp": "Collaboration",
+    "Miro": "Collaboration",
+    "Airtable": "Collaboration",
+    
+    # Development Tools
+    "GitHub": "Development",
+    "GitLab": "Development",
+    "Bitbucket": "Development",
     "Atlassian": "Development",
     "Jira": "Development",
+    "Confluence": "Development",
+    "Postman": "Development",
+    "Datadog": "Monitoring",
+    "New Relic": "Monitoring",
+    "Sentry": "Monitoring",
+    "LogRocket": "Monitoring",
+    
+    # Marketing & Sales
+    "Salesforce": "CRM",
+    "HubSpot": "Marketing/CRM",
+    "Mailchimp": "Marketing",
+    "SendGrid": "Marketing",
+    "Typeform": "Marketing",
+    "Intercom": "Support",
+    "Zendesk": "Support",
+    "Pipedrive": "CRM",
+    
+    # Design
     "Canva": "Design",
     "Figma": "Design",
+    "Adobe": "Design",
+    
+    # FinTech & HR
     "Stripe": "Payments",
     "Plaid": "Financial Services",
     "Gusto": "Payroll",
     "Rippling": "Payroll",
-    "Microsoft 365": "Productivity",
-    "DigitalOcean": "Cloud Infrastructure",
-    "Clerk": "Authentication",
-    "PostHog": "Analytics",
-    "Mixpanel": "Analytics"
+    "Deel": "Payroll",
+    
+    # Security & DevSecOps
+    "Okta": "Security/Identity",
+    "Auth0": "Security/Identity",
+    "Tailscale": "Security/Networking",
+    "1Password": "Security",
+    "Bitwarden": "Security",
+    "CrowdStrike": "Security",
+    "Snyk": "Security",
+    
+    # Data & AI
+    "OpenAI": "AI/Machine Learning",
+    "Anthropic": "AI/Machine Learning",
+    "Pinecone": "Database/AI",
+    "MongoDB": "Database",
+    "Snowflake": "Data Warehouse",
+    "Databricks": "Data Science",
+    "Supabase": "Database/Backend",
+    "Firebase": "Database/Backend",
+    
+    # Infrastructure & Specialized
+    "New Relic": "Monitoring",
+    "Dynatrace": "Monitoring",
+    "Grafana": "Monitoring",
+    "HashiCorp": "Infrastructure",
+    "Terraform": "Infrastructure",
+    "Twilio": "Communication APIs",
+    "MessageBird": "Communication APIs",
+    "Logtail": "Logging",
+}
+
+# Substring matches for vendors who often have complex merchant strings
+VENDOR_SUBSTRINGS = {
+    "AMAZON WEB SERVICES": "AWS",
+    "AWS.AMAZON.COM": "AWS",
+    "GOOGLE *GSUITE": "Google Workspace",
+    "GOOGLE *CLOUD": "Google Cloud",
+    "MSFT *AZURE": "Azure",
+    "MICROSOFT*TEAMS": "Microsoft Teams",
+    "GITHUB.COM": "GitHub",
+    "SLACK.COM": "Slack",
+    "ZOOM.US": "Zoom",
+    "FIGMA.COM": "Figma",
+    "ADOBE *CREATIVE": "Adobe",
+    "CANVA *DESIGN": "Canva",
+    "STRIPE *": "Stripe",
+    "HUBSPOT *": "HubSpot",
+    "SALESFORCE.COM": "Salesforce",
+    "NOTION.SO": "Notion",
 }
 
 def detect_saas_vendors(db: Session, company_id: UUID = None) -> List[Dict[str, Any]]:
     """
-    Search banking transactions for known SaaS vendors and categorize them.
-    
-    Returns:
-        List of detected SaaS vendors with their total spend.
+    Search banking transactions for known SaaS vendors using substring and fuzzy matching.
     """
     from models import BankingTransaction, BankFeed
-    
-    # Simple keyword-based detection
-    # In production, this would use a more sophisticated fuzzy matching or a third-party API
     
     query = db.query(
         BankingTransaction.merchant_name,
@@ -51,21 +133,80 @@ def detect_saas_vendors(db: Session, company_id: UUID = None) -> List[Dict[str, 
     
     results = query.group_by(BankingTransaction.merchant_name).all()
     
+    vendor_keys = list(COMMON_SAAS_VENDORS.keys())
     saas_list = []
+    
     for merchant, spend, count in results:
-        # Check if merchant is in our known SaaS dictionary
-        detected_category = None
-        for vendor_key, category in COMMON_SAAS_VENDORS.items():
-            if vendor_key.lower() in str(merchant or "").lower():
-                detected_category = category
+        merchant_str = str(merchant or "").strip().upper()
+        if not merchant_str:
+            continue
+            
+        detected_vendor = None
+        confidence = 0.0
+        
+        # 1. Check specialized substring mapping
+        for pattern, vendor_key in VENDOR_SUBSTRINGS.items():
+            if pattern in merchant_str:
+                detected_vendor = vendor_key
+                confidence = 1.0
                 break
         
-        if detected_category:
+        # 2. Key-in-string check (case-insensitive)
+        if not detected_vendor:
+            for vendor_key in vendor_keys:
+                if vendor_key.upper() in merchant_str:
+                    detected_vendor = vendor_key
+                    confidence = 0.9
+                    break
+        
+        # 3. Fuzzy match fallback
+        if not detected_vendor:
+            matches = difflib.get_close_matches(merchant_str, [v.upper() for v in vendor_keys], n=1, cutoff=0.7)
+            if matches:
+                # Find original case key
+                for v in vendor_keys:
+                    if v.upper() == matches[0]:
+                        detected_vendor = v
+                        confidence = 0.8
+                        break
+        
+        if detected_vendor:
             saas_list.append({
-                "vendor": merchant,
-                "category": detected_category,
+                "vendor_identified": detected_vendor,
+                "merchant_raw": merchant, # Original case
+                "category": COMMON_SAAS_VENDORS[detected_vendor],
                 "total_spend": float(spend),
-                "transaction_count": count
+                "transaction_count": count,
+                "confidence_score": confidence
             })
             
     return sorted(saas_list, key=lambda x: x["total_spend"], reverse=True)
+
+def get_saas_benchmarks(company_stage: str = "seed") -> Dict[str, Any]:
+    """
+    Provides industry standard benchmarks for SaaS spend based on company stage.
+    Data represents typical monthly spend and category distribution.
+    """
+    benchmarks = {
+        "seed": {
+            "avg_monthly_spend": 2500,
+            "top_categories": ["Cloud Infrastructure", "Development", "Productivity"],
+            "suggested_count": 8,
+            "max_spend_per_employee": 150
+        },
+        "series_a": {
+            "avg_monthly_spend": 12000,
+            "top_categories": ["Cloud Infrastructure", "CRM", "Marketing", "Collaboration"],
+            "suggested_count": 25,
+            "max_spend_per_employee": 300
+        },
+        "series_b": {
+            "avg_monthly_spend": 45000,
+            "top_categories": ["Cloud Infrastructure", "CRM", "HR/Payroll", "Security", "Analytics"],
+            "suggested_count": 60,
+            "max_spend_per_employee": 500
+        }
+    }
+    
+    stage = company_stage.lower().replace(" ", "_")
+    return benchmarks.get(stage, benchmarks["seed"])

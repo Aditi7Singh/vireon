@@ -73,36 +73,88 @@ def gather_financial_context(company_id: UUID, db: Session) -> dict:
     }
 
 
-def _fallback_recommendations(context: dict) -> list:
-    runway = context.get("runway", {}).get("runway_months", 0)
-    burn = context.get("burn_summary", {}).get("net_burn", 0)
-    return [
-        {
-            "id": "rec-1",
-            "priority": "high" if runway < 9 else "medium",
+def _generate_logic_based_recommendations(context: dict) -> list:
+    recommendations = []
+    runway_months = context.get("runway", {}).get("runway_months", 0)
+    burn_summary = context.get("burn_summary", {})
+    net_burn = burn_summary.get("net_burn", 0)
+    rev_growth = burn_summary.get("revenue_growth_mom", 0)
+    cost_growth = burn_summary.get("expense_growth_mom", 0)
+
+    # 1. Runway & Burn Rule
+    if runway_months < 9:
+        priority = "high" if runway_months < 6 else "medium"
+        recommendations.append({
+            "id": "rec-runway-1",
+            "priority": priority,
             "category": "runway",
-            "title": "Protect runway against current burn",
-            "finding": f"Current monthly net burn is INR {burn:,.0f} with runway at {runway:.1f} months.",
-            "impact_inr": burn * 0.1,
-            "impact_runway_days": 20,
-            "action": "Reduce non-critical discretionary spend by 10% over the next 30 days.",
-            "confidence": 0.78,
-        }
-    ]
+            "title": "Cash preservation required" if priority == "high" else "Runway monitoring",
+            "finding": f"Runway is {runway_months:.1f} months. MoM costs grew {cost_growth:.1f}% while revenue grew {rev_growth:.1f}%.",
+            "impact_inr": net_burn * 0.15,
+            "impact_runway_days": 45 if priority == "high" else 20,
+            "action": "Freeze non-essential hiring and reduce discretionary marketing spend by 15% immediately." if priority == "high" else "Monitor MoM burn and defer non-critical equipment purchases.",
+            "confidence": 0.90
+        })
+
+    # 2. Product Profitability Rule
+    product_data = context.get("product_pl_last_3_months", [])
+    if product_data:
+        latest = product_data[0].get("data", [])
+        for prod in latest:
+            margin = prod.get("gross_margin_pct", 0)
+            name = prod.get("product", "Unknown Product")
+            if margin < 30 and name != "AI Lab": # AI Lab might be in R&D
+                recommendations.append({
+                    "id": f"rec-margin-{name.lower()}",
+                    "priority": "high",
+                    "category": "profitability",
+                    "title": f"Low Margin on {name}",
+                    "finding": f"{name} is operating at a {margin:.1f}% gross margin, which is below the 40% target for Series A.",
+                    "impact_inr": prod.get("revenue", 0) * 0.1,
+                    "action": f"Audit cloud unit costs for {name} and review pricing tiers for low-volume enterprise customers.",
+                    "confidence": 0.85
+                })
+
+    # 3. Vendor Anomaly Rule
+    anomalies = context.get("anomalies_last_30_days", [])
+    for a in anomalies:
+        if a.get("severity") == "high" or a.get("actual", 0) > 100000:
+            recommendations.append({
+                "id": f"rec-anomaly-{a.get('type')}",
+                "priority": "medium",
+                "category": "optimization",
+                "title": f"Investigation: {a.get('type')}",
+                "finding": f"Anomaly detected: {a.get('description')}. Actual impact: INR {a.get('actual'):,.0f}.",
+                "impact_inr": a.get("actual", 0),
+                "action": "Review the specific ledger entries for this anomaly and verify if this is a one-time setup cost or a recurring leak.",
+                "confidence": 0.95
+            })
+
+    # 4. Tax/Statutory Rule (Simplified)
+    # If cash is low vs impending tax liability (if we had upcoming tax logic)
+    # Skipping for now to keep it concise, but can be added in next iteration.
+
+    # Fallback if nothing specific found
+    if not recommendations:
+        recommendations = _fallback_recommendations(context)
+
+    return recommendations
 
 
 def generate_recommendations(company_id: UUID, db: Session) -> dict:
     context = gather_financial_context(company_id, db)
 
     system_prompt = (
-        "You are Vireon, the AI finance manager for Seedling Labs, an Indian startup building three products: "
-        "Orchard, Sprouts, and AI Lab. You have two offices: Bengaluru (HQ) and Gangavathi (new). "
-        "Your job is to act as a Chief Financial Officer. You will be given financial data. Generate 4-6 specific, actionable recommendations. "
-        "Each recommendation must: (1) name the exact issue or opportunity, (2) give a specific number/impact in INR or months of runway, "
-        "(3) suggest a concrete action. Do NOT give generic advice. Format as JSON array."
+        "You are Vireon, the AI finance manager for Seedling Labs. "
+        "Your job is to provide Chief Financial Officer level advice. "
+        "You will be given financial context and a list of rule-based insights. "
+        "Rewrite or improve these insights into a highly professional JSON list. "
+        "Ensure each recommendation has a specific title, finding, action, and impact_inr."
     )
 
-    recommendations = _fallback_recommendations(context)
+    # Combine logic-based rules with optional AI enrichment
+    base_recommendations = _generate_logic_based_recommendations(context)
+    recommendations = base_recommendations
 
     openrouter_key = os.getenv("OPENROUTER_API_KEY")
     if openrouter_key:

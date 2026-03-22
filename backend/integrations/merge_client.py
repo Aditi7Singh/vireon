@@ -131,7 +131,20 @@ class MergeAccountingClient:
         """
         data = self._request("GET", "accounts")
         return data.get("results", [])
-    
+
+    def get_journal_entries(self, period_months: int = 1) -> List[Dict]:
+        """
+        Fetch journal entries (GL transactions).
+        """
+        end_date = datetime.now().date()
+        start_date = end_date - timedelta(days=period_months * 30)
+        
+        data = self._request("GET", "journal-entries", params={
+            "created_at_after": start_date.isoformat(),
+            "created_at_before": end_date.isoformat()
+        })
+        return data.get("results", [])
+
     def sync_to_postgres(self):
         """
         Pull all data from Merge.dev and upsert into PostgreSQL.

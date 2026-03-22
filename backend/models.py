@@ -64,6 +64,9 @@ class Company(Base):
     alert_thresholds = Column(JSON, nullable=False, default=lambda: {"critical_months": 3, "warning_months": 6})
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    
+    last_sync_erpnext = Column(DateTime, nullable=True)
+    last_sync_merge = Column(DateTime, nullable=True)
 
     accounts = relationship("Account", back_populates="company")
 
@@ -276,6 +279,7 @@ class MonthlyMetric(Base):
     metric_month = Column(Date, nullable=False)
     total_revenue = Column(Numeric(15, 2), default=0)
     total_expenses = Column(Numeric(15, 2), default=0)
+    total_tax_liability = Column(Numeric(15, 2), default=0)
     net_cash_flow = Column(Numeric(15, 2), default=0)
     burn_rate = Column(Numeric(15, 2), default=0)
     runway_months = Column(Numeric(5, 2), default=0)
@@ -342,7 +346,8 @@ class Document(Base):
     file_type = Column(String(50)) # receipt, invoice, bank_statement
     status = Column(String(20), default="processed")
     ocr_text = Column(Text)
-    extracted_data = Column(JSON)
+    extracted_data = Column(JSON) # Raw heuristic extraction
+    structured_data = Column(JSON) # AI-refined structured extraction
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
 class User(Base):
@@ -606,6 +611,8 @@ class GLAccountCode(str, enum.Enum):
     MARKETING_EXPENSE = "5300"
     OFFICE_EXPENSE = "5400"
     DEPRECIATION_EXPENSE = "5500"
+    REVALUATION_GAIN_LOSS_UNREALIZED = "5600"
+    MISC = "5999"
 
 
 class GeneralLedger(Base):
@@ -676,4 +683,40 @@ class FxRevaluationSnapshot(Base):
     current_rate = Column(Numeric(15, 6), nullable=False)
     revalued_amount_inr = Column(Numeric(15, 2), nullable=False, default=0)
     gain_loss_inr = Column(Numeric(15, 2), nullable=False, default=0)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class QuarterlyTaxLiability(Base):
+    __tablename__ = "quarterly_tax_liabilities"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    year = Column(Integer, nullable=False)
+    quarter = Column(Integer, nullable=False)  # 1, 2, 3, 4
+    
+    gst_liability = Column(Numeric(15, 2), default=0)
+    tds_liability = Column(Numeric(15, 2), default=0)
+    advance_tax_estimate = Column(Numeric(15, 2), default=0)
+    total_liability = Column(Numeric(15, 2), nullable=False)
+    
+    paid_amount = Column(Numeric(15, 2), default=0)
+    remaining_balance = Column(Numeric(15, 2), nullable=False)
+    status = Column(String(20), default="pending")  # pending, partially_paid, paid, overdue
+    due_date = Column(Date, nullable=False)
+    
+    payment_reference = Column(String(255), nullable=True)
+    last_payment_date = Column(Date, nullable=True)
+    
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+
+class ScenarioSnapshot(Base):
+    __tablename__ = "scenario_snapshots"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), index=True)
+    name = Column(String(255), nullable=False)
+    scenario_type = Column(String(50)) # hiring, revenue, cost_cut, combined
+    input_data = Column(JSON, nullable=False)
+    result_data = Column(JSON, nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)

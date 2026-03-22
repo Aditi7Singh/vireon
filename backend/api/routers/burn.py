@@ -43,3 +43,31 @@ def dashboard(company_id: UUID, month: str, db: Session = Depends(database.get_d
         "expenses": burn_service.get_expense_breakdown(company_id, db, month),
         "headcount": burn_service.get_headcount_costs(company_id, db),
     }
+
+
+@router.get("/margin/{company_id}")
+def gross_margin(company_id: UUID, month: str, db: Session = Depends(database.get_db)):
+    """Server-side gross margin calculated from GL accounts + expense COGS."""
+    from services.margin_service import calculate_server_side_margin
+    from datetime import datetime
+    month_date = datetime.strptime(month, "%Y-%m").date()
+    return calculate_server_side_margin(db, company_id, month_date)
+
+
+@router.get("/margin/{company_id}/by-product")
+def product_margin(company_id: UUID, month: str, db: Session = Depends(database.get_db)):
+    """Per-product gross margin breakdown."""
+    from services.margin_service import calculate_product_margin
+    from datetime import datetime
+    month_date = datetime.strptime(month, "%Y-%m").date()
+    return calculate_product_margin(db, company_id, month_date)
+
+
+@router.get("/margin/{company_id}/alerts")
+def margin_alerts(company_id: UUID, month: str, threshold: float = 50.0, db: Session = Depends(database.get_db)):
+    """Alerts when margin drops below threshold."""
+    from services.margin_service import check_margin_alerts
+    from datetime import datetime
+    month_date = datetime.strptime(month, "%Y-%m").date()
+    return check_margin_alerts(db, company_id, month_date, threshold)
+

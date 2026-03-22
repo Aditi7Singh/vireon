@@ -1,10 +1,26 @@
 "use client";
 
+import { useState, useEffect } from "react";
+
 import TopBar from "@/components/TopBar";
-import { useExpenses } from "@/hooks/useFinancialData";
+import { useExpenses, useAlerts } from "@/hooks/useFinancialData";
 import { useAppStore } from "@/lib/store";
 import { cn, formatCurrency } from "@/lib/utils";
-import { Receipt, ShieldCheck, Sparkles, Users, Globe, Layers, Zap, Tag } from "lucide-react";
+import { Receipt, ShieldCheck, Sparkles, Users, Globe, Layers, Zap, Tag, AlertTriangle, Copy, TrendingUp } from "lucide-react";
+import { 
+  Card, 
+  Title, 
+  DonutChart, 
+  BarChart, 
+  Select, 
+  SelectItem, 
+  List, 
+  ListItem, 
+  Flex, 
+  Text, 
+  Badge, 
+  Icon 
+} from "@tremor/react";
 import type { ElementType } from "react";
 
 const categoryMeta: Record<string, { label: string; icon: ElementType; color: string }> = {
@@ -17,10 +33,18 @@ const categoryMeta: Record<string, { label: string; icon: ElementType; color: st
 };
 
 export default function ExpensesPage() {
-  const { expenses } = useExpenses();
+  const [department, setDepartment] = useState<string>("all");
+  const { expenses } = useExpenses(3, department === "all" ? undefined : { department });
+  const { alerts } = useAlerts();
+
+  const expenseAlerts = alerts.alerts.filter(a => 
+    ["spending_spike", "duplicate_invoice"].includes(a.alert_type)
+  );
   const { openChat } = useAppStore();
 
   const totalExpenses = Object.values(expenses.breakdown as Record<string, number>).reduce((a: number, b: number) => a + b, 0);
+
+  const departments = ["all", "Engineering", "Marketing", "Sales", "Operations", "Finance"];
 
   return (
     <div className="min-h-screen bg-[#f6f3ee] pb-14 text-[#1d1b17]">
@@ -29,13 +53,25 @@ export default function ExpensesPage() {
       <div className="mx-auto max-w-7xl space-y-6 px-4 pt-6 sm:px-6 lg:px-8">
         <section className="rounded-3xl border border-[#d9cdbc] bg-[linear-gradient(145deg,#fff8ec_0%,#f3eadb_100%)] p-6 shadow-[0_18px_48px_rgba(63,45,24,0.1)] sm:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div>
+            <div className="space-y-4">
               <p className="inline-flex items-center gap-2 rounded-full border border-[#d9c29a] bg-[#fff4dd] px-3 py-1 text-xs font-semibold text-[#8c5c19]">
                 <Receipt className="h-3.5 w-3.5" />
                 Audited expense ledger
               </p>
-              <h1 className="mt-3 text-3xl font-semibold text-[#2c2013]">Expense Control Center</h1>
-              <p className="mt-2 text-sm text-[#5f5344]">Total outflow this cycle: {formatCurrency(totalExpenses)}</p>
+              <h1 className="text-3xl font-semibold text-[#2c2013]">Expense Control Center</h1>
+              
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-[#7a664f]">Department:</span>
+                <select 
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  className="rounded-lg border border-[#cebda8] bg-white px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-[#9a5d34]/20"
+                >
+                  {departments.map(d => <option key={d} value={d}>{d.charAt(0).toUpperCase() + d.slice(1)}</option>)}
+                </select>
+              </div>
+
+              <p className="text-sm text-[#5f5344]">Total outflow this cycle: {formatCurrency(totalExpenses)}</p>
             </div>
             <button
               onClick={() => openChat("Optimize expenditures")}
@@ -84,6 +120,42 @@ export default function ExpensesPage() {
           })}
         </section>
       </div>
+
+      {expenseAlerts.length > 0 && (
+        <Card className="mt-8 border-[#e2d1c3] bg-[#fdfaf7]">
+          <Flex className="mb-4">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-[#9a461f]" />
+              <Title className="text-[#4a3f35]">Expense Anomalies & Audit Flags</Title>
+            </div>
+          </Flex>
+          <List>
+            {expenseAlerts.map((alert) => (
+              <ListItem key={alert.id} className="py-3">
+                <Flex justifyContent="start" className="gap-4">
+                  <Icon 
+                    icon={alert.alert_type === 'duplicate_invoice' ? Copy : TrendingUp} 
+                    color="orange" 
+                    variant="light" 
+                  />
+                  <div>
+                    <Text className="font-medium text-[#4a3f35]">{alert.description}</Text>
+                    <Text className="text-xs text-[#7b6d5b]">
+                      Category: {alert.category} • Method: Deterministic Audit
+                    </Text>
+                  </div>
+                </Flex>
+                <div className="text-right">
+                  <Text className="font-bold text-[#9a461f]">₹{alert.amount.toLocaleString()}</Text>
+                  <Badge color="orange" size="xs">
+                    {alert.alert_type === 'duplicate_invoice' ? "Duplicate" : "Spike"}
+                  </Badge>
+                </div>
+              </ListItem>
+            ))}
+          </List>
+        </Card>
+      )}
     </div>
   );
 }

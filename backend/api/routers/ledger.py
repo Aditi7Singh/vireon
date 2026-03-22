@@ -27,6 +27,7 @@ def list_entries(
     category: Optional[schemas.LedgerCategory] = None,
     product_tag: Optional[schemas.LedgerProductTag] = None,
     entry_type: Optional[schemas.LedgerEntryType] = None,
+    department: Optional[str] = None,
     db: Session = Depends(database.get_db),
 ):
     q = db.query(models.FinancialLedgerEntry).filter(models.FinancialLedgerEntry.company_id == company_id)
@@ -40,6 +41,8 @@ def list_entries(
         q = q.filter(models.FinancialLedgerEntry.product_tag == product_tag.value)
     if entry_type:
         q = q.filter(models.FinancialLedgerEntry.entry_type == entry_type.value)
+    if department:
+        q = q.filter(models.FinancialLedgerEntry.department == department)
     return q.order_by(models.FinancialLedgerEntry.transaction_date.desc()).all()
 
 

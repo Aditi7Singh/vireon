@@ -143,28 +143,44 @@ export function ChatDrawer() {
       isLoading: true,
     };
 
-    setMessages((prev) => [...prev, userMessage, loadingMessage]);
+    setMessages((prev: Message[]) => [...prev, userMessage, loadingMessage]);
     setInput("");
     setIsLoading(true);
 
     try {
-      // If we have a context, we can prepend it or send it as part of the query if the backend supports it.
-      // Currently the backend takes 'query' and 'company_id'. 
-      // I'll update the backend to take 'context' or just include it in the query for now.
       const fullQuery = normalizedChatContext ? `[Context: ${normalizedChatContext}] ${query}` : query;
-      
       const response = await api.chat(fullQuery, chatSessionId || undefined);
       
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.isLoading
-            ? { ...msg, content: response.response, isLoading: false }
-            : msg
-        )
-      );
+      // Simulate streaming
+      let currentContent = "";
+      const fullContent = response.response;
+      const words = fullContent.split(" ");
+      let wordIndex = 0;
+
+      const interval = setInterval(() => {
+        if (wordIndex < words.length) {
+          currentContent += (wordIndex === 0 ? "" : " ") + words[wordIndex];
+          setMessages((prev: Message[]) =>
+            prev.map((msg: Message) =>
+              msg.isLoading
+                ? { ...msg, content: currentContent, isLoading: wordIndex === words.length - 1 ? false : true }
+                : msg
+            )
+          );
+          wordIndex++;
+        } else {
+          clearInterval(interval);
+          setMessages((prev: Message[]) =>
+            prev.map((msg: Message) =>
+              msg.isLoading ? { ...msg, isLoading: false } : msg
+            )
+          );
+        }
+      }, 30); // Speed of "streaming"
+      
     } catch (error) {
-      setMessages((prev) =>
-        prev.map((msg) =>
+      setMessages((prev: Message[]) =>
+        prev.map((msg: Message) =>
           msg.isLoading
             ? {
                 ...msg,

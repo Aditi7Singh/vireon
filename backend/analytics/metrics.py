@@ -310,8 +310,10 @@ def decompose_ctc(annual_ctc: float, num_employees: int = 1) -> Dict[str, float]
             "overhead": overhead_monthly,
             "software": software_licenses_monthly,
             "equipment_one_time": equipment_one_time,
-            "employer_monthly_total": employer_monthly_total,
-            "employer_first_month_total": employer_first_month_total,
+            "onboarding_overhead": 25000.0, # Training and set-up
+            "benefits_accrual": round(gross_salary * 0.05, 2), # Insurance, perks, etc.
+            "employer_monthly_total": employer_monthly_total + round(gross_salary * 0.05, 2),
+            "employer_first_month_total": employer_first_month_total + 25000.0 + round(gross_salary * 0.05, 2),
             "employee_pf_deduction": employee_pf,
             "employee_esi_deduction": employee_esi,
             "pt_deduction": pt_deduction,
@@ -321,8 +323,8 @@ def decompose_ctc(annual_ctc: float, num_employees: int = 1) -> Dict[str, float]
         "totals_monthly": {
             "num_employees": num_employees,
             "total_gross_payroll": gross_salary * num_employees,
-            "total_employer_cost": employer_monthly_total * num_employees,
-            "total_employer_first_month": employer_first_month_total * num_employees,
+            "total_employer_cost": (employer_monthly_total + round(gross_salary * 0.05, 2)) * num_employees,
+            "total_employer_first_month": (employer_first_month_total + 25000.0 + round(gross_salary * 0.05, 2)) * num_employees,
             "total_employee_deductions": employee_total_deductions * num_employees,
             "total_take_home": take_home * num_employees
         }
@@ -725,9 +727,11 @@ def scenario_hire_india(
             "gratuity_per_hire": ctc_breakdown["per_employee_monthly"]["gratuity_provision"],
             "monthly_cost_per_hire": monthly_cost_per_hire,
             "monthly_cost_total": monthly_cost_total,
-            "one_time_equipment": 80000 * num_hires,
+            "one_time_equipment": 120000 * num_hires, # Refined: Laptop + Monitor + Peripherals
             "one_time_recruiting": 150000 * num_hires,
-            "total_one_time": (80000 + 150000) * num_hires
+            "one_time_onboarding": 25000 * num_hires,
+            "benefits_accrual_total": (monthly_cost_total - (ctc_breakdown["totals_monthly"]["total_gross_payroll"])) * 0.5, # Estimation
+            "total_one_time": (120000 + 150000 + 25000) * num_hires
         },
         "runway_impact": {
             "current_runway_months": current_runway,
@@ -1509,6 +1513,18 @@ def calculate_monthly_payroll_cost(db: Session, company_id: str, month: date) ->
             monthly_salaries += float(emp.salary) * 26 / 12  # 26 biweekly periods per year
         elif emp.pay_frequency == "weekly":
             monthly_salaries += float(emp.salary) * 52 / 12  # 52 weekly periods per year
+            
+    # Include pending hires (future hire_date) for forecasting
+    pending_hires = db.query(Employee).filter(
+        Employee.company_id == company_id,
+        Employee.status == "active",
+        Employee.hire_date > end_of_month if 'end_of_month' in locals() else date.today()
+    ).all()
+    
+    forecast_pending_cost = 0
+    for emp in pending_hires:
+        decomp = decompose_ctc(float(emp.salary))
+        forecast_pending_cost += decomp["per_employee_monthly"]["employer_monthly_total"]
     
     # Get actual payroll entries for the month
     start_of_month = month.replace(day=1)

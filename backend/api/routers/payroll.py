@@ -88,10 +88,11 @@ def create_payroll_entry(
     # Calculate taxes if not provided
     if entry.federal_tax == 0 and entry.state_tax == 0:
         tax_calc = calculate_payroll_taxes(entry.gross_pay)
-        entry.federal_tax = tax_calc["federal_tax"]
-        entry.state_tax = tax_calc["state_tax"]
-        entry.social_security = tax_calc["social_security"]
-        entry.medicare = tax_calc["medicare"]
+        # Mapping Indian taxes to existing US-centric fields for compatibility
+        entry.federal_tax = tax_calc.get("income_tax_tds", 0) # Mapping to federal_tax field
+        entry.social_security = tax_calc["employee_pf"]
+        entry.medicare = tax_calc["employee_esi"]
+        entry.state_tax = tax_calc["professional_tax"]
         entry.net_pay = tax_calc["net_pay"]
     
     db_entry = models.PayrollEntry(
@@ -106,10 +107,74 @@ def create_payroll_entry(
         other_deductions=entry.other_deductions,
         net_pay=entry.net_pay,
         pay_date=entry.pay_date,
-        status=entry.status
+        status=entry.status,
+        department=employee.department
     )
     
     db.add(db_entry)
+    
+    # --- Ledger Integration ---
+    # Create GeneralLedger entry for payroll disbursement
+    ledger_entry = models.GeneralLedger(
+        company_id=company.id,
+        account_code=models.GLAccountCode.PAYROLL_EXPENSE,
+        account_name="Payroll Expense",
+        transaction_date=entry.pay_date,
+        debit_amount=entry.gross_pay,
+        credit_amount=0,
+        description=f"Payroll for {employee.first_name} {employee.last_name} - Period {entry.pay_period_start} to {entry.pay_period_end}",
+        department=employee.department,
+        source_type="payroll",
+        reference_id=str(db_entry.id)
+    )
+    db.add(ledger_entry)
+    
+    # Create matching credit entry for cash/bank (simplified)
+    cash_entry = models.GeneralLedger(
+        company_id=company.id,
+        account_code=models.GLAccountCode.CASH,
+        account_name="Cash & Bank",
+        transaction_date=entry.pay_date,
+        debit_amount=0,
+        credit_amount=entry.net_pay, # Total cash outflow from bank
+        description=f"Net salary disbursement - {employee.first_name} {employee.last_name}",
+        source_type="payroll",
+        reference_id=str(db_entry.id)
+    )
+    db.add(cash_entry)
+    
+    # Create credit entries for tax liabilities (PF/ESI/PT/TDS)
+    statutory_entry = models.GeneralLedger(
+        company_id=company.id,
+        account_code=models.GLAccountCode.ACCRUED_EXPENSES,
+        account_name="Statutory Dues Payable",
+        transaction_date=entry.pay_date,
+        debit_amount=0,
+        credit_amount=entry.gross_pay - entry.net_pay,
+        description=f"Statutory deductions (PF/ESI/PT) - {employee.first_name} {employee.last_name}",
+        source_type="payroll",
+        reference_id=str(db_entry.id)
+    )
+    db.add(statutory_entry)
+    
+    # --- Unified Financial Ledger Integration ---
+    # Primary ledger used for burn/runway (FinancialLedgerEntry)
+    fl_entry = models.FinancialLedgerEntry(
+        company_id=company.id,
+        transaction_date=entry.pay_date,
+        amount=entry.gross_pay,
+        currency="INR",
+        amount_inr=entry.gross_pay,
+        entry_type=models.LedgerEntryType.DEBIT,
+        category=models.LedgerCategory.PAYROLL,
+        description=f"Payroll: {employee.first_name} {employee.last_name}",
+        department=employee.department,
+        source=models.LedgerSource.SYSTEM,
+        reference_id=str(db_entry.id),
+        reference_type="payroll"
+    )
+    db.add(fl_entry)
+    
     db.commit()
     db.refresh(db_entry)
     return db_entry

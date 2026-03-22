@@ -18,10 +18,11 @@ def process_document_ocr(document_id: str, file_b64: str, filename: str, content
             return {"success": False, "message": "Document not found"}
 
         raw = base64.b64decode(file_b64.encode("utf-8"))
-        ocr_text, extracted_data, status = extract_document_content(raw, filename, content_type)
+        ocr_text, extracted_data, structured_data, status = extract_document_content(raw, filename, content_type)
 
         doc.ocr_text = ocr_text
         doc.extracted_data = extracted_data
+        doc.structured_data = structured_data
         doc.status = status
         db.commit()
         return {"success": True, "document_id": document_id, "status": status}

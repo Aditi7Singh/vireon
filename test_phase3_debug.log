@@ -1,0 +1,95 @@
+python : E.F
+At line:1 char:1
++ python backend/test
+s/test_phase3.py 
+2>&1 | Out-File 
+-FilePath test_ph ...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (E.F:Str   
+ ing) [], RemoteE    
+xception
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+=====================
+=====================
+=====================
+=======
+ERROR: test_advanced_
+anomalies (__main__.T
+estPhase3Features.tes
+t_advanced_anomalies)
+---------------------
+---------------------
+---------------------
+-------
+Traceback (most 
+recent call last):
+  File "C:\Users\yagn
+a\OneDrive\Desktop\My
+ Proj\CAPSTONE\vireon
+\backend\tests\test_p
+hase3.py", line 105, 
+in test_advanced_anom
+alies
+    account_code=mode
+ls.GLAccountCode.REVE
+NUE,
+                 ^^^^
+^^^^^^^^^^^^^^^^^^^^^
+^^^
+  File "C:\Users\yagn
+a\AppData\Local\Progr
+ams\Python\Python311\
+Lib\enum.py", line 
+784, in __getattr__
+    raise 
+AttributeError(name) 
+from None
+AttributeError: 
+REVENUE
+
+=====================
+=====================
+=====================
+=======
+FAIL: test_automated_
+loan_posting (__main_
+_.TestPhase3Features.
+test_automated_loan_p
+osting)
+---------------------
+---------------------
+---------------------
+-------
+Traceback (most 
+recent call last):
+  File "C:\Users\yagn
+a\OneDrive\Desktop\My
+ Proj\CAPSTONE\vireon
+\backend\tests\test_p
+hase3.py", line 98, 
+in test_automated_loa
+n_posting
+    self.assertEqual(
+float(payment.interes
+t_paid), 1000.0) # 
+1% of 100k
+    ^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
+AssertionError: 
+100000.0 != 1000.0
+
+---------------------
+---------------------
+---------------------
+-------
+Ran 3 tests in 0.278s
+
+FAILED (failures=1, 
+errors=1)

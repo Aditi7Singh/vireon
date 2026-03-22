@@ -107,3 +107,42 @@ def get_monthly_depreciation_expense(
     """Get total depreciation expense for a specific month."""
     expense = calculate_monthly_depreciation_expense(db, company_id, month)
     return {"month": month, "depreciation_expense": expense}
+
+
+class DisposeAssetRequest(BaseModel):
+    disposal_value: float
+    disposal_date: Optional[date] = None
+
+
+@router.post("/assets/{asset_id}/dispose")
+def dispose_asset_endpoint(
+    asset_id: str,
+    payload: DisposeAssetRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Dispose of a fixed asset.
+    Records gain/loss and posts GL entries for the disposal.
+    """
+    from services.depreciation_service import dispose_asset
+
+    result = dispose_asset(db, asset_id, payload.disposal_value, payload.disposal_date)
+    if "error" in result:
+        raise HTTPException(status_code=400, detail=result["error"])
+    return result
+
+
+@router.post("/post-gl/{company_id}")
+def post_depreciation_gl(
+    company_id: str,
+    month: date,
+    db: Session = Depends(get_db),
+):
+    """
+    Post monthly depreciation to GL for a company.
+    Creates double-entry GL records and DepreciationEntry records for each active asset.
+    """
+    from services.depreciation_service import post_depreciation_to_gl
+
+    result = post_depreciation_to_gl(db, company_id, month)
+    return result

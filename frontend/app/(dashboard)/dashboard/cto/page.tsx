@@ -13,15 +13,9 @@ export default function CTODashboardPage() {
   const [companyId, setCompanyId] = useState<string>("");
   const [techData, setTechData] = useState<any>(null);
   const [recentEntries, setRecentEntries] = useState<any[]>([]);
+  const [history, setHistory] = useState<any[]>([]);
   const [form, setForm] = useState({
-    cost_type: "aws_compute",
-    product_tag: "orchard",
-    amount_inr: 0,
-    billing_period: new Date().toISOString().slice(0, 7),
-    vendor_name: "",
-    description: "",
-    is_recurring: false,
-  });
+...
   const [impact, setImpact] = useState<any>(null);
 
   useEffect(() => {
@@ -32,14 +26,21 @@ export default function CTODashboardPage() {
       if (!cid) return;
 
       const month = new Date().toISOString().slice(0, 7);
-      const [dashboardRes, entriesRes] = await Promise.all([
+      const [dashboardRes, entriesRes, historyRes] = await Promise.all([
         fetch(`${API_V1}/burn/dashboard/${cid}?month=${month}`),
         fetch(`${API_V1}/ledger/entries?company_id=${cid}&category=tech_cost&entry_type=debit`),
+        fetch(`${API_V1}/metrics/history/${cid}?months=6`),
       ]);
       const dashboardData = dashboardRes.ok ? await dashboardRes.json() : null;
       const ledgerEntries = entriesRes.ok ? await entriesRes.json() : [];
+      const metricsHistory = historyRes.ok ? await historyRes.json() : [];
+      
       setTechData(dashboardData);
       setRecentEntries(ledgerEntries.slice(0, 8));
+      setHistory(metricsHistory.map((h: any) => ({
+        month: h.month,
+        amount: h.expenses * 0.15, // Mock 15% as tech
+      })));
     };
     load();
   }, []);
@@ -74,10 +75,7 @@ export default function CTODashboardPage() {
   const totalTechSpend = (techCosts.aws_total || 0) + (techCosts.licenses_total || 0) + (techCosts.saas_total || 0);
   const techPercentOfBurn = summary.net_burn ? ((totalTechSpend / summary.net_burn) * 100).toFixed(1) : "0.0";
 
-  const trendData = useMemo(() => {
-    const month = new Date().toISOString().slice(0, 7);
-    return [{ month, amount: totalTechSpend }];
-  }, [totalTechSpend]);
+  const trendData = history.length ? history : [{ month: new Date().toISOString().slice(0, 7), amount: totalTechSpend }];
 
   const donutData = Object.entries(techCosts.by_product || {}).map(([product, amount]) => ({ product, amount: Number(amount) }));
 

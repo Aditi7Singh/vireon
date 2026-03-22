@@ -59,6 +59,8 @@ def create_financial_ledger_entries(company):
         
         # --- REVENUE ENTRIES ---
         mrr = monthly_arr / 12 * (1.05 ** month)
+        prod = random.choice(products)
+        office = random.choice(offices)
         revenue = FinancialLedgerEntry(
             id=uuid.uuid4(),
             company_id=company.id,
@@ -67,39 +69,56 @@ def create_financial_ledger_entries(company):
             amount=mrr,
             currency="INR",
             transaction_date=current_date.date(),
-            product_tag=random.choice(products),
-            office_tag=random.choice(offices),
+            product_tag=prod,
+            office_tag=office,
             source=LedgerSource.ERPNEXT,
             entry_type=LedgerEntryType.CREDIT,
-            description=f"MRR {current_date.strftime('%B %Y')}",
+            description=f"MRR {current_date.strftime('%B %Y')} - {prod.value} subscription from {office.value}",
             entered_by_role=LedgerEnteredByRole.SYSTEM,
             department=random.choice(departments),
         )
         session.add(revenue)
         entries_count += 1
         
-        # --- PAYROLL (Biggest expense) ---
-        headcount = 15 + int(7 * (month / 12))
-        avg_ctc = 1200000.0
-        payroll_amount = headcount * (avg_ctc / 12)
-        payroll = FinancialLedgerEntry(
+        # --- PAYROLL ---
+        # Bengaluru HQ
+        payroll_blr = FinancialLedgerEntry(
             id=uuid.uuid4(),
             company_id=company.id,
             category=LedgerCategory.PAYROLL,
-            amount_inr=payroll_amount,
-            amount=payroll_amount,
+            amount_inr=1200000.0,
+            amount=1200000.0,
             currency="INR",
             transaction_date=current_date.date(),
             product_tag=LedgerProductTag.SHARED,
             office_tag=LedgerOfficeTag.BENGALURU,
             source=LedgerSource.ERPNEXT,
             entry_type=LedgerEntryType.DEBIT,
-            description=f"Monthly payroll - {headcount} people",
+            description="Bengaluru HQ Payroll",
             entered_by_role=LedgerEnteredByRole.FINANCE,
             department="people",
         )
-        session.add(payroll)
-        entries_count += 1
+        session.add(payroll_blr)
+        
+        # Gangavathi Hub
+        payroll_gv = FinancialLedgerEntry(
+            id=uuid.uuid4(),
+            company_id=company.id,
+            category=LedgerCategory.PAYROLL,
+            amount_inr=500000.0,
+            amount=500000.0,
+            currency="INR",
+            transaction_date=current_date.date(),
+            product_tag=LedgerProductTag.SPROUTS,
+            office_tag=LedgerOfficeTag.GANGAVATHI,
+            source=LedgerSource.ERPNEXT,
+            entry_type=LedgerEntryType.DEBIT,
+            description="Gangavathi Hub Operations Payroll",
+            entered_by_role=LedgerEnteredByRole.FINANCE,
+            department="operations",
+        )
+        session.add(payroll_gv)
+        entries_count += 2
         
         # --- AWS COSTS ---
         aws_cost = 150000 * (1 + month * 0.08)
@@ -111,56 +130,56 @@ def create_financial_ledger_entries(company):
             amount=aws_cost,
             currency="INR",
             transaction_date=current_date.date(),
-            product_tag=random.choice(products),
+            product_tag=LedgerProductTag.SHARED,
             office_tag=LedgerOfficeTag.BENGALURU,
             source=LedgerSource.AWS_BILLING,
             entry_type=LedgerEntryType.DEBIT,
-            description="AWS infrastructure - EC2, RDS, S3",
+            description="AWS infrastructure - EC2, AI Lab model inference",
             entered_by_role=LedgerEnteredByRole.CTO,
             department="engineering",
         )
         session.add(aws)
         entries_count += 1
         
-        # --- MARKETING ---
-        marketing = FinancialLedgerEntry(
-            id=uuid.uuid4(),
-            company_id=company.id,
-            category=LedgerCategory.MARKETING,
-            amount_inr=80000,
-            amount=80000,
-            currency="INR",
-            transaction_date=current_date.date(),
-            product_tag=LedgerProductTag.ORCHARD,
-            office_tag=LedgerOfficeTag.BENGALURU,
-            source=LedgerSource.MANUAL_MARKETING,
-            entry_type=LedgerEntryType.DEBIT,
-            description="Digital marketing - Google Ads, content",
-            entered_by_role=LedgerEnteredByRole.MARKETING,
-            department="marketing",
-        )
-        session.add(marketing)
-        entries_count += 1
-        
         # --- OFFICE EXPENSES ---
-        office = FinancialLedgerEntry(
+        # Bengaluru Rent
+        rent_blr = FinancialLedgerEntry(
             id=uuid.uuid4(),
             company_id=company.id,
             category=LedgerCategory.OFFICE_EXPENSE,
-            amount_inr=25000,
-            amount=25000,
+            amount_inr=150000,
+            amount=150000,
             currency="INR",
             transaction_date=current_date.date(),
             product_tag=LedgerProductTag.UNALLOCATED,
-            office_tag=random.choice(offices),
+            office_tag=LedgerOfficeTag.BENGALURU,
             source=LedgerSource.MANUAL_FINANCE,
             entry_type=LedgerEntryType.DEBIT,
-            description="Office rent, WiFi, utilities",
+            description="Bengaluru Office Rent & Utilities",
             entered_by_role=LedgerEnteredByRole.FINANCE,
             department="operations",
         )
-        session.add(office)
-        entries_count += 1
+        session.add(rent_blr)
+        
+        # Gangavathi Rent (Much cheaper)
+        rent_gv = FinancialLedgerEntry(
+            id=uuid.uuid4(),
+            company_id=company.id,
+            category=LedgerCategory.OFFICE_EXPENSE,
+            amount_inr=35000,
+            amount=35000,
+            currency="INR",
+            transaction_date=current_date.date(),
+            product_tag=LedgerProductTag.UNALLOCATED,
+            office_tag=LedgerOfficeTag.GANGAVATHI,
+            source=LedgerSource.MANUAL_FINANCE,
+            entry_type=LedgerEntryType.DEBIT,
+            description="Gangavathi Hub Rent",
+            entered_by_role=LedgerEnteredByRole.FINANCE,
+            department="operations",
+        )
+        session.add(rent_gv)
+        entries_count += 2
     
     session.commit()
     print(f"✅ Created {entries_count} financial ledger entries (12 months)")

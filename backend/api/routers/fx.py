@@ -142,3 +142,26 @@ def get_revaluation_snapshots(
             for r in rows
         ],
     }
+
+
+@router.get("/pl-consolidated/{company_id}")
+def consolidated_pl(
+    company_id: UUID,
+    month: str,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    """Get P&L consolidated across all currencies into INR."""
+    from services.fx_service import get_multicurrency_pl
+    return get_multicurrency_pl(db, company_id, month)
+
+
+@router.get("/adjusted-runway/{company_id}")
+def adjusted_runway(
+    company_id: UUID,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    """Get runway calculation factoring in FX volatility and revaluation results."""
+    from services.fx_service import get_fx_adjusted_runway
+    return get_fx_adjusted_runway(db, company_id)

@@ -148,7 +148,8 @@ export const api = {
   getScorecard: () => fetchAPI<Scorecard>("/scorecard"),
 
   // Expenses
-  getExpenses: (months: number = 3) => fetchAPI<ExpenseBreakdown>("/expenses", { params: { months } }),
+  getExpenses: (months: number = 3, params?: { department?: string; product_tag?: string }) => 
+    fetchAPI<ExpenseBreakdown>("/expenses", { params: { months, ...params } }),
 
   // Alerts
   getAlerts: (params?: { severity?: string; category?: string; limit?: number }) =>
@@ -167,7 +168,17 @@ export const api = {
   getHistory: (sessionId: string) =>
     fetchAPI<{ session_id: string; messages: AgentMessage[] }>(`/agent/history/${sessionId}`),
   
-  // Benchmarks
+  // Tax
+  getTaxRules: (companyId: string) => fetchAPI<any[]>(`/tax/rules/${companyId}`),
+  getTaxSummary: (companyId: string, year: number, quarter: number) => 
+    fetchAPI<any>("/tax/quarterly-summary", { params: { company_id: companyId, year, quarter } }),
+  getTaxSchedule: (companyId: string) => fetchAPI<any[]>(`/tax/payment-schedule/${companyId}`),
+  reconcileTaxPayment: (liabilityId: string, amount: number, reference: string) =>
+    fetchAPI<any>("/tax/reconcile-payment", {
+      method: "POST",
+      params: { liability_id: liabilityId, amount, reference }
+    }),
+
   getBenchmarks: () => fetchAPI<any>("/benchmarks/sass-health"),
   getMe: () => fetchAPI<any>("/users/me/"),
   getStartupHealth: () => fetchAPI<StartupHealth>("/system/startup-health"),

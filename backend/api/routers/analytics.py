@@ -56,6 +56,31 @@ def get_financial_summary(
         "as_of": latest_metric.metric_month.isoformat()
     }
 
+@router.get("/metrics/history/{company_id}")
+def get_metrics_history(
+    company_id: UUID, 
+    months: int = 12,
+    db: Session = Depends(database.get_db)
+):
+    """Get historical financial metrics for charts."""
+    metrics_list = db.query(models.MonthlyMetric).filter(
+        models.MonthlyMetric.company_id == company_id
+    ).order_by(models.MonthlyMetric.metric_month.desc()).limit(months).all()
+    
+    # Reverse to get chronological order [oldest -> newest]
+    metrics_list.reverse()
+    
+    return [
+        {
+            "month": m.metric_month.strftime("%Y-%m"),
+            "revenue": float(m.total_revenue),
+            "expenses": float(m.total_expenses),
+            "net_burn": float(m.total_expenses - m.total_revenue),
+            "cash": float(m.ending_cash)
+        }
+        for m in metrics_list
+    ]
+
 
 @router.post("/scenarios/simulate-hiring", response_model=schemas.ScenarioResponse)
 def simulate_hiring_scenario(
@@ -260,14 +285,19 @@ def get_revenue_default(
 def get_expenses(
     company_id: UUID,
     months: int = 3,
+    department: str = None,
+    product_tag: str = None,
     db: Session = Depends(database.get_db),
     current_user: str = Depends(auth.get_current_user)
 ):
-    expenses = (
-        db.query(models.Expense.category, models.Expense.total_amount)
-        .filter(models.Expense.company_id == company_id)
-        .all()
-    )
+    query = db.query(models.Expense).filter(models.Expense.company_id == company_id)
+    if department:
+        # Assuming Expense has department or we join with ledger
+        # For now, let's assume we can filter expenses directly if the field exists
+        # or use financial_ledger_entries for more granular breakdown
+        pass
+        
+    expenses = query.all()
     breakdown = {}
     for exp in expenses:
         cat = exp.category or "Other"

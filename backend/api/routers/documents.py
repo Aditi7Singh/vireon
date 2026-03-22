@@ -25,12 +25,17 @@ def upload_document(
     """
     raw = file.file.read()
     async_mode = os.getenv("OCR_ASYNC", "false").lower() == "true"
+    
+    # Save to storage (Mock cloud storage)
+    from services.storage_service import storage
+    storage_path = storage.save_file(raw, file.filename)
 
     extracted_text = None
     extracted_data = None
+    structured_data = None
     status = "pending" if async_mode else "processed"
     if not async_mode:
-        extracted_text, extracted_data, status = extract_document_content(raw, file.filename, file.content_type)
+        extracted_text, extracted_data, structured_data, status = extract_document_content(raw, file.filename, file.content_type)
 
     db_doc = models.Document(
         company_id=company_id,
@@ -39,7 +44,14 @@ def upload_document(
         status=status,
         ocr_text=extracted_text,
         extracted_data=extracted_data,
+        structured_data=structured_data,
+        # In a real app, we'd add a 'storage_path' column to Document model. 
+        # For this prototype, we'll store it in extracted_data metadata if needed.
     )
+    if not db_doc.extracted_data:
+        db_doc.extracted_data = {}
+    db_doc.extracted_data["storage_path"] = storage_path
+    
     db.add(db_doc)
     db.commit()
     db.refresh(db_doc)

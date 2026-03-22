@@ -88,13 +88,13 @@ export function useRevenue() {
   return { revenue: data, isLoading, error, mutate };
 }
 
-export function useExpenses(months: number = 3) {
+export function useExpenses(months: number = 3, params?: { department?: string; product_tag?: string }) {
   const initial: ExpenseBreakdown = {
     breakdown: {},
     trend: [],
     movers: []
   };
-  const getExpenses = useCallback(() => api.getExpenses(months), [months]);
+  const getExpenses = useCallback(() => api.getExpenses(months, params), [months, params]);
   const { data, isLoading, error, mutate } = useApi(getExpenses, initial);
   return { expenses: data, isLoading, error, mutate };
 }

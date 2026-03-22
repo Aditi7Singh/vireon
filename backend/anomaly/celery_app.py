@@ -16,7 +16,7 @@ app = Celery(
     "vireon_anomaly",
     broker=REDIS_URL,
     backend=REDIS_URL,
-    include=["anomaly.tasks", "tasks.alert_tasks", "tasks.document_tasks", "tasks.fx_tasks"]
+    include=["anomaly.tasks", "tasks.alert_tasks", "tasks.document_tasks", "tasks.fx_tasks", "tasks.sync_tasks"]
 )
 
 # Configure Celery
@@ -65,6 +65,21 @@ app.conf.beat_schedule = {
     "monthly-fx-revaluation": {
         "task": "tasks.fx_tasks.run_monthly_fx_revaluation_all_companies",
         "schedule": crontab(hour=1, minute=0, day_of_month=1),
+    },
+    # Daily background sync for all integrations at 4:00 AM UTC
+    "daily-background-sync": {
+        "task": "tasks.sync_tasks.trigger_all_company_syncs",
+        "schedule": crontab(hour=4, minute=0),
+    },
+    # Monthly depreciation posting on the 1st of each month at 01:30 UTC
+    "monthly-depreciation-posting": {
+        "task": "anomaly.tasks.post_monthly_depreciation",
+        "schedule": crontab(hour=1, minute=30, day_of_month=1),
+    },
+    # Daily loan payment auto-posting at 3:00 AM UTC
+    "daily-loan-payment-posting": {
+        "task": "anomaly.tasks.auto_post_loan_payments",
+        "schedule": crontab(hour=3, minute=0),
     },
 }
 

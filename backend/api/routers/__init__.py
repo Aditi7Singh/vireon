@@ -23,4 +23,5 @@ from . import (
 	notifications,
 	system,
 	fx,
+	tax,
 )

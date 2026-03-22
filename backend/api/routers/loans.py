@@ -107,6 +107,50 @@ def add_loan_payment(
         loan.status = "paid_off"
     
     db.add(db_payment)
+    
+    # --- Ledger Integration ---
+    # Principal Payment (Debit Liability/Credit Cash)
+    principal_entry = models.GeneralLedger(
+        company_id=loan.company_id,
+        account_code=models.GLAccountCode.LONG_TERM_DEBT, # or SHORT_TERM_DEBT depending on loan
+        account_name="Loan Principal Payment",
+        transaction_date=payment.payment_date,
+        debit_amount=payment.principal_paid,
+        credit_amount=0,
+        description=f"Loan principal repayment - {loan.loan_name}",
+        source_type="loan_payment",
+        reference_id=str(db_payment.id)
+    )
+    db.add(principal_entry)
+    
+    # Interest Payment (Debit Expense/Credit Cash)
+    interest_entry = models.GeneralLedger(
+        company_id=loan.company_id,
+        account_code=models.GLAccountCode.ACCRUED_EXPENSES, # Usually mapped to interest expense in a real COA
+        account_name="Loan Interest Expense",
+        transaction_date=payment.payment_date,
+        debit_amount=payment.interest_paid,
+        credit_amount=0,
+        description=f"Loan interest payment - {loan.loan_name}",
+        source_type="loan_payment",
+        reference_id=str(db_payment.id)
+    )
+    db.add(interest_entry)
+    
+    # Matching Cash Credit
+    cash_credit = models.GeneralLedger(
+        company_id=loan.company_id,
+        account_code=models.GLAccountCode.CASH,
+        account_name="Cash & Bank",
+        transaction_date=payment.payment_date,
+        debit_amount=0,
+        credit_amount=payment.payment_amount,
+        description=f"Loan payment outflow - {loan.loan_name}",
+        source_type="loan_payment",
+        reference_id=str(db_payment.id)
+    )
+    db.add(cash_credit)
+    
     db.commit()
     db.refresh(db_payment)
     return db_payment

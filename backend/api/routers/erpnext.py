@@ -249,134 +249,25 @@ async def erpnext_webhook(request: Request, db: Session = Depends(database.get_d
         return {"status": "error", "message": str(e)}
 
 @router.post("/sync/erpnext")
-async def manual_sync_erpnext(db: Session = Depends(database.get_db), current_user: str = Depends(auth.get_current_user)):
+async def manual_sync_erpnext(
+    incremental: bool = True,
+    db: Session = Depends(database.get_db), 
+    current_user: str = Depends(auth.get_current_user)
+):
     """
     Trigger a manual bidirectional sync with ERPNext.
     This fetches all key docs (Accounts, Contacts, and Invoices) and updates the Neon system of record.
     """
-    client = get_erpnext_client()
+    from services.erpnext_service import ERPNextService
     
-    try:
-        company = db.query(models.Company).first()
-        if not company:
-            company = models.Company(name="My ERPNext Company", stage="seed")
-            db.add(company)
-            db.flush()
+    company = db.query(models.Company).first()
+    if not company:
+        raise HTTPException(status_code=404, detail="No company found. Please bootstrap first.")
         
-        print("Syncing Accounts...")
-        accounts = await client.get_resource_list("Account", fields=["name", "report_type", "account_type", "root_type"])
-        for acc in accounts:
-            acc_data = {
-                "remote_id": acc["name"],
-                "name": acc["name"],
-                "classification": acc.get("root_type"),
-                "type": acc.get("account_type"),
-                "company_id": company.id
-            }
-            db_acc = db.query(models.Account).filter(models.Account.remote_id == acc["name"]).first()
-            if db_acc:
-                for key, val in acc_data.items(): setattr(db_acc, key, val)
-            else:
-                db.add(models.Account(**acc_data))
-
-        print("Syncing Contacts...")
-        customers = await client.get_resource_list("Customer", fields=["name", "email_id", "phone"])
-        suppliers = await client.get_resource_list("Supplier", fields=["name", "email_id", "phone"])
+    service = ERPNextService(db, company.id)
+    result = await service.sync_all(incremental=incremental)
+    
+    if "error" in result:
+        raise HTTPException(status_code=500, detail=result["error"])
         
-        contact_id_map = {}
-        
-        for c in customers:
-            contact_data = {
-                "remote_id": c["name"],
-                "name": c["name"],
-                "type": "CUSTOMER",
-                "email": c.get("email_id"),
-                "phone": c.get("phone"),
-                "company_id": company.id
-            }
-            db_contact = db.query(models.Contact).filter(models.Contact.remote_id == c["name"]).first()
-            if db_contact:
-                for key, val in contact_data.items(): setattr(db_contact, key, val)
-            else:
-                db_contact = models.Contact(**contact_data)
-                db.add(db_contact)
-            db.flush()
-            contact_id_map[c["name"]] = db_contact.id
-
-        for s in suppliers:
-            contact_data = {
-                "remote_id": s["name"],
-                "name": s["name"],
-                "type": "VENDOR",
-                "email": s.get("email_id"),
-                "phone": s.get("phone"),
-                "company_id": company.id
-            }
-            db_contact = db.query(models.Contact).filter(models.Contact.remote_id == s["name"]).first()
-            if db_contact:
-                for key, val in contact_data.items(): setattr(db_contact, key, val)
-            else:
-                db_contact = models.Contact(**contact_data)
-                db.add(db_contact)
-            db.flush()
-            contact_id_map[s["name"]] = db_contact.id
-
-        print("Syncing Sales Invoices...")
-        sales_invoices = await client.get_sales_invoices()
-        for inv in sales_invoices:
-            contact_id = contact_id_map.get(inv.get("customer"))
-            inv_data = {
-                "remote_id": inv["name"],
-                "invoice_number": inv["name"],
-                "issue_date": inv["posting_date"],
-                "due_date": inv.get("due_date", inv["posting_date"]),
-                "status": inv["status"],
-                "type": "ACCOUNTS_RECEIVABLE",
-                "total_amount": inv["grand_total"],
-                "amount_paid": inv.get("grand_total", 0) - inv.get("outstanding_amount", 0),
-                "amount_due": inv.get("outstanding_amount", 0),
-                "currency": inv.get("currency", "USD"),
-                "company_id": company.id,
-                "contact_id": contact_id
-            }
-            db_inv = db.query(models.Invoice).filter(models.Invoice.remote_id == inv["name"]).first()
-            if db_inv:
-                for key, val in inv_data.items(): setattr(db_inv, key, val)
-            else:
-                db.add(models.Invoice(**inv_data))
-
-        print("Syncing Purchase Invoices...")
-        purchase_invoices = await client.get_purchase_invoices()
-        for inv in purchase_invoices:
-            contact_id = contact_id_map.get(inv.get("supplier"))
-            inv_data = {
-                "remote_id": inv["name"],
-                "invoice_number": inv["name"],
-                "issue_date": inv["posting_date"],
-                "due_date": inv.get("due_date", inv["posting_date"]),
-                "status": inv["status"],
-                "type": "ACCOUNTS_PAYABLE",
-                "total_amount": inv["grand_total"],
-                "amount_paid": inv.get("grand_total", 0) - inv.get("outstanding_amount", 0),
-                "amount_due": inv.get("outstanding_amount", 0),
-                "currency": inv.get("currency", "USD"),
-                "company_id": company.id,
-                "contact_id": contact_id
-            }
-            db_inv = db.query(models.Invoice).filter(models.Invoice.remote_id == inv["name"]).first()
-            if db_inv:
-                for key, val in inv_data.items(): setattr(db_inv, key, val)
-            else:
-                db.add(models.Invoice(**inv_data))
-
-        db.commit()
-        return {
-            "status": "success", 
-            "message": f"Successfully synced {len(customers) + len(suppliers)} Contacts and {len(sales_invoices) + len(purchase_invoices)} Invoices from ERPNext to Neon."
-        }
-    except Exception as e:
-        logger.error(f"Manual sync failed: {e}")
-        db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        await client.close()
+    return result

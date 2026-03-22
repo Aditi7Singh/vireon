@@ -52,15 +52,26 @@ def _expense_category(raw: str | None) -> models.LedgerCategory:
 
 def _product_tag(text: str | None) -> models.LedgerProductTag:
     value = (text or "").lower()
-    if "orchard" in value:
+    if any(k in value for k in ["orchard", "fruit", "harvest"]):
         return models.LedgerProductTag.ORCHARD
-    if "sprouts" in value:
+    if any(k in value for k in ["sprout", "seedling", "growth"]):
         return models.LedgerProductTag.SPROUTS
-    if any(k in value for k in ["ai lab", "ai_lab", "ai"]):
+    if any(k in value for k in ["ai lab", "ai_lab", "ai", "model", "inference"]):
         return models.LedgerProductTag.AI_LAB
-    if "shared" in value:
+    if any(k in value for k in ["shared", "common", "platform", "hq"]):
         return models.LedgerProductTag.SHARED
     return models.LedgerProductTag.UNALLOCATED
+
+
+def _office_tag(text: str | None) -> models.LedgerOfficeTag:
+    value = (text or "").lower()
+    if any(k in value for k in ["bengaluru", "bangalore", "blr", "hq"]):
+        return models.LedgerOfficeTag.BENGALURU
+    if any(k in value for k in ["gangavathi", "hub", "rural"]):
+        return models.LedgerOfficeTag.GANGAVATHI
+    if any(k in value for k in ["remote", "wfh", "travel"]):
+        return models.LedgerOfficeTag.REMOTE
+    return models.LedgerOfficeTag.NA
 
 
 def create_ledger_entry(db: Session, payload: dict) -> models.FinancialLedgerEntry:
@@ -108,6 +119,7 @@ def sync_existing_to_ledger(company_id: UUID, db: Session) -> dict:
             "entry_type": models.LedgerEntryType.DEBIT,
             "category": _expense_category(exp.category),
             "product_tag": _product_tag((exp.memo or "") + " " + (exp.category or "")),
+            "office_tag": _office_tag((exp.memo or "") + " " + (exp.department or "")),
             "source": models.LedgerSource.ERPNEXT,
             "reference_id": str(exp.id),
             "reference_type": "expense",
@@ -121,6 +133,14 @@ def sync_existing_to_ledger(company_id: UUID, db: Session) -> dict:
 
     invoices = db.query(models.Invoice).filter(models.Invoice.company_id == company_id).all()
     for inv in invoices:
+        # Calculate tax details using tax_service
+        tax_details = {}
+        try:
+            from services.tax_service import calculate_tax_for_invoice
+            tax_details = calculate_tax_for_invoice(db, company_id, float(inv.sub_total or inv.total_amount))
+        except Exception:
+            tax_details = {}
+
         payload = {
             "company_id": company_id,
             "transaction_date": inv.issue_date,
@@ -135,7 +155,13 @@ def sync_existing_to_ledger(company_id: UUID, db: Session) -> dict:
             "description": inv.memo or f"Invoice {inv.invoice_number}",
             "entered_by_role": models.LedgerEnteredByRole.SYSTEM,
             "is_recurring": True,
-            "tags": {"invoice_number": inv.invoice_number, "status": inv.status},
+            "tags": {
+                "invoice_number": inv.invoice_number,
+                "status": inv.status,
+                "gst_amount": tax_details.get("gst_amount", 0),
+                "tds_deducted": tax_details.get("tds_deducted", 0),
+                "net_cash_expected": tax_details.get("net_cash_expected", float(inv.total_amount)),
+            },
         }
         create_ledger_entry(db, payload)
         created += 1

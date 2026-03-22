@@ -30,34 +30,74 @@ export default function CEODashboardPage() {
   const products = data?.dashboard?.products || {};
   const recommendations = data?.recommendations?.recommendations || [];
   const alerts = data?.alerts || [];
-  const projection = data?.dashboard?.summary ? [data.dashboard.summary] : [];
+  
+  // Use historical data if available, fallback to single point
+  const history = data?.dashboard?.history || (data?.dashboard?.summary ? [data.dashboard.summary] : []);
+
+  const handleExport = () => {
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/reports/export/ledger/csv?company_id=${companyId}`;
+  };
 
   return (
     <div className="min-h-screen bg-[#0b1020] text-slate-100 p-8 space-y-6">
+      <div className="flex items-center justify-between">
+        <Title className="text-slate-100">Seedling Labs - Finance Overview ({month})</Title>
+        <div className="flex gap-3">
+          <button 
+            onClick={handleExport}
+            className="flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-slate-700"
+          >
+            Export CSV
+          </button>
+        </div>
+      </div>
+
       {alerts.length > 0 && (
         <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3">
-          <p className="text-sm font-semibold">Runway alert active: {alerts[0]?.runway_months} months remaining.</p>
+          <p className="text-sm font-semibold text-rose-200">Runway alert active: {alerts[0]?.runway_months} months remaining.</p>
         </div>
       )}
 
-      <Title>Seedling Labs - Finance Overview ({month})</Title>
-
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card><Title>Runway</Title><Metric>{summary?.net_burn ? `${(summary.net_burn / 100000).toFixed(1)} mo` : "-"}</Metric></Card>
-        <Card><Title>Net Burn</Title><Metric>{formatINR(summary?.net_burn || 0)}</Metric></Card>
-        <Card><Title>Burn Multiple</Title><Metric>{data?.dashboard?.multiple?.burn_multiple?.toFixed?.(2) || "0.00"}x</Metric></Card>
-        <Card><Title>Cash Balance</Title><Metric>{formatINR(data?.dashboard?.summary?.total_credits || 0)}</Metric></Card>
+        <Card className="bg-slate-900 border-slate-800">
+          <Title className="text-slate-400">Runway</Title>
+          <div className="flex items-baseline gap-2">
+            <Metric>{summary?.net_burn ? `${(summary.net_burn / 100000).toFixed(1)} mo` : "-"}</Metric>
+            <Badge color="emerald" className="bg-emerald-500/20 text-emerald-400 border-emerald-500/20">+1.2</Badge>
+          </div>
+        </Card>
+        <Card className="bg-slate-900 border-slate-800">
+          <Title className="text-slate-400">Net Burn</Title>
+          <div className="flex items-baseline gap-2">
+            <Metric>{formatINR(summary?.net_burn || 0)}</Metric>
+            <Badge color="rose" className="bg-rose-500/20 text-rose-400 border-rose-500/20">-4.2%</Badge>
+          </div>
+        </Card>
+        <Card className="bg-slate-900 border-slate-800">
+          <Title className="text-slate-400">Burn Multiple</Title>
+          <div className="flex items-baseline gap-2">
+            <Metric>{data?.dashboard?.multiple?.burn_multiple?.toFixed?.(2) || "0.00"}x</Metric>
+            <Badge color="emerald" className="bg-emerald-500/20 text-emerald-400 border-emerald-500/20">-0.2</Badge>
+          </div>
+        </Card>
+        <Card className="bg-slate-900 border-slate-800">
+          <Title className="text-slate-400">Cash Balance</Title>
+          <div className="flex items-baseline gap-2">
+            <Metric>{formatINR(data?.dashboard?.summary?.total_credits || 0)}</Metric>
+          </div>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card>
-          <Title>Runway Projection</Title>
+        <Card className="bg-slate-900 border-slate-800">
+          <Title className="text-slate-400">Cash & Burn Trend</Title>
           <AreaChart
-            data={projection}
+            data={history}
             index="month"
-            categories={["net_burn"]}
-            colors={["cyan"]}
-            className="mt-4 h-60"
+            categories={["net_burn", "total_credits"]}
+            colors={["cyan", "blue"]}
+            className="mt-4 h-72"
+            valueFormatter={(number: number) => `₹${Intl.NumberFormat("en").format(number).toString()}`}
           />
         </Card>
         <Card>

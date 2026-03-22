@@ -166,6 +166,7 @@ class MonthlyMetricBase(BaseModel):
     metric_month: date
     total_revenue: float = 0.0
     total_expenses: float = 0.0
+    total_tax_liability: float = 0.0
     net_cash_flow: float = 0.0
     burn_rate: float = 0.0
     runway_months: float = 0.0
@@ -426,6 +427,7 @@ class DocumentBase(BaseModel):
     status: str = "pending" # pending, processing, completed, failed
     ocr_text: Optional[str] = None
     extracted_data: Optional[dict] = None
+    structured_data: Optional[dict] = None
 
 class DocumentCreate(DocumentBase):
     company_id: UUID
@@ -561,6 +563,9 @@ class HiringImpactRequest(BaseModel):
     company_id: UUID
     annual_ctc_inr: float
     join_month: str
+    equipment_cost: float = 0.0
+    onboarding_cost: float = 0.0
+    benefits_multiplier: float = 1.0 # factor to apply to salary, e.g. 1.2
 
 
 class NotificationContactsUpdate(BaseModel):
