@@ -3,9 +3,29 @@ from __future__ import annotations
 import io
 import json
 from typing import Tuple
+import os
 
 
 import re
+
+
+def _extract_with_textract(raw: bytes) -> str | None:
+    """Optional OCR provider path using AWS Textract.
+
+    Enabled when OCR_PROVIDER=textract and boto3 credentials are configured.
+    """
+    try:
+        import boto3
+
+        client = boto3.client("textract", region_name=os.getenv("AWS_REGION", "us-east-1"))
+        response = client.detect_document_text(Document={"Bytes": raw})
+        lines = []
+        for block in response.get("Blocks", []):
+            if block.get("BlockType") == "LINE" and block.get("Text"):
+                lines.append(block["Text"])
+        return "\n".join(lines).strip() or None
+    except Exception:
+        return None
 
 def _map_fields_regex(text: str) -> dict:
     """Simulate structured field mapping using heuristics and regex."""
@@ -68,24 +88,27 @@ def extract_structured_fields(text: str) -> dict | None:
     {text}
     """
     
-    try:
-        messages = [
-            SystemMessage(content="You are a financial data extraction expert. Return only valid JSON."),
-            HumanMessage(content=prompt.format(text=text))
-        ]
-        response = llm.invoke(messages)
-        
-        # Parse JSON from response
-        content = response.content
-        if "```json" in content:
-            content = content.split("```json")[1].split("```")[0]
-        elif "```" in content:
-            content = content.split("```")[1].split("```")[0]
-            
-        return json.loads(content.strip())
-    except Exception as e:
-        print(f"[EXTRACT] AI extraction failed: {e}")
-        return None
+    for _ in range(2):
+        try:
+            messages = [
+                SystemMessage(content="You are a financial data extraction expert. Return only valid JSON."),
+                HumanMessage(content=prompt.format(text=text))
+            ]
+            response = llm.invoke(messages)
+
+            # Parse JSON from response
+            content = response.content
+            if isinstance(content, list):
+                content = "\n".join(str(x) for x in content)
+            if "```json" in content:
+                content = content.split("```json")[1].split("```")[0]
+            elif "```" in content:
+                content = content.split("```")[1].split("```")[0]
+
+            return json.loads(content.strip())
+        except Exception as e:
+            print(f"[EXTRACT] AI extraction failed: {e}")
+    return None
 
 def extract_document_content(raw: bytes, filename: str | None, content_type: str | None) -> Tuple[str | None, dict | None, dict | None, str]:
     """Returns (ocr_text, extracted_data_raw, structured_data_ai, status)."""
@@ -96,6 +119,7 @@ def extract_document_content(raw: bytes, filename: str | None, content_type: str
 
     ctype = (content_type or "").lower()
     name = (filename or "").lower()
+    ocr_provider = os.getenv("OCR_PROVIDER", "local").lower()
 
     try:
         if "text" in ctype or name.endswith((".txt", ".md", ".csv")):
@@ -114,6 +138,11 @@ def extract_document_content(raw: bytes, filename: str | None, content_type: str
                 extracted_text = "\n".join(pages).strip() or None
             except Exception:
                 status = "pending"
+
+            # If embedded text extraction is empty and textract is enabled, attempt OCR provider.
+            if not extracted_text and ocr_provider == "textract":
+                extracted_text = _extract_with_textract(raw)
+                status = "processed" if extracted_text else "pending"
         else:
             status = "pending"
             

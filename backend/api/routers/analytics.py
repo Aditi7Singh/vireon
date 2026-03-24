@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from uuid import UUID
 from fastapi.responses import StreamingResponse
 import io
+from typing import Optional
 
 import models
 import schemas
@@ -313,10 +316,19 @@ def get_expenses(
 @router.get("/expenses")
 def get_expenses_default(
     months: int = 3,
+    department: Optional[str] = None,
+    product_tag: Optional[str] = None,
     db: Session = Depends(database.get_db),
     current_user: str = Depends(auth.get_current_user)
 ):
-    return get_expenses(_default_company_id(db), months, db, current_user)
+    return get_expenses(
+        company_id=_default_company_id(db),
+        months=months,
+        department=department,
+        product_tag=product_tag,
+        db=db,
+        current_user=current_user,
+    )
 
 @router.get("/cash-balance/{company_id}")
 def get_cash_balance(

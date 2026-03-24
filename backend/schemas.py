@@ -569,11 +569,11 @@ class HiringImpactRequest(BaseModel):
 
 
 class NotificationContactsUpdate(BaseModel):
+    email_recipients: Optional[List[str]] = None
     ceo: Optional[str] = None
     founders: Optional[List[str]] = None
     finance: Optional[List[str]] = None
     cto: Optional[str] = None
-    slack_webhook: Optional[str] = None
 
 
 class AlertThresholdsUpdate(BaseModel):

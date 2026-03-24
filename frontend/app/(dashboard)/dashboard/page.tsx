@@ -32,19 +32,19 @@ const priorityActions = [
     title: "Optimize cloud spend in ML workloads",
     impact: "Estimated monthly savings: $38,400",
     owner: "CTO",
-    href: "/dashboard/expenses",
+    href: "/expenses",
   },
   {
     title: "Accelerate collections for enterprise invoices",
     impact: "Improve runway by 1.2 months",
     owner: "Finance",
-    href: "/dashboard/revenue",
+    href: "/revenue",
   },
   {
     title: "Recalibrate growth hiring for Q3",
     impact: "Reduce burn multiple from 1.9 to 1.6",
     owner: "CEO",
-    href: "/dashboard/runway",
+    href: "/runway",
   },
 ];
 
@@ -53,25 +53,31 @@ const moduleCards = [
     title: "Runway Intelligence",
     description: "Live runway projection with growth and hiring simulation overlays.",
     icon: CalendarClock,
-    href: "/dashboard/runway",
+    href: "/runway",
   },
   {
     title: "Expense Forensics",
     description: "Vendor-level leakage discovery and spend concentration insights.",
     icon: Receipt,
-    href: "/dashboard/expenses",
+    href: "/expenses",
   },
   {
     title: "Revenue Signal",
     description: "MRR quality, cohort retention, and delayed collection watch.",
     icon: Wallet,
-    href: "/dashboard/revenue",
+    href: "/revenue",
   },
   {
     title: "Scenario Engine",
     description: "Compare base, conservative, and aggressive plans instantly.",
     icon: Layers3,
-    href: "/dashboard/scenarios",
+    href: "/scenarios",
+  },
+  {
+    title: "Feature Hub",
+    description: "Single destination for every implemented module and control.",
+    icon: Sparkles,
+    href: "/features",
   },
 ];
 

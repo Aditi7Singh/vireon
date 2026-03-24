@@ -1,25 +1,67 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import TopBar from "@/components/TopBar";
 import { useAlerts } from "@/hooks/useFinancialData";
 import { useAppStore } from "@/lib/store";
+import api from "@/lib/api";
 import { cn, formatCurrency, formatRelativeTime } from "@/lib/utils";
 import { Alert } from "@/lib/api";
 import { AlertTriangle, CheckCircle2, RefreshCw, Search, ShieldCheck, Sparkles } from "lucide-react";
 
 export default function AnomaliesPage() {
   const { alerts, isLoading, mutate } = useAlerts();
-  const { openChat, isSyncing, setIsSyncing } = useAppStore();
+  const { openChat, isSyncing, setIsSyncing, setAlertCount, setCriticalAlertCount } = useAppStore();
   const [filter, setFilter] = useState<"all" | "critical" | "warning" | "info">("all");
+  const [query, setQuery] = useState("");
+  const [actionError, setActionError] = useState<string | null>(null);
 
-  const filteredAlerts: Alert[] = alerts?.alerts?.filter((alert: Alert) => filter === "all" || alert.severity === filter) ?? [];
+  useEffect(() => {
+    setAlertCount(alerts?.total ?? 0);
+    setCriticalAlertCount(alerts?.critical_count ?? 0);
+  }, [alerts, setAlertCount, setCriticalAlertCount]);
+
+  const filteredAlerts: Alert[] = useMemo(() => {
+    const base = alerts?.alerts ?? [];
+    return base.filter((alert: Alert) => {
+      const matchesSeverity = filter === "all" || alert.severity === filter;
+      const normalized = `${alert.description} ${alert.alert_type} ${alert.category}`.toLowerCase();
+      const matchesQuery = !query.trim() || normalized.includes(query.trim().toLowerCase());
+      return matchesSeverity && matchesQuery;
+    });
+  }, [alerts, filter, query]);
 
   const handleScan = async () => {
+    setActionError(null);
     setIsSyncing(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setIsSyncing(false);
-    mutate();
+    try {
+      await api.triggerScan();
+      await mutate();
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "Failed to trigger anomaly scan.");
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const handleDismiss = async (alertId: string) => {
+    setActionError(null);
+    try {
+      await api.dismissAlert(alertId);
+      await mutate();
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "Failed to dismiss alert.");
+    }
+  };
+
+  const handleSeedDemo = async () => {
+    setActionError(null);
+    try {
+      await api.seedDemoAlerts();
+      await mutate();
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "Failed to seed demo anomalies.");
+    }
   };
 
   return (
@@ -38,6 +80,12 @@ export default function AnomaliesPage() {
               <p className="mt-2 text-sm text-[#5f5344]">Identify unusual spikes before they affect runway.</p>
             </div>
             <div className="flex items-center gap-2">
+              <button
+                onClick={handleSeedDemo}
+                className="inline-flex items-center gap-2 rounded-xl border border-[#d4c2a5] bg-[#fff3df] px-4 py-2.5 text-sm font-medium text-[#6a4d26] hover:bg-[#f6e5c8]"
+              >
+                Seed demo alerts
+              </button>
               <button onClick={handleScan} className="inline-flex items-center gap-2 rounded-xl border border-[#ccb89a] bg-[#fff9ee] px-4 py-2.5 text-sm font-medium text-[#5f4828] hover:bg-[#f8ebd7]" disabled={isSyncing}>
                 <RefreshCw className={cn("h-4 w-4", isSyncing && "animate-spin")} />
                 {isSyncing ? "Scanning" : "Run scan"}
@@ -51,6 +99,9 @@ export default function AnomaliesPage() {
         </section>
 
         <section className="flex flex-wrap items-center gap-2">
+          {actionError && (
+            <p className="w-full rounded-xl border border-[#ebc1b8] bg-[#fff2ef] px-3 py-2 text-xs text-[#9f3f30]">{actionError}</p>
+          )}
           {(["all", "critical", "warning", "info"] as const).map((f) => (
             <button key={f} onClick={() => setFilter(f)} className={cn("rounded-full border px-3 py-1.5 text-xs font-medium", filter === f ? "border-[#b99561] bg-[#f5e7cf] text-[#6b4a1e]" : "border-[#dbcdb9] bg-[#fffdf8] text-[#7a6a57]")}>
               {f}
@@ -58,7 +109,12 @@ export default function AnomaliesPage() {
           ))}
           <div className="relative ml-auto w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8a7b68]" />
-            <input className="w-full rounded-xl border border-[#dbcdb9] bg-[#fffdf8] py-2 pl-10 pr-3 text-sm" placeholder="Search alerts" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full rounded-xl border border-[#dbcdb9] bg-[#fffdf8] py-2 pl-10 pr-3 text-sm"
+              placeholder="Search alerts"
+            />
           </div>
         </section>
 
@@ -76,6 +132,20 @@ export default function AnomaliesPage() {
                 <p>Baseline: {formatCurrency(alert.baseline)}</p>
                 <p>Delta: {alert.delta_pct.toFixed(1)}%</p>
                 <p>Runway impact: -{alert.runway_impact.toFixed(1)} mo</p>
+              </div>
+              <div className="mt-4 flex items-center gap-2">
+                <button
+                  onClick={() => openChat(`Anomaly Analysis: ${alert.description}`)}
+                  className="rounded-lg border border-[#cbb48f] bg-[#fbf2e2] px-3 py-1.5 text-xs font-semibold text-[#6c512f] hover:bg-[#f2e2c9]"
+                >
+                  Analyze with AI
+                </button>
+                <button
+                  onClick={() => handleDismiss(alert.id)}
+                  className="rounded-lg border border-[#d6c7b1] bg-white px-3 py-1.5 text-xs font-semibold text-[#645643] hover:bg-[#f7f3eb]"
+                >
+                  Dismiss
+                </button>
               </div>
             </article>
           ))}

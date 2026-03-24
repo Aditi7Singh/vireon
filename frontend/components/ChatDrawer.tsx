@@ -50,9 +50,6 @@ export function ChatDrawer() {
   }, [normalizedChatContext, chatOpen]);
 
   const triggerProactiveMessage = () => {
-    // Only trigger if history is empty (optional but safer)
-    if (messages.length > 5) return; 
-
     // Specific anomaly, proactively explain it
     if (normalizedChatContext.startsWith("Anomaly Analysis:")) {
        const anomalyDesc = normalizedChatContext.replace("Anomaly Analysis:", "").trim();
@@ -83,6 +80,19 @@ export function ChatDrawer() {
     } else if (normalizedChatContext === "Revenue Intelligence") {
        setTimeout(() => {
          handleSend("Give me a strategic growth audit of our revenue performance.");
+       }, 500);
+    } else if (normalizedChatContext.startsWith("Build an executive scenario memo")) {
+       setTimeout(() => {
+         handleSend("Create an executive scenario memo with assumptions, net runway effect, risk flags, and a 30/60/90-day action plan.");
+       }, 500);
+    } else if (normalizedChatContext.startsWith("Strategic Advisory for Rule of 40 performance")) {
+       setTimeout(() => {
+         handleSend("Interpret our benchmark metrics, identify the biggest operating gap, and propose a practical execution plan by owner and timeline.");
+       }, 500);
+    } else if (normalizedChatContext.length > 24) {
+       // For long-form context prompts from CTA buttons, auto-run the request.
+       setTimeout(() => {
+         handleSend(normalizedChatContext);
        }, 500);
     }
   };
@@ -198,26 +208,26 @@ export function ChatDrawer() {
   if (!chatOpen) return null;
 
   return (
-    <div className="fixed inset-y-0 right-0 w-[480px] bg-white/80 dark:bg-slate-950/80 backdrop-blur-2xl border-l border-slate-200/50 dark:border-slate-800/50 shadow-[-20px_0_50px_rgba(0,0,0,0.1)] dark:shadow-[-20px_0_50px_rgba(0,0,0,0.3)] z-[100] flex flex-col transition-all duration-500 overflow-hidden">
+    <div className="fixed inset-y-0 right-0 w-[480px] bg-[#2a241d]/95 backdrop-blur-2xl border-l border-[#43382c] shadow-[-24px_0_60px_rgba(14,11,8,0.45)] z-[100] flex flex-col transition-all duration-500 overflow-hidden text-[#f7efe3]">
       {/* Header */}
-      <div className="flex items-center justify-between h-24 px-8 border-b border-slate-200/50 dark:border-slate-800/50 shrink-0 bg-slate-50/50 dark:bg-slate-900/50">
+      <div className="flex items-center justify-between h-24 px-8 border-b border-[#45392d] shrink-0 bg-[#231d17]/85">
         <div className="flex items-center gap-4">
           <div className="relative">
-             <div className="p-3 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-lg ring-4 ring-white dark:ring-slate-950">
+             <div className="p-3 bg-gradient-to-br from-[#9a5d34] to-[#4d3120] rounded-2xl shadow-lg ring-4 ring-[#201a14]">
                <Sparkles className="w-5 h-5 text-white" />
              </div>
-             <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-white dark:border-slate-950 rounded-full animate-pulse" />
+             <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-[#201a14] rounded-full animate-pulse" />
           </div>
           <div>
-            <h2 className="text-lg font-black text-slate-900 dark:text-white font-outfit tracking-tight">
+            <h2 className="text-lg font-black text-[#fff7ec] font-outfit tracking-tight">
               AI Financial Assistant
             </h2>
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Connected to Financial Intelligence</p>
+            <p className="text-[10px] font-bold text-[#c9b9a6] uppercase tracking-widest">Smart Financial Manager</p>
           </div>
         </div>
         <button
           onClick={closeChat}
-          className="p-2.5 text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all"
+          className="p-2.5 text-[#cabba8] hover:text-[#fff8ee] hover:bg-[#3a3127] rounded-2xl transition-all"
         >
           <X className="w-5 h-5" />
         </button>
@@ -234,10 +244,10 @@ export function ChatDrawer() {
             )}
           >
             <div className="flex items-center gap-2 mb-2 px-1">
-               <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+              <span className="text-[10px] font-black text-[#c8b8a7] uppercase tracking-widest">
                   {msg.role === "assistant" ? "AI CFO" : "You"}
                </span>
-               <span className="text-[10px] text-slate-400 font-medium">
+              <span className="text-[10px] text-[#a9947d] font-medium">
                   {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                </span>
             </div>
@@ -246,15 +256,15 @@ export function ChatDrawer() {
               className={cn(
                 "relative p-5 text-sm font-medium leading-relaxed transition-all duration-300",
                 msg.role === "user"
-                  ? "bg-indigo-600 text-white rounded-3xl rounded-tr-sm shadow-xl shadow-indigo-500/10"
-                  : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl rounded-tl-sm whitespace-pre-wrap dark:text-slate-200 shadow-sm"
+                  ? "bg-[#9a5d34] text-[#fff8ee] rounded-3xl rounded-tr-sm shadow-xl shadow-[#6f4327]/30"
+                  : "bg-[#f3eadb] border border-[#d8cab6] rounded-3xl rounded-tl-sm whitespace-pre-wrap text-[#2f271f] shadow-sm"
               )}
             >
               {msg.isLoading ? (
                 <div className="flex items-center gap-2 py-1 px-4">
-                  <div className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce [animation-delay:-0.3s]"></div>
-                  <div className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce [animation-delay:-0.15s]"></div>
-                  <div className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce"></div>
+                  <div className="w-2 h-2 rounded-full bg-[#9a5d34] animate-bounce [animation-delay:-0.3s]"></div>
+                  <div className="w-2 h-2 rounded-full bg-[#9a5d34] animate-bounce [animation-delay:-0.15s]"></div>
+                  <div className="w-2 h-2 rounded-full bg-[#9a5d34] animate-bounce"></div>
                 </div>
               ) : (
                 msg.content
@@ -270,15 +280,15 @@ export function ChatDrawer() {
         {/* Quick Prompts */}
         {messages.length <= 2 && (
           <div className="mb-6">
-            <p className="text-[10px] font-black uppercase tracking-tighter text-slate-400 mb-4 ml-1">Suggested Intelligence Queries</p>
+            <p className="text-[10px] font-black uppercase tracking-tighter text-[#c7b7a4] mb-4 ml-1">Suggested Intelligence Queries</p>
             <div className="grid grid-cols-2 gap-3">
               {QUICK_PROMPTS.map((prompt) => (
                 <button
                   key={prompt.text}
                   onClick={() => handleSend(prompt.text)}
-                  className="flex items-center gap-3 p-3.5 rounded-2xl text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/50 text-slate-700 dark:text-slate-300 hover:border-indigo-500/50 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-left shadow-sm group"
+                  className="flex items-center gap-3 p-3.5 rounded-2xl text-xs font-bold bg-[#342a21] border border-[#4c3f31] text-[#f0e3d3] hover:border-[#a86a40] hover:bg-[#3d3126] transition-all text-left shadow-sm group"
                 >
-                  <prompt.icon className="w-4 h-4 text-indigo-500 group-hover:scale-110 transition-transform" />
+                  <prompt.icon className="w-4 h-4 text-[#d18b57] group-hover:scale-110 transition-transform" />
                   <span className="truncate">{prompt.text}</span>
                   <ArrowRight className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
                 </button>
@@ -289,7 +299,7 @@ export function ChatDrawer() {
 
         {/* Input */}
         <div className="relative group">
-          <div className="absolute inset-x-0 -bottom-1 h-px bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-700" />
+          <div className="absolute inset-x-0 -bottom-1 h-px bg-gradient-to-r from-transparent via-[#9a5d34] to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-700" />
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -309,24 +319,24 @@ export function ChatDrawer() {
               }}
               placeholder="Query financial state..."
               rows={1}
-              className="w-full pl-6 pr-24 py-5 bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200/50 dark:border-slate-800/50 rounded-[28px] text-sm focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/5 transition-all text-slate-900 dark:text-white placeholder-slate-400 font-bold resize-none min-h-[64px]"
+              className="w-full pl-6 pr-24 py-5 bg-[#3a2f25] border border-[#544536] rounded-[28px] text-sm focus:outline-none focus:bg-[#433628] focus:ring-4 focus:ring-[#9a5d34]/20 transition-all text-[#fff6ea] placeholder-[#c7b59f] font-bold resize-none min-h-[64px]"
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-               <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-200/50 dark:bg-slate-800/50 border border-slate-300/50 dark:border-slate-700/50">
-                  <span className="text-[10px] font-black text-slate-500">Enter</span>
-                  <CornerDownLeft className="w-3 h-3 text-slate-500" />
+               <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[#483b2f] border border-[#5d4d3d]">
+                  <span className="text-[10px] font-black text-[#dac8b4]">Enter</span>
+                  <CornerDownLeft className="w-3 h-3 text-[#dac8b4]" />
                </div>
                <button
                   type="submit"
                   disabled={!input.trim() || isLoading}
-                  className="p-3 rounded-2xl bg-indigo-600 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:bg-indigo-500 active:scale-90 shadow-lg shadow-indigo-600/20"
+                  className="p-3 rounded-2xl bg-[#9a5d34] text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:bg-[#824d2b] active:scale-90 shadow-lg shadow-[#6a4025]/30"
                >
                   <Send className="w-4 h-4" />
                </button>
             </div>
           </form>
         </div>
-        <p className="mt-4 text-[10px] text-center font-bold text-slate-400 uppercase tracking-tighter">Powered by Agentic Intelligence (V0 Alpha)</p>
+        <p className="mt-4 text-[10px] text-center font-bold text-[#b7a28a] uppercase tracking-tighter">Powered by Agentic Intelligence (V0 Alpha)</p>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import TopBar from "@/components/TopBar";
 import api from "@/lib/api";
 import { useAppStore } from "@/lib/store";
-import { Bot, MessageSquare, RefreshCw, Send, Sparkles, User } from "lucide-react";
+import { AlertCircle, Bot, CheckCircle2, MessageSquare, RefreshCw, Send, Sparkles, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function AgentPage() {
@@ -12,6 +12,7 @@ export default function AgentPage() {
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [healthStatus, setHealthStatus] = useState<"ok" | "warning" | "unknown">("unknown");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -41,6 +42,18 @@ export default function AgentPage() {
     loadHistory();
   }, [chatSessionId]);
 
+  useEffect(() => {
+    const loadHealth = async () => {
+      try {
+        const health = await api.getStartupHealth();
+        setHealthStatus(health.status || "unknown");
+      } catch {
+        setHealthStatus("unknown");
+      }
+    };
+    loadHealth();
+  }, []);
+
   const handleSend = async (seed?: string) => {
     const query = (seed || input).trim();
     if (!query || isLoading) return;
@@ -59,19 +72,26 @@ export default function AgentPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f6f3ee] pb-10 text-[#1d1b17]">
+    <div className="min-h-screen bg-[#ece3d4] pb-10 text-[#1d1b17]">
       <TopBar title="Vireon AI Assistant" />
 
-      <div className="mx-auto grid max-w-7xl gap-5 px-4 pt-6 sm:px-6 lg:grid-cols-[1fr_280px] lg:px-8">
-        <section className="rounded-2xl border border-[#d9cdbc] bg-[#fffdf8] shadow-[0_16px_36px_rgba(63,45,24,0.08)]">
-          <header className="border-b border-[#e5dbc9] p-5">
-            <p className="inline-flex items-center gap-2 rounded-full border border-[#d9c29a] bg-[#fff4dd] px-3 py-1 text-xs font-semibold text-[#8c5c19]"><Sparkles className="h-3.5 w-3.5" />Financial intelligence core</p>
+      <div className="mx-auto grid max-w-7xl gap-5 px-4 pt-6 sm:px-6 lg:grid-cols-[1fr_300px] lg:px-8">
+        <section className="rounded-2xl border border-[#cfbfa9] bg-[#f8efe3] shadow-[0_16px_36px_rgba(63,45,24,0.12)]">
+          <header className="border-b border-[#deceb8] p-5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="inline-flex items-center gap-2 rounded-full border border-[#cba880] bg-[#f5e1c8] px-3 py-1 text-xs font-semibold text-[#7a4c1c]"><Sparkles className="h-3.5 w-3.5" />Financial intelligence core</p>
+              {healthStatus === "ok" ? (
+                <span className="inline-flex items-center gap-1 rounded-full border border-[#b7d8bf] bg-[#edf8ef] px-2.5 py-1 text-[10px] font-semibold text-[#2f6a45]"><CheckCircle2 className="h-3 w-3" />Backend connected</span>
+              ) : (
+                <span className="inline-flex items-center gap-1 rounded-full border border-[#e1c4af] bg-[#fff2ee] px-2.5 py-1 text-[10px] font-semibold text-[#9f3f30]"><AlertCircle className="h-3 w-3" />Check backend status</span>
+              )}
+            </div>
           </header>
 
           <div className="max-h-[58vh] overflow-y-auto p-5 space-y-4">
             {messages.map((msg, idx) => (
               <div key={idx} className={cn("flex", msg.role === "user" ? "justify-end" : "justify-start")}>
-                <div className={cn("max-w-[85%] rounded-2xl px-4 py-3 text-sm", msg.role === "user" ? "bg-[#241d16] text-[#fff8ee]" : "border border-[#e4d9c8] bg-[#fff8ec] text-[#33291f]")}>
+                <div className={cn("max-w-[85%] rounded-2xl px-4 py-3 text-sm", msg.role === "user" ? "bg-[#2d241b] text-[#fff8ee]" : "border border-[#ddcfbc] bg-[#f6ecde] text-[#33291f]")}>
                   <div className="mb-1 inline-flex items-center gap-1 text-xs opacity-70">{msg.role === "user" ? <User className="h-3.5 w-3.5" /> : <Bot className="h-3.5 w-3.5" />}{msg.role}</div>
                   <p className="whitespace-pre-wrap">{msg.content}</p>
                 </div>
@@ -86,29 +106,34 @@ export default function AgentPage() {
                 "Survival path audit",
                 "Growth vector analysis",
                 "GL anomaly detection",
+                "Show top active alerts",
               ].map((s) => (
-                <button key={s} onClick={() => handleSend(s)} className="rounded-full border border-[#d7c8b2] bg-[#fff8eb] px-3 py-1.5 text-xs text-[#6f5837] hover:bg-[#f8ecd9]">{s}</button>
+                <button key={s} onClick={() => handleSend(s)} className="rounded-full border border-[#ceb99d] bg-[#f7ead8] px-3 py-1.5 text-xs text-[#6f5837] hover:bg-[#efd9bf]">{s}</button>
               ))}
             </div>
             <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} className="flex items-center gap-2">
               <div className="relative flex-1">
                 <MessageSquare className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8a7b68]" />
-                <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask your finance question" className="w-full rounded-xl border border-[#dbcdb9] bg-white py-2.5 pl-10 pr-3 text-sm" />
+                <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask your finance question" className="w-full rounded-xl border border-[#ccb89d] bg-[#fff8ed] py-2.5 pl-10 pr-3 text-sm" />
               </div>
-              <button type="submit" disabled={isLoading} className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#241d16] text-[#fff8ee] disabled:opacity-60">
+              <button type="submit" disabled={isLoading} className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#8f5632] text-[#fff8ee] disabled:opacity-60 hover:bg-[#764729]">
                 {isLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               </button>
             </form>
           </div>
         </section>
 
-        <aside className="rounded-2xl border border-[#ddd2c4] bg-[#fffdf8] p-5 h-fit">
+        <aside className="rounded-2xl border border-[#ccbca6] bg-[#f4e8d8] p-5 h-fit space-y-4">
           <h3 className="text-sm font-semibold text-[#2a2017]">Capabilities</h3>
-          <ul className="mt-3 space-y-2 text-sm text-[#5f5243]">
+          <ul className="space-y-2 text-sm text-[#5f5243]">
             <li>Runway and burn diagnostics</li>
             <li>Revenue and retention insights</li>
             <li>Scenario planning narratives</li>
+            <li>Anomaly triage with recommendations</li>
           </ul>
+          <div className="rounded-xl border border-[#deccb5] bg-[#fff7eb] p-3 text-xs text-[#6d5a3d]">
+            Ask precise questions for better output, for example: "What changed in burn this month and why?"
+          </div>
         </aside>
       </div>
     </div>

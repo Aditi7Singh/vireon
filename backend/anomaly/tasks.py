@@ -5,16 +5,15 @@ Background tasks for anomaly detection and alerting.
 """
 
 import os
-import httpx
 from datetime import datetime, timedelta
 from sqlalchemy import create_engine, text
 from anomaly.celery_app import app
 from anomaly.scanner import run_full_scan
 from config.settings import BACKEND_URL, DATABASE_URL, REDIS_URL
+from tasks.alert_tasks import _send_email
 
 
-# Get Slack webhook URL
-SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
+DEFAULT_ALERT_EMAIL = os.getenv("ALERT_FALLBACK_EMAIL", "sysswork@gmail.com")
 
 
 @app.task(bind=True, max_retries=3, time_limit=300)
@@ -44,28 +43,22 @@ def scan_for_anomalies(self):
 @app.task
 def send_critical_alert_notification(scan_result: dict):
     """
-    Send Slack notification for critical alerts.
+    Send email notification for critical alerts.
     
     Args:
         scan_result: Result from scan_for_anomalies
     """
-    if not SLACK_WEBHOOK_URL:
-        print("[TASKS] Slack not configured, skipping notification")
-        return
-    
     try:
-        message = {
-            "text": f"🚨 *Agentic CFO Alert*: {scan_result.get('critical_count', 0)} critical "
-                    f"financial anomalies detected. Check your dashboard."
-        }
-        
-        response = httpx.post(SLACK_WEBHOOK_URL, json=message, timeout=5)
-        response.raise_for_status()
-        
-        print("[TASKS] Slack notification sent successfully")
+        subject = "[VIREON] Critical anomaly alert"
+        body = (
+            f"{scan_result.get('critical_count', 0)} critical financial anomalies were detected.\n"
+            "Please review the dashboard for details."
+        )
+        _send_email([DEFAULT_ALERT_EMAIL], subject, body)
+        print("[TASKS] Email notification sent successfully")
         
     except Exception as e:
-        print(f"[TASKS] Failed to send Slack notification: {e}")
+        print(f"[TASKS] Failed to send email notification: {e}")
 
 
 @app.task
@@ -180,12 +173,13 @@ def quarterly_tax_reminder():
             summary = calculate_quarterly_tax_summary(db, comp.id, current_year, current_quarter)
             liability = summary.get("total_tax_liability", 0)
             
-            if liability > 0 and SLACK_WEBHOOK_URL:
-                # Send slack reminder
-                msg = {
-                    "text": f"🗓️ *Quarterly Tax Reminder* for {comp.name}: Q{current_quarter} total estimated tax liability is ₹{liability:,.2f}. Please review your dashboard."
-                }
-                httpx.post(SLACK_WEBHOOK_URL, json=msg, timeout=5)
+            if liability > 0:
+                subject = f"[VIREON] Quarterly tax reminder: {comp.name}"
+                body = (
+                    f"Q{current_quarter} total estimated tax liability is ₹{liability:,.2f}.\n"
+                    "Please review your dashboard."
+                )
+                _send_email([DEFAULT_ALERT_EMAIL], subject, body)
                 alerts_sent += 1
                 
         db.close()

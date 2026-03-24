@@ -686,6 +686,23 @@ class FxRevaluationSnapshot(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
 
+class FxCloseBatch(Base):
+    __tablename__ = "fx_close_batches"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    close_month = Column(String(7), nullable=False, index=True)  # YYYY-MM
+    status = Column(String(20), nullable=False, default="draft")  # draft, posted, approved
+    total_gain_loss_inr = Column(Numeric(15, 2), nullable=False, default=0)
+    posted_by = Column(String(100), nullable=True)
+    posted_at = Column(DateTime, nullable=True)
+    approved_by = Column(String(100), nullable=True)
+    approved_at = Column(DateTime, nullable=True)
+    notes = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+
 class QuarterlyTaxLiability(Base):
     __tablename__ = "quarterly_tax_liabilities"
 

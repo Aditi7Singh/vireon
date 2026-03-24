@@ -1,0 +1,5 @@
+{
+  "cloud_costs": "latest_timestamp_wins",
+  "merge": "manual_review",
+  "plaid": "latest_timestamp_wins"
+}

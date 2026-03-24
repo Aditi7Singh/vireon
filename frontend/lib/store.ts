@@ -75,16 +75,16 @@ export const useAppStore = create<AppState>()(
     setLastSyncTime: (time) => set({ lastSyncTime: time }),
     setIsSyncing: (syncing) => set({ isSyncing: syncing }),
 
-    // User - default demo user
+    // User - default dashboard identity
     user: {
-      name: "Jane Doe",
-      email: "jane@seedlinglabs.com",
-      role: "Finance Director",
+      name: "Yagnasri",
+      email: "yagnasri@vireon.ai",
+      role: "CFO",
     },
     setUser: (user) => set({ user }),
 
     // Theme
-    theme: "dark",
+    theme: "light",
     setTheme: (theme) => set({ theme }),
   })
 );

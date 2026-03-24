@@ -11,6 +11,7 @@ import auth
 import database
 import models
 from services.fx_service import run_revaluation
+from services.fx_close_service import preview_fx_close, post_fx_close_entries, approve_fx_close_batch
 
 
 router = APIRouter(prefix="/fx", tags=["fx"])
@@ -20,6 +21,15 @@ class ConvertRequest(BaseModel):
     amount: float
     base_currency: str
     target_currency: str = "INR"
+
+
+class FxClosePostRequest(BaseModel):
+    month: str
+    posted_by: str = "system"
+
+
+class FxCloseApproveRequest(BaseModel):
+    approved_by: str = "finance"
 
 
 @router.post("/sync-default")
@@ -165,3 +175,33 @@ def adjusted_runway(
     """Get runway calculation factoring in FX volatility and revaluation results."""
     from services.fx_service import get_fx_adjusted_runway
     return get_fx_adjusted_runway(db, company_id)
+
+
+@router.get("/close/preview/{company_id}")
+def preview_close(
+    company_id: UUID,
+    month: str,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    return preview_fx_close(db, company_id, month)
+
+
+@router.post("/close/post/{company_id}")
+def post_close(
+    company_id: UUID,
+    payload: FxClosePostRequest,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    return post_fx_close_entries(db, company_id, payload.month, payload.posted_by)
+
+
+@router.post("/close/approve/{batch_id}")
+def approve_close(
+    batch_id: UUID,
+    payload: FxCloseApproveRequest,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    return approve_fx_close_batch(db, batch_id, payload.approved_by)

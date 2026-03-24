@@ -3,10 +3,31 @@
 backend/.env
 backend/.env.local
 
+# OS artifacts
+.DS_Store
+
 # Local Python environments
 backend/.venv/
+.venv/
+
+# Python cache artifacts
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
 
 # Local SQLite and scheduler artifacts
 backend/*.db
 backend/celerybeat-schedule
 backend/celerybeat-schedule.db
+
+# Local runtime artifacts
+*.log
+*.db
+
+# Frontend local build/test artifacts
+frontend/node_modules/
+frontend/.next/
+frontend/playwright-report/
+frontend/test-results/

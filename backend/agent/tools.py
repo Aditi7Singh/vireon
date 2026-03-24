@@ -712,6 +712,25 @@ def get_asset_utilization() -> Dict[str, Any]:
         except: pass
 
 
+@tool
+def get_recommendations_report() -> Dict[str, Any]:
+    """Generate and return a recommendations report for the default company."""
+    try:
+        db = _get_db()
+        company = _get_first_company(db)
+        if not company:
+            return {"error": "No company found", "tool": "get_recommendations_report"}
+
+        from services.recommendations_service import generate_recommendations
+
+        return generate_recommendations(company.id, db)
+    except Exception as e:
+        return {"error": str(e), "tool": "get_recommendations_report"}
+    finally:
+        try: db.close()
+        except: pass
+
+
 # Export all tools as a list for LangGraph
 ALL_TOOLS = [
     get_cash_balance,
@@ -729,4 +748,5 @@ ALL_TOOLS = [
     get_tax_liability,
     get_depreciation_expense,
     get_asset_utilization,
+    get_recommendations_report,
 ]

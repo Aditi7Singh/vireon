@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from datetime import date, datetime, timedelta
 from enum import Enum
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, HTTPException
@@ -99,7 +101,7 @@ class HiringCostInput(BaseModel):
     description: str
 
 
-def _require_role(actual: str | None, allowed: list[str]):
+def _require_role(actual: Optional[str], allowed: List[str]):
     role = (actual or "").lower()
     if role not in allowed:
         raise HTTPException(status_code=403, detail=f"Role {role or 'unknown'} cannot access this endpoint")

@@ -333,6 +333,64 @@ class TestFxService:
         assert result["runway_months"] == 10.0
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# RECOMMENDATIONS & CLOUD COSTS TESTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class TestRecommendationsService:
+
+    def test_generate_logic_fallback_when_context_has_no_signals(self):
+        from services.recommendations_service import _generate_logic_based_recommendations
+
+        context = {
+            "runway": {"runway_months": 12},
+            "burn_summary": {"net_burn": 100000, "breakdown_by_category": {}},
+            "product_pl_last_3_months": [],
+            "anomalies_last_30_days": [],
+        }
+        recs = _generate_logic_based_recommendations(context)
+
+        assert isinstance(recs, list)
+        assert len(recs) >= 1
+        assert all("title" in r and "action" in r for r in recs)
+
+    def test_generate_logic_handles_dict_product_payload(self):
+        from services.recommendations_service import _generate_logic_based_recommendations
+
+        context = {
+            "runway": {"runway_months": 10},
+            "burn_summary": {"net_burn": 200000, "breakdown_by_category": {"tech_cost": 120000}},
+            "product_pl_last_3_months": [
+                {
+                    "month": "2026-03",
+                    "data": {
+                        "orchard": {"total_revenue": 500000, "gross_margin_pct": 22.5},
+                        "ai_lab": {"total_revenue": 100000, "gross_margin_pct": 5.0},
+                    },
+                }
+            ],
+            "anomalies_last_30_days": [],
+        }
+        recs = _generate_logic_based_recommendations(context)
+        ids = [r.get("id", "") for r in recs]
+        assert any("rec-margin-orchard" in r for r in ids)
+        assert not any("rec-margin-ai_lab" in r for r in ids)
+
+
+class TestCloudRecommendations:
+
+    def test_cloud_recommendations_empty_accounts(self):
+        from api.routers.cloud_costs import get_cloud_recommendations
+
+        db = MagicMock()
+        db.query.return_value.filter.return_value.all.return_value = []
+
+        result = get_cloud_recommendations(uuid.uuid4(), db, "finance")
+        assert "recommendations" in result
+        assert result["recommendations"] == []
+        assert result["total_potential_monthly_saving"] == 0.0
+
+
 def test_models_only_used_for_forecasting():
         """ARIMA/SARIMA models are only in the forecasting service, not in other services."""
         import importlib

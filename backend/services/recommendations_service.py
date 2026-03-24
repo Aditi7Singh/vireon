@@ -99,19 +99,35 @@ def _generate_logic_based_recommendations(context: dict) -> list:
     # 2. Product Profitability Rule
     product_data = context.get("product_pl_last_3_months", [])
     if product_data:
-        latest = product_data[0].get("data", [])
-        for prod in latest:
-            margin = prod.get("gross_margin_pct", 0)
-            name = prod.get("product", "Unknown Product")
-            if margin < 30 and name != "AI Lab": # AI Lab might be in R&D
+        latest = product_data[0].get("data", {})
+        product_rows = []
+        if isinstance(latest, dict):
+            for product_name, values in latest.items():
+                values = values or {}
+                product_rows.append(
+                    {
+                        "product": product_name,
+                        "gross_margin_pct": float(values.get("gross_margin_pct", 0) or 0),
+                        "revenue": float(values.get("total_revenue", 0) or 0),
+                    }
+                )
+        elif isinstance(latest, list):
+            product_rows = latest
+
+        for prod in product_rows:
+            margin = float(prod.get("gross_margin_pct", 0) or 0)
+            name = str(prod.get("product", "Unknown Product"))
+            if margin < 30 and name.lower() != "ai_lab":
+                impact_base = float(prod.get("revenue", 0) or 0)
                 recommendations.append({
-                    "id": f"rec-margin-{name.lower()}",
+                    "id": f"rec-margin-{name.lower().replace(' ', '-')}",
                     "priority": "high",
                     "category": "profitability",
                     "title": f"Low Margin on {name}",
-                    "finding": f"{name} is operating at a {margin:.1f}% gross margin, which is below the 40% target for Series A.",
-                    "impact_inr": prod.get("revenue", 0) * 0.1,
-                    "action": f"Audit cloud unit costs for {name} and review pricing tiers for low-volume enterprise customers.",
+                    "finding": f"{name} is operating at a {margin:.1f}% gross margin, below the 40% target.",
+                    "impact_inr": impact_base * 0.1,
+                    "impact_runway_days": 12,
+                    "action": f"Audit cost-to-serve for {name}, remove low-ROI infra usage, and revisit pricing for low-margin customer segments.",
                     "confidence": 0.85
                 })
 
@@ -139,6 +155,44 @@ def _generate_logic_based_recommendations(context: dict) -> list:
         recommendations = _fallback_recommendations(context)
 
     return recommendations
+
+
+def _fallback_recommendations(context: dict) -> list:
+    burn_summary = context.get("burn_summary", {})
+    breakdown = burn_summary.get("breakdown_by_category", {}) or {}
+    top_cost = sorted(breakdown.items(), key=lambda x: float(x[1] or 0), reverse=True)
+    top_category, top_amount = top_cost[0] if top_cost else ("misc", 0.0)
+    runway_months = float(context.get("runway", {}).get("runway_months", 0) or 0)
+    runway_buffer_action = (
+        "Build a 90-day cash defense plan and lock discretionary spend approvals to Finance."
+        if runway_months and runway_months < 9
+        else "Keep a monthly burn review rhythm and pre-approve only high-ROI growth spends."
+    )
+
+    return [
+        {
+            "id": "rec-fallback-burn-governance",
+            "priority": "medium",
+            "category": "governance",
+            "title": "Tighten burn governance",
+            "finding": f"Top expense category this month is {top_category} at INR {float(top_amount):,.0f}.",
+            "impact_inr": float(top_amount) * 0.08,
+            "impact_runway_days": 10,
+            "action": "Introduce weekly owner-level spend reviews for the top 3 cost categories and cap unplanned spend.",
+            "confidence": 0.78,
+        },
+        {
+            "id": "rec-fallback-runway-buffer",
+            "priority": "high" if runway_months and runway_months < 9 else "low",
+            "category": "runway",
+            "title": "Protect runway buffer",
+            "finding": f"Current projected runway is {runway_months:.1f} months.",
+            "impact_inr": abs(float(burn_summary.get("net_burn", 0) or 0)) * 0.1,
+            "impact_runway_days": 15,
+            "action": runway_buffer_action,
+            "confidence": 0.82,
+        },
+    ]
 
 
 def generate_recommendations(company_id: UUID, db: Session) -> dict:
@@ -174,7 +228,14 @@ def generate_recommendations(company_id: UUID, db: Session) -> dict:
             )
             if resp.ok:
                 content = resp.json()["choices"][0]["message"]["content"]
-                parsed = json.loads(content) if isinstance(content, str) else content
+                parsed = None
+                if isinstance(content, str):
+                    try:
+                        parsed = json.loads(content)
+                    except Exception:
+                        parsed = None
+                elif isinstance(content, list):
+                    parsed = content
                 if isinstance(parsed, list) and parsed:
                     recommendations = parsed
         except Exception:

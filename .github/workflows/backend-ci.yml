@@ -11,7 +11,7 @@ on:
       - ".github/workflows/backend-ci.yml"
 
 jobs:
-  test-bootstrap:
+  test-backend:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -37,3 +37,17 @@ jobs:
           REDIS_URL: redis://localhost:6379/0
         run: |
           pytest tests/test_startup_bootstrap.py -q
+
+      - name: Run dashboard API tests
+        env:
+          DATABASE_URL: sqlite:///./vireon_ci.db
+          REDIS_URL: redis://localhost:6379/0
+        run: |
+          pytest tests/test_dashboard_api.py -q
+
+      - name: Run full backend test suite
+        env:
+          DATABASE_URL: sqlite:///./vireon_ci.db
+          REDIS_URL: redis://localhost:6379/0
+        run: |
+          pytest tests -q

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Card, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Title } from "@tremor/react";
+import { BarChart, Card, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Title } from "@tremor/react";
 import { useFinancialData } from "@/hooks/useFinancialData";
 import api from "@/lib/api";
 
@@ -14,6 +14,7 @@ export default function FinanceDashboardPage() {
   const [companyId, setCompanyId] = useState<string>("");
   const [pendingReview, setPendingReview] = useState<Record<string, any[]>>({});
   const [reconciliation, setReconciliation] = useState<{ netBurn: number; expenseTotal: number; variance: number } | null>(null);
+  const [trendSeries, setTrendSeries] = useState<Array<{ month: string; revenue: number; net_burn: number; cash: number }>>([]);
   const { data, isLoading } = useFinancialData(companyId, month);
 
   useEffect(() => {
@@ -33,10 +34,12 @@ export default function FinanceDashboardPage() {
         fetch(`${API_V1}/burn/summary/${companyId}?month=${month}`),
         fetch(`${API_V1}/burn/expenses/${companyId}?month=${month}`),
       ]);
+      const historyRes = await fetch(`${API_V1}/metrics/history/${companyId}?months=6`);
 
       const pending = pendingRes.ok ? await pendingRes.json() : { pending_review: {} };
       const burn = burnRes.ok ? await burnRes.json() : { net_burn: 0 };
       const expenses = expensesRes.ok ? await expensesRes.json() : { tech_costs: {}, non_tech_costs: {} };
+      const history = historyRes.ok ? await historyRes.json() : [];
 
       setPendingReview(pending.pending_review || {});
 
@@ -45,6 +48,12 @@ export default function FinanceDashboardPage() {
       const expenseTotal = techTotal + nonTechTotal;
       const netBurn = Number(burn.net_burn || 0);
       setReconciliation({ netBurn, expenseTotal, variance: netBurn - expenseTotal });
+      setTrendSeries(history.map((h: any) => ({
+        month: h.month,
+        revenue: Number(h.revenue || 0),
+        net_burn: Number(h.net_burn || 0),
+        cash: Number(h.cash || 0),
+      })));
     };
     loadFinance();
   }, [companyId, month]);
@@ -62,6 +71,36 @@ export default function FinanceDashboardPage() {
     }));
   }, [data, month]);
 
+  async function exportLedgerCsv() {
+    if (!companyId) return;
+    const res = await fetch(`${API_V1}/reports/export/ledger/csv?company_id=${companyId}`);
+    if (!res.ok) return;
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `finance-ledger-${companyId}-${month}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  async function exportSummaryPdf() {
+    if (!companyId) return;
+    const res = await fetch(`${API_V1}/reports/export/summary/pdf?company_id=${companyId}`);
+    if (!res.ok) return;
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `finance-summary-${companyId}-${month}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="min-h-screen bg-[#f6f3ee] text-[#1d1b19] p-8 space-y-6">
       <Title>Finance Team Dashboard</Title>
@@ -73,8 +112,19 @@ export default function FinanceDashboardPage() {
           onChange={(e) => setMonth(e.target.value)}
           className="bg-white border border-[#e1d3c2] rounded px-3 py-2"
         />
-        <button className="px-4 py-2 rounded bg-[#9a5d34] hover:bg-[#7f4c2a] text-white text-sm font-semibold">Export</button>
+        <button onClick={exportLedgerCsv} className="px-4 py-2 rounded bg-[#9a5d34] hover:bg-[#7f4c2a] text-white text-sm font-semibold">Export CSV</button>
+        <button onClick={exportSummaryPdf} className="px-4 py-2 rounded bg-[#1f1a16] hover:bg-[#151210] text-white text-sm font-semibold">Export PDF</button>
       </div>
+
+      <Card>
+        <Title>6-Month Trend</Title>
+        <BarChart
+          className="mt-4 h-64"
+          data={trendSeries.length ? trendSeries : [{ month, revenue: 0, net_burn: 0, cash: 0 }]}
+          index="month"
+          categories={["revenue", "net_burn", "cash"]}
+        />
+      </Card>
 
       <Card>
         <Title>Expense Breakdown</Title>

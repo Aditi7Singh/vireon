@@ -76,6 +76,13 @@ export function TopBar({ title }: { title: string }) {
           )}
         </Link>
 
+        <Link
+          href="/features"
+          className="px-3 py-2 text-xs font-semibold text-[#4d3d2a] rounded-lg border border-[#dfcfba] bg-white hover:bg-[#f9f0e0] transition"
+        >
+          Feature Hub
+        </Link>
+
         {/* User profile */}
         <div className="flex items-center gap-3 pl-4 border-l border-[#e5d8c9] ml-2">
           <div className="flex flex-col items-end hidden sm:flex">

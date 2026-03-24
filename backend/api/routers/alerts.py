@@ -2,6 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from uuid import UUID
+import os
+import uuid
+from datetime import date, timedelta
 
 import models
 import schemas
@@ -93,3 +96,71 @@ def trigger_scan(
     detect_revenue_anomalies(db, company_id=company.id)
     detect_duplicate_invoices(db, company_id=company.id)
     return {"task_id": "immediate_scan_task"}
+
+
+@router.post("/seed-demo")
+def seed_demo_alerts(
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user)
+):
+    """Create deterministic demo anomalies so UI pages are never empty in sandbox/dev."""
+    env = os.getenv("ENV", "development").lower()
+    if env in {"prod", "production"}:
+        raise HTTPException(status_code=403, detail="Demo alert seeding is disabled in production")
+
+    company = db.query(models.Company).first()
+    if not company:
+        raise HTTPException(status_code=404, detail="No company found")
+
+    today = date.today()
+    demo_rows = [
+        {
+            "severity": "critical",
+            "type": "spending_spike",
+            "description": "Cloud infrastructure spend spiked 68% vs baseline in the last 7 days.",
+            "expected_value": 180000,
+            "actual_value": 302000,
+        },
+        {
+            "severity": "warning",
+            "type": "revenue_drop",
+            "description": "Enterprise renewals dropped below rolling baseline for this month.",
+            "expected_value": 950000,
+            "actual_value": 812000,
+        },
+        {
+            "severity": "warning",
+            "type": "duplicate_invoice",
+            "description": "Potential duplicate vendor invoice detected in payable ledger.",
+            "expected_value": 1,
+            "actual_value": 2,
+        },
+    ]
+
+    created = 0
+    for index, payload in enumerate(demo_rows):
+        marker = f"demo-{payload['type']}"
+        exists = (
+            db.query(models.Anomaly)
+            .filter(models.Anomaly.company_id == company.id, models.Anomaly.remote_id == marker)
+            .first()
+        )
+        if exists:
+            continue
+
+        db.add(models.Anomaly(
+            id=uuid.uuid4(),
+            remote_id=marker,
+            company_id=company.id,
+            anomaly_date=today - timedelta(days=index),
+            severity=payload["severity"],
+            type=payload["type"],
+            description=payload["description"],
+            expected_value=payload["expected_value"],
+            actual_value=payload["actual_value"],
+            status="open",
+        ))
+        created += 1
+
+    db.commit()
+    return {"success": True, "created": created}

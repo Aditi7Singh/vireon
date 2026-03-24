@@ -18,7 +18,10 @@ import {
   Receipt,
   LineChart,
   Bot,
-  LogOut
+  LogOut,
+  Landmark,
+  Grid3X3,
+  Cpu
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -27,13 +30,17 @@ import { Logo } from "./Logo";
 
 const navItems = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+  { name: "Feature Hub", path: "/features", icon: Grid3X3 },
+  { name: "CTO Planner", path: "/dashboard/cto", icon: Cpu },
   { name: "Runway", path: "/runway", icon: Wallet },
   { name: "Expenses", path: "/expenses", icon: Receipt },
   { name: "Revenue", path: "/revenue", icon: BarChart3 },
+  { name: "Tax", path: "/tax", icon: Landmark },
   { name: "Scenarios", path: "/scenarios", icon: LineChart },
   { name: "Benchmarking", path: "/benchmarking", icon: TrendingUp },
   { name: "AI Agent", path: "/agent", icon: Bot },
   { name: "Anomalies", path: "/anomalies", icon: AlertTriangle },
+  { name: "Settings", path: "/settings", icon: Settings },
 ];
 
 export function Sidebar() {

@@ -38,15 +38,27 @@ def ensure_sqlite_compatibility() -> None:
             statements.append("ALTER TABLE companies ADD COLUMN notification_contacts JSON")
         if not _column_exists(inspector, "companies", "alert_thresholds"):
             statements.append("ALTER TABLE companies ADD COLUMN alert_thresholds JSON")
+        if not _column_exists(inspector, "companies", "updated_at"):
+            statements.append("ALTER TABLE companies ADD COLUMN updated_at DATETIME")
+        if not _column_exists(inspector, "companies", "last_sync_erpnext"):
+            statements.append("ALTER TABLE companies ADD COLUMN last_sync_erpnext DATETIME")
+        if not _column_exists(inspector, "companies", "last_sync_merge"):
+            statements.append("ALTER TABLE companies ADD COLUMN last_sync_merge DATETIME")
 
     if _table_exists(inspector, "expenses") and not _column_exists(inspector, "expenses", "department"):
         statements.append("ALTER TABLE expenses ADD COLUMN department VARCHAR(50)")
+
+    if _table_exists(inspector, "monthly_metrics") and not _column_exists(inspector, "monthly_metrics", "total_tax_liability"):
+        statements.append("ALTER TABLE monthly_metrics ADD COLUMN total_tax_liability NUMERIC(15,2) DEFAULT 0")
 
     if _table_exists(inspector, "financial_ledger_entries") and not _column_exists(inspector, "financial_ledger_entries", "department"):
         statements.append("ALTER TABLE financial_ledger_entries ADD COLUMN department VARCHAR(50)")
 
     if _table_exists(inspector, "payroll_entries") and not _column_exists(inspector, "payroll_entries", "department"):
         statements.append("ALTER TABLE payroll_entries ADD COLUMN department VARCHAR(50)")
+
+    if _table_exists(inspector, "documents") and not _column_exists(inspector, "documents", "structured_data"):
+        statements.append("ALTER TABLE documents ADD COLUMN structured_data JSON")
 
     if not statements:
         return

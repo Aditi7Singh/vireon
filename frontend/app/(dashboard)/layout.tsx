@@ -12,19 +12,22 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { sidebarExpanded, setUser } = useAppStore();
+  const { sidebarExpanded, setUser, setAlertCount, setCriticalAlertCount } = useAppStore();
   const [startupIssues, setStartupIssues] = useState<string[]>([]);
+  const [startupActions, setStartupActions] = useState<string[]>([]);
+  const [actionBusy, setActionBusy] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const user = await api.getMe();
         if (user) {
+          const isDemoUser = user.username === "vireon_demo";
           // Map backend User model to frontend store user format
           setUser({
-            name: user.username, // Using username as name for now
-            email: user.email || `${user.username}@vireon.ai`,
-            role: user.role
+            name: isDemoUser ? "Yagnasri" : user.username,
+            email: isDemoUser ? "yagnasri@vireon.ai" : (user.email || `${user.username}@vireon.ai`),
+            role: isDemoUser ? "CFO" : user.role
           });
         }
       } catch (error) {
@@ -39,12 +42,42 @@ export default function DashboardLayout({
       try {
         const health = await api.getStartupHealth();
         setStartupIssues(health.issues || []);
+        setStartupActions(health.actions || []);
       } catch {
         setStartupIssues(["Startup health check unavailable"]);
+        setStartupActions([]);
       }
     };
     fetchHealth();
   }, []);
+
+  useEffect(() => {
+    const fetchAlerts = async () => {
+      try {
+        const payload = await api.getAlerts();
+        setAlertCount(payload.total || 0);
+        setCriticalAlertCount(payload.critical_count || 0);
+      } catch {
+        setAlertCount(0);
+        setCriticalAlertCount(0);
+      }
+    };
+    fetchAlerts();
+  }, [setAlertCount, setCriticalAlertCount]);
+
+  const runAction = async (action: string) => {
+    try {
+      setActionBusy(action);
+      await api.runStartupRemediation(action);
+      const health = await api.getStartupHealth();
+      setStartupIssues(health.issues || []);
+      setStartupActions(health.actions || []);
+    } catch (error) {
+      console.error("Startup remediation failed:", error);
+    } finally {
+      setActionBusy(null);
+    }
+  };
 
   return (
     <div className="flex h-screen bg-[#f6f3ee] overflow-hidden font-sans antialiased text-[#1d1b19]">
@@ -59,6 +92,22 @@ export default function DashboardLayout({
               <div className="mx-6 mt-6 rounded-2xl border border-[#e5c3a4] bg-[#fff2e7] px-4 py-3 text-[#6b3f20]">
                 <p className="text-xs font-black uppercase tracking-[0.16em]">Startup Checks</p>
                 <p className="mt-1 text-sm">Some data sources still need setup: {startupIssues.join(", ")}</p>
+                {startupActions.length > 0 && (
+                  <div className="mt-2 space-y-1 text-xs">
+                    {startupActions.map((action, index) => (
+                      <div key={`${action}-${index}`} className="flex items-center justify-between gap-3 rounded-lg border border-[#e8c9af] bg-white/70 px-3 py-2">
+                        <p className="text-[#7a4b26]">Action: {action}</p>
+                        <button
+                          disabled={actionBusy === action}
+                          onClick={() => runAction(action)}
+                          className="rounded bg-[#9a5d34] px-2 py-1 text-[11px] font-semibold text-white disabled:opacity-60"
+                        >
+                          {actionBusy === action ? "Running..." : "Run"}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
             {children}

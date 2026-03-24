@@ -134,8 +134,70 @@ export interface StartupHealth {
     ocr_pipeline: string;
   };
   table_readiness?: Record<string, boolean>;
+  credential_readiness?: {
+    environment?: string;
+    storage_backend?: string;
+    ocr_provider?: string;
+    missing_keys?: string[];
+    ready?: boolean;
+  };
+  connector_conflict_policy?: {
+    merge?: "source_of_truth" | "latest_timestamp_wins" | "manual_review";
+    plaid?: "source_of_truth" | "latest_timestamp_wins" | "manual_review";
+    cloud_costs?: "source_of_truth" | "latest_timestamp_wins" | "manual_review";
+  };
   issues: string[];
   actions?: string[];
+}
+
+export interface StartupRemediationResult {
+  success: boolean;
+  action: string;
+  message?: string;
+  synced?: number;
+  result?: unknown;
+}
+
+export interface ScenarioSnapshot {
+  id: string;
+  name: string;
+  scenario_type: string;
+  input_data: Record<string, unknown>;
+  result_data: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface NotificationContacts {
+  email_recipients: string[];
+  ceo?: string;
+  founders?: string[];
+  finance?: string[];
+  cto?: string;
+}
+
+export interface InvoiceTaxBreakdown {
+  invoice_base: number;
+  gst_amount: number;
+  tds_deducted: number;
+  total_invoice: number;
+  net_cash_expected: number;
+}
+
+export interface PayrollTaxBreakdown {
+  gross_pay: number;
+  employee_pf: number;
+  employee_esi: number;
+  professional_tax: number;
+  income_tax_tds: number;
+  total_deductions: number;
+  net_pay: number;
+}
+
+export interface HiringImpactResponse {
+  baseline_runway_months: number;
+  new_runway_months: number;
+  runway_impact_days: number;
+  projected_hire_costs_12m?: number;
 }
 
 // API Functions
@@ -158,6 +220,8 @@ export const api = {
     fetchAPI<{ status: string }>(`/alerts/${alertId}/dismiss`, { method: "PATCH" }),
   triggerScan: () =>
     fetchAPI<{ task_id: string }>("/alerts/scan-now", { method: "POST" }),
+  seedDemoAlerts: () =>
+    fetchAPI<{ success: boolean; created: number }>("/alerts/seed-demo", { method: "POST" }),
 
   // Agent
   chat: (message: string, sessionId?: string) =>
@@ -178,10 +242,88 @@ export const api = {
       method: "POST",
       params: { liability_id: liabilityId, amount, reference }
     }),
+  createQuarterlyLiability: (companyId: string, year: number, quarter: number) =>
+    fetchAPI<any>("/tax/quarterly-liability", {
+      method: "POST",
+      params: { company_id: companyId, year, quarter },
+    }),
+  calculateInvoiceTax: (companyId: string, invoiceBaseAmount: number, isService: boolean = true) =>
+    fetchAPI<InvoiceTaxBreakdown>("/tax/calculate/invoice", {
+      params: { company_id: companyId, invoice_base_amount: invoiceBaseAmount, is_service: isService },
+    }),
+  calculatePayrollTax: (companyId: string, grossMonthly: number) =>
+    fetchAPI<PayrollTaxBreakdown>("/tax/calculate/payroll", {
+      params: { company_id: companyId, gross_monthly: grossMonthly },
+    }),
+
+  // Notifications
+  getNotificationContacts: (companyId: string) =>
+    fetchAPI<NotificationContacts>(`/notifications/contacts/${companyId}`),
+  updateNotificationContacts: (companyId: string, payload: NotificationContacts) =>
+    fetchAPI<{ success: boolean; notification_contacts: NotificationContacts }>(`/notifications/contacts/${companyId}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+  sendTestNotification: (companyId: string) =>
+    fetchAPI<{ success: boolean; message: string; alert_id: string }>(`/alerts/test-notification/${companyId}`, {
+      method: "POST",
+    }),
+
+  // Manual inputs
+  createTechCost: (payload: {
+    company_id: string;
+    cost_type: "aws_compute" | "aws_storage" | "aws_other" | "software_license" | "saas_tool" | "infra_other";
+    product_tag: "orchard" | "sprouts" | "ai_lab" | "shared" | "unallocated";
+    amount_inr: number;
+    billing_period: string;
+    vendor_name: string;
+    description: string;
+    is_recurring?: boolean;
+  }) =>
+    fetchAPI<{ success: boolean; ledger_entry_id: string; message: string }>("/inputs/tech-cost", {
+      method: "POST",
+      headers: { "x-user-role": "cto" },
+      body: JSON.stringify(payload),
+    }),
+  getHiringImpact: (payload: {
+    company_id: string;
+    annual_ctc_inr: number;
+    join_month: string;
+  }) =>
+    fetchAPI<HiringImpactResponse>("/forecast/hiring-impact", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
 
   getBenchmarks: () => fetchAPI<any>("/benchmarks/sass-health"),
   getMe: () => fetchAPI<any>("/users/me/"),
   getStartupHealth: () => fetchAPI<StartupHealth>("/system/startup-health"),
+  runStartupRemediation: (action: string, month?: string) =>
+    fetchAPI<StartupRemediationResult>("/system/remediate", {
+      method: "POST",
+      body: JSON.stringify({ action, month }),
+    }),
+  getConnectorConflictPolicy: () =>
+    fetchAPI<{ policy: Record<string, string> }>("/system/connectors/conflict-policy"),
+  updateConnectorConflictPolicy: (policy: Record<string, string>) =>
+    fetchAPI<{ success: boolean; policy?: Record<string, string>; message?: string }>(
+      "/system/connectors/conflict-policy",
+      {
+        method: "PUT",
+        body: JSON.stringify(policy),
+      }
+    ),
+  saveScenario: (payload: {
+    name: string;
+    scenario_type: string;
+    input_data: Record<string, unknown>;
+    result_data: Record<string, unknown>;
+  }) =>
+    fetchAPI<{ status: string; id: string }>("/planning/scenarios/save", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  getScenarioHistory: () => fetchAPI<ScenarioSnapshot[]>("/planning/scenarios/history"),
 };
 
 export default api;

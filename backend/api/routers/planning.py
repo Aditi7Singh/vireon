@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Dict
 from uuid import UUID
+from pydantic import BaseModel
 
 import models
 import schemas
@@ -10,6 +11,13 @@ import auth
 from services import planning as planning_service
 
 router = APIRouter(prefix="/planning", tags=["planning"])
+
+
+class ScenarioSaveRequest(BaseModel):
+    name: str
+    scenario_type: str
+    input_data: Dict
+    result_data: Dict
 
 @router.get("/budgets", response_model=List[schemas.Budget])
 def get_budgets(db: Session = Depends(database.get_db), current_user: models.User = Depends(auth.get_current_user)):
@@ -88,10 +96,7 @@ def get_budget_alerts(budget_id: UUID, threshold: float = 10.0, db: Session = De
 
 @router.post("/scenarios/save")
 def save_scenario(
-    name: str,
-    scenario_type: str,
-    input_data: Dict,
-    result_data: Dict,
+    payload: ScenarioSaveRequest,
     db: Session = Depends(database.get_db),
     current_user: models.User = Depends(auth.get_current_user)
 ):
@@ -102,10 +107,10 @@ def save_scenario(
         
     snapshot = models.ScenarioSnapshot(
         company_id=company.id,
-        name=name,
-        scenario_type=scenario_type,
-        input_data=input_data,
-        result_data=result_data
+        name=payload.name,
+        scenario_type=payload.scenario_type,
+        input_data=payload.input_data,
+        result_data=payload.result_data
     )
     db.add(snapshot)
     db.commit()

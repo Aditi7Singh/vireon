@@ -9,13 +9,16 @@ from database import SessionLocal
 from services.document_extraction import extract_document_content
 
 
-@celery.task
-def process_document_ocr(document_id: str, file_b64: str, filename: str, content_type: str):
+@celery.task(bind=True, autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={"max_retries": 3})
+def process_document_ocr(self, document_id: str, file_b64: str, filename: str, content_type: str):
     db = SessionLocal()
     try:
         doc = db.query(models.Document).filter(models.Document.id == UUID(document_id)).first()
         if not doc:
             return {"success": False, "message": "Document not found"}
+
+        doc.status = "processing"
+        db.commit()
 
         raw = base64.b64decode(file_b64.encode("utf-8"))
         ocr_text, extracted_data, structured_data, status = extract_document_content(raw, filename, content_type)
@@ -26,5 +29,15 @@ def process_document_ocr(document_id: str, file_b64: str, filename: str, content
         doc.status = status
         db.commit()
         return {"success": True, "document_id": document_id, "status": status}
+    except Exception:
+        # Mark as pending so retries can continue cleanly.
+        try:
+            doc = db.query(models.Document).filter(models.Document.id == UUID(document_id)).first()
+            if doc:
+                doc.status = "pending"
+                db.commit()
+        except Exception:
+            pass
+        raise
     finally:
         db.close()

@@ -65,7 +65,7 @@ def calculate_server_side_margin(db: Session, company_id: Any, target_month: dat
     gross_profit = revenue - cogs
     margin_pct = (gross_profit / revenue * 100) if revenue > 0 else 0.0
 
-    return {
+    result = {
         "month": target_month.strftime("%Y-%m"),
         "revenue": revenue,
         "cogs": cogs,
@@ -73,6 +73,11 @@ def calculate_server_side_margin(db: Session, company_id: Any, target_month: dat
         "margin_percentage": round(margin_pct, 2),
         "status": "healthy" if margin_pct > 70 else "warning" if margin_pct > 40 else "critical"
     }
+    # Backward-compatible aliases used by existing tests and legacy callers.
+    result["total_revenue"] = result["revenue"]
+    result["total_cogs"] = result["cogs"]
+    result["gross_margin_pct"] = result["margin_percentage"]
+    return result
 
 def calculate_product_margin(db: Session, company_id: Any, target_month: date = None) -> List[Dict[str, Any]]:
     """Breakdown of margins by product tag."""
@@ -130,15 +135,31 @@ def calculate_product_margin(db: Session, company_id: Any, target_month: date = 
         })
     return results
 
-def check_margin_alerts(db: Session, company_id: Any, target_month: date = None, threshold: float = 50.0) -> List[Dict[str, Any]]:
-    """Checks if overall or product-level margins are below threshold."""
+def check_margin_alerts(
+    db: Session,
+    company_id: Any,
+    target_month: date = None,
+    threshold: float = 50.0,
+    threshold_pct: float = None,
+) -> List[Dict[str, Any]]:
+    """Checks if overall margins are below threshold.
+
+    `threshold_pct` is kept for backward compatibility with older callers.
+    """
+    effective_threshold = float(threshold_pct) if threshold_pct is not None else float(threshold)
+
     overall = calculate_server_side_margin(db, company_id, target_month)
+    margin_pct = float(overall.get("gross_margin_pct", overall.get("margin_percentage", 0.0)) or 0.0)
+
     alerts = []
-    if overall.get("margin_percentage", 0) < threshold:
-        alerts.append({
-            "type": "low_margin",
-            "severity": "critical" if overall["margin_percentage"] < (threshold / 2) else "warning",
-            "message": f"Overall gross margin ({overall['margin_percentage']}%) is below threshold ({threshold}%)",
-            "data": overall
-        })
+    if margin_pct < effective_threshold:
+        alerts.append(
+            {
+                "alert_type": "margin_below_threshold",
+                "type": "low_margin",
+                "severity": "critical" if margin_pct < (effective_threshold / 2) else "warning",
+                "message": f"Overall gross margin ({margin_pct}%) is below threshold ({effective_threshold}%)",
+                "data": overall,
+            }
+        )
     return alerts

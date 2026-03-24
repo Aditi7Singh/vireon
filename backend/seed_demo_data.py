@@ -32,8 +32,7 @@ def create_company():
         effective_tax_rate=0.25,  # 25%
         founding_date=datetime(2020, 1, 1).date(),
         notification_contacts={
-            "email": ["founder@seedlinglabs.io", "cfo@seedlinglabs.io"],
-            "slack_webhook": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+            "email_recipients": ["sysswork@gmail.com"]
         },
         alert_thresholds={
             "critical_months": 3,
