@@ -6,6 +6,7 @@ from uuid import UUID
 from fastapi.responses import StreamingResponse
 import io
 from typing import Optional
+from datetime import date
 
 import models
 import schemas
@@ -14,6 +15,7 @@ import auth
 from analytics import metrics, scenarios
 from pdf_utils import generate_runway_report_pdf, generate_budget_variance_report_pdf
 from services.planning import calculate_forecast, get_budget_variance
+from services import burn_service
 
 router = APIRouter(prefix="", tags=["analytics", "scenarios"])
 
@@ -293,19 +295,49 @@ def get_expenses(
     db: Session = Depends(database.get_db),
     current_user: str = Depends(auth.get_current_user)
 ):
-    query = db.query(models.Expense).filter(models.Expense.company_id == company_id)
-    if department:
-        # Assuming Expense has department or we join with ledger
-        # For now, let's assume we can filter expenses directly if the field exists
-        # or use financial_ledger_entries for more granular breakdown
-        pass
-        
-    expenses = query.all()
-    breakdown = {}
-    for exp in expenses:
-        cat = exp.category or "Other"
-        breakdown[cat] = breakdown.get(cat, 0) + float(exp.total_amount or 0)
-        
+    month = date.today().strftime("%Y-%m")
+
+    # Primary source: ledger-based burn service for normalized categories.
+    burn_breakdown = burn_service.get_expense_breakdown(company_id, db, month)
+    headcount = burn_service.get_headcount_costs(company_id, db)
+
+    tech = burn_breakdown.get("tech_costs", {})
+    non_tech = burn_breakdown.get("non_tech_costs", {})
+    payroll = burn_breakdown.get("payroll", {})
+    hiring_total = sum(float(h.get("monthly_cost", 0)) for h in headcount.get("pending_hires", []))
+
+    breakdown = {
+        "payroll": float(payroll.get("total", 0)),
+        "aws": float(tech.get("aws_total", 0)),
+        "saas": float(tech.get("saas_total", 0)) + float(tech.get("licenses_total", 0)),
+        "marketing": float(non_tech.get("marketing", 0)),
+        "office": float(non_tech.get("office_bengaluru", 0)) + float(non_tech.get("office_gangavathi", 0)),
+        "hiring": float(hiring_total),
+        "misc": float(non_tech.get("misc", 0)),
+    }
+
+    # Fallback: if ledger-backed categories are empty, use Expense table totals.
+    if all(v == 0 for v in breakdown.values()):
+        query = db.query(models.Expense).filter(models.Expense.company_id == company_id)
+        expenses = query.all()
+        for exp in expenses:
+            cat = (exp.category or "other").strip().lower().replace(" ", "_")
+            amount = float(exp.total_amount or 0)
+            if "cloud" in cat or "infra" in cat or "aws" in cat:
+                breakdown["aws"] += amount
+            elif "payroll" in cat or "salary" in cat:
+                breakdown["payroll"] += amount
+            elif "office" in cat:
+                breakdown["office"] += amount
+            elif "marketing" in cat:
+                breakdown["marketing"] += amount
+            elif "hiring" in cat:
+                breakdown["hiring"] += amount
+            elif "saas" in cat or "license" in cat:
+                breakdown["saas"] += amount
+            else:
+                breakdown["misc"] += amount
+
     return {
         "breakdown": breakdown,
         "trend": [],

@@ -243,10 +243,7 @@ export default function FeaturesPage() {
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7a6a4f]">Action Hub</p>
               <h1 className="mt-2 text-2xl font-semibold text-[#2f2618]">Operate The Smart CFO Features</h1>
-              <p className="mt-2 max-w-3xl text-sm text-[#5a4a34]">
-                This page focuses on capabilities not obvious in the sidebar: anomaly generation, tax liability creation,
-                Claude subscription capture, notification automation, and leadership-grade finance workflows.
-              </p>
+
             </div>
             <button
               onClick={() => void loadAll()}
@@ -339,7 +336,7 @@ export default function FeaturesPage() {
         <section className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <article className="rounded-2xl border border-[#d8cebb] bg-[#fffdf8] p-5 shadow-sm">
             <h3 className="inline-flex items-center gap-2 text-base font-semibold text-[#3a2f1f]"><Cpu className="h-4 w-4" />AI Stack Cost Capture</h3>
-            <p className="mt-1 text-sm text-[#5f513c]">Record Claude subscription spend into the ledger so burn, runway, and expense analytics include real AI tooling cost.</p>
+
             <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <label className="text-xs font-semibold uppercase tracking-wide text-[#7a6a4f]">
                 Claude monthly cost (INR)
@@ -374,30 +371,7 @@ export default function FeaturesPage() {
             </div>
           </article>
 
-          <article className="rounded-2xl border border-[#d8cebb] bg-[#fffdf8] p-5 shadow-sm">
-            <h3 className="inline-flex items-center gap-2 text-base font-semibold text-[#3a2f1f]"><Mail className="h-4 w-4" />Email Notifications</h3>
-            <p className="mt-1 text-sm text-[#5f513c]">Email-only notifications are enabled. Configure recipients and send a test alert email.</p>
-            {smtpMissingKeys.length > 0 && (
-              <p className="mt-2 rounded-lg border border-[#efc1b8] bg-[#fff2ef] px-3 py-2 text-xs text-[#8d3f30]">
-                Email delivery is blocked until SMTP is configured: {smtpMissingKeys.join(", ")}
-              </p>
-            )}
-            <label className="mt-4 block text-xs font-semibold uppercase tracking-wide text-[#7a6a4f]">Recipients (comma separated)</label>
-            <input
-              value={emailRecipients}
-              onChange={(e) => setEmailRecipients(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-[#d6c8b4] bg-[#fffaf2] px-3 py-2 text-sm text-[#2a2017]"
-              placeholder="sysswork@gmail.com"
-            />
-            <div className="mt-3 flex flex-wrap gap-2">
-              <button onClick={() => void runSaveEmailRecipients()} disabled={busyAction === "save-email"} className="rounded-lg border border-[#ceb89a] bg-[#f9f1e2] px-3 py-1.5 text-xs font-semibold text-[#513f27] hover:bg-[#f2e6d2] disabled:opacity-70">
-                {busyAction === "save-email" ? "Saving..." : "Save recipients"}
-              </button>
-              <button onClick={() => void runTestEmail()} disabled={busyAction === "test-email"} className="rounded-lg border border-[#ceb89a] bg-[#f9f1e2] px-3 py-1.5 text-xs font-semibold text-[#513f27] hover:bg-[#f2e6d2] disabled:opacity-70">
-                {busyAction === "test-email" ? "Sending..." : "Send test email"}
-              </button>
-            </div>
-          </article>
+
 
           <article className="rounded-2xl border border-[#d8cebb] bg-[#fffdf8] p-5 shadow-sm">
             <h3 className="inline-flex items-center gap-2 text-base font-semibold text-[#3a2f1f]"><WandSparkles className="h-4 w-4" />Hiring Impact Calculator</h3>
@@ -445,9 +419,7 @@ export default function FeaturesPage() {
 
         <section className="rounded-2xl border border-[#d8cebb] bg-[#fffdf8] p-5 shadow-sm">
           <h2 className="inline-flex items-center gap-2 text-base font-semibold text-[#3a2f1f]"><Sparkles className="h-4 w-4" />Smart CFO Agent For Leadership</h2>
-          <p className="mt-1 text-sm text-[#5f513c]">
-            Use these concrete prompts to showcase finance-agent versatility beyond normal dashboard browsing.
-          </p>
+
           <div className="mt-3 flex flex-wrap gap-2">
             <button onClick={() => openChat("Create a CEO brief with top 5 financial risks and recommended actions")}
               className="rounded-lg border border-[#ceb89a] bg-[#f9f1e2] px-3 py-1.5 text-xs font-semibold text-[#513f27] hover:bg-[#f2e6d2]">

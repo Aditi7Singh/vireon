@@ -34,6 +34,13 @@ def _sanitize_contacts(contacts: Optional[dict]) -> dict:
     if not recipients:
         recipients = [DEFAULT_ALERT_EMAIL]
     contacts["email_recipients"] = list(dict.fromkeys(recipients))
+    
+    # Preserve ceo and finance fields for email alert configuration
+    if "ceo" not in contacts:
+        contacts["ceo"] = None
+    if "finance" not in contacts:
+        contacts["finance"] = []
+    
     return contacts
 
 

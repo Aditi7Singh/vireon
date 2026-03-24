@@ -4,7 +4,8 @@ import TopBar from "@/components/TopBar";
 import { useRunway, useScorecard } from "@/hooks/useFinancialData";
 import { useAppStore } from "@/lib/store";
 import { cn, formatCurrency } from "@/lib/utils";
-import { AlertTriangle, CalendarClock, ShieldCheck, Sparkles, TrendingDown } from "lucide-react";
+import { AlertTriangle, CalendarClock, ShieldCheck, Sparkles, TrendingDown, DollarSign, Users, TrendingUp } from "lucide-react";
+import { useState } from "react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 const projectionData = [
@@ -20,7 +21,13 @@ export default function RunwayPage() {
   const { runway } = useRunway();
   const { scorecard } = useScorecard();
   const { openChat } = useAppStore();
+  const [scenario, setScenario] = useState({ burnReduction: 0, hiringImpact: 0, revenueGrowth: 0 });
 
+  // Calculate scenario impacts
+  const baseBurn = scorecard.monthly_net_burn || 45000;
+  const adjustedBurn = baseBurn * (1 - scenario.burnReduction / 100) * (1 + scenario.hiringImpact / 100);
+  const adjustedRunway = scorecard.total_cash / adjustedBurn;
+  const runwayImprovement = adjustedRunway - runway.runway_months;
   const isLowRunway = runway.runway_months < 6;
   const isHealthyRunway = runway.runway_months >= 12;
 
@@ -55,6 +62,103 @@ export default function RunwayPage() {
               <Sparkles className="h-4 w-4" />
               Forecast analysis
             </button>
+          </div>
+        </section>
+        {/* Scenario Modeling */}
+        <section className="rounded-2xl border border-[#ded2c4] bg-[#fffdf8] p-5 sm:p-6 space-y-6">
+          <div>
+            <h2 className="text-lg font-semibold text-[#2a2017] mb-1">🎯 Scenario Planner</h2>
+            <p className="text-xs text-[#7b6d5b]">Model what-if scenarios to extend runway</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-4">
+            {/* Burn Reduction */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#5f5344] flex items-center gap-2">
+                <DollarSign className="h-4 w-4" />
+                Reduce Spend
+              </label>
+              <input 
+                type="range" 
+                min="0" 
+                max="50" 
+                value={scenario.burnReduction}
+                onChange={(e) => setScenario(prev => ({ ...prev, burnReduction: Number(e.target.value) }))}
+                className="w-full h-2 bg-[#f0ebe3] rounded-lg appearance-none cursor-pointer"
+              />
+              <div className="flex justify-between text-xs text-[#7b6d5b]">
+                <span>0%</span>
+                <span className="font-bold text-[#2a2017]">{scenario.burnReduction}%</span>
+                <span>50%</span>
+              </div>
+            </div>
+
+            {/* Hiring Impact */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#5f5344] flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Add Headcount
+              </label>
+              <input 
+                type="range" 
+                min="0" 
+                max="50" 
+                value={scenario.hiringImpact}
+                onChange={(e) => setScenario(prev => ({ ...prev, hiringImpact: Number(e.target.value) }))}
+                className="w-full h-2 bg-[#f0ebe3] rounded-lg appearance-none cursor-pointer"
+              />
+              <div className="flex justify-between text-xs text-[#7b6d5b]">
+                <span>None</span>
+                <span className="font-bold text-[#2a2017]">+{scenario.hiringImpact}%</span>
+                <span>50%</span>
+              </div>
+            </div>
+
+            {/* Revenue Growth */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#5f5344] flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                Revenue Growth
+              </label>
+              <input 
+                type="range" 
+                min="0" 
+                max="150" 
+                value={scenario.revenueGrowth}
+                onChange={(e) => setScenario(prev => ({ ...prev, revenueGrowth: Number(e.target.value) }))}
+                className="w-full h-2 bg-[#f0ebe3] rounded-lg appearance-none cursor-pointer"
+              />
+              <div className="flex justify-between text-xs text-[#7b6d5b]">
+                <span>0%</span>
+                <span className="font-bold text-[#2a2017]">+{scenario.revenueGrowth}%</span>
+                <span>150%</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Results */}
+          <div className={`pt-4 rounded-lg border ${runwayImprovement > 0 ? 'border-green-200 bg-green-50' : 'border-[#ede8df] bg-[#f9f7f3]'} p-4 space-y-2`}>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#6f6251]">Base Monthly Burn</span>
+              <span className="font-bold text-[#2a2017]">{formatCurrency(baseBurn)}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#6f6251]">Scenario Monthly Burn</span>
+              <span className="font-bold text-[#2a2017]">{formatCurrency(adjustedBurn)}</span>
+            </div>
+            <div className="flex items-center justify-between pt-2 border-t border-current/10">
+              <span className="text-sm font-semibold text-[#2a2017]">New Runway</span>
+              <span className={`text-2xl font-bold ${runwayImprovement > 0 ? 'text-green-600' : runwayImprovement < 0 ? 'text-red-600' : 'text-[#2a2017]'}`}>
+                {adjustedRunway.toFixed(1)} months
+              </span>
+            </div>
+            {runwayImprovement !== 0 && (
+              <div className="text-xs font-semibold pt-1">
+                <span className={runwayImprovement > 0 ? 'text-green-600' : 'text-red-600'}>
+                  {runwayImprovement > 0 ? '✓ +' : ''}{runwayImprovement.toFixed(1)} months impact
+                </span>
+              </div>
+            )}
           </div>
         </section>
 

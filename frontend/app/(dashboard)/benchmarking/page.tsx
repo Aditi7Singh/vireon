@@ -9,13 +9,68 @@ import { ArrowUpRight, Sparkles, Target, TrendingUp } from "lucide-react";
 export default function BenchmarkingPage() {
   const [benchmarks, setBenchmarks] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { openChat } = useAppStore();
 
   useEffect(() => {
     const loadData = async () => {
       try {
+        setError(null);
         const data = await api.getBenchmarks();
-        setBenchmarks(data);
+        setBenchmarks(data || {
+          metrics: [
+            {
+              name: "Rule of 40",
+              value: "0.0%",
+              status: "Pending Data",
+              benchmark: "40.0%",
+              description: "Growth Rate + Profit Margin"
+            },
+            {
+              name: "Burn Multiple",
+              value: "0.00x",
+              status: "Pending Data",
+              benchmark: "< 1.5x",
+              description: "Efficiency of burning capital for growth"
+            },
+            {
+              name: "Net Revenue Retention",
+              value: "0%",
+              status: "Pending Data",
+              benchmark: "> 110%",
+              description: "LTM revenue from existing customers"
+            }
+          ],
+          summary: "Benchmark card is ready. Add monthly metrics to see live SaaS health scoring."
+        });
+      } catch (err) {
+        setError("Failed to load benchmarks");
+        setBenchmarks({
+          metrics: [
+            {
+              name: "Rule of 40",
+              value: "—",
+              status: "Error",
+              benchmark: "40.0%",
+              description: "Growth Rate + Profit Margin"
+            },
+            {
+              name: "Burn Multiple",
+              value: "—",
+              status: "Error",
+              benchmark: "< 1.5x",
+              description: "Efficiency of burning capital for growth"
+            },
+            {
+              name: "Net Revenue Retention",
+              value: "—",
+              status: "Error",
+              benchmark: "> 110%",
+              description: "LTM revenue from existing customers"
+            }
+          ],
+          summary: "Unable to load benchmarks at this time."
+        });
       } finally {
         setIsLoading(false);
       }
@@ -24,7 +79,18 @@ export default function BenchmarkingPage() {
   }, []);
 
   if (isLoading) {
-    return <div className="min-h-screen bg-[#f6f3ee]" />;
+    return (
+      <div className="min-h-screen bg-[#f6f3ee] pb-14 text-[#1d1b17]">
+        <TopBar title="Performance Intelligence" />
+        <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+          <div className="flex h-96 items-center justify-center">
+            <div className="text-center">
+              <div className="animate-pulse text-sm text-[#8a7b68]">Loading benchmarks...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -53,18 +119,52 @@ export default function BenchmarkingPage() {
         </section>
 
         <section className="grid gap-4 md:grid-cols-3">
-          {(benchmarks?.metrics || []).map((m: any, i: number) => (
-            <article key={i} className="rounded-2xl border border-[#ded2c4] bg-[#fffdf8] p-5">
-              <div className="flex items-center justify-between">
-                <p className="text-xs uppercase tracking-[0.12em] text-[#776b5a]">{m.name}</p>
-                <TrendingUp className="h-4 w-4 text-[#87602a]" />
-              </div>
-              <p className="mt-2 text-2xl font-semibold text-[#2a2017]">{m.value}</p>
-              <p className="mt-1 text-xs text-[#6f6252]">Benchmark: {m.benchmark}</p>
-              <p className="mt-2 text-xs text-[#7e715f]">{m.description}</p>
-              <button className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-[#8a5a1e]">Analyze <ArrowUpRight className="h-3.5 w-3.5" /></button>
-            </article>
-          ))}
+          {(benchmarks?.metrics || []).map((m: any, i: number) => {
+            const getStatusColor = (status: string) => {
+              switch(status?.toLowerCase()) {
+                case 'excellent': return { bg: 'bg-emerald-50', border: 'border-emerald-200', badge: 'bg-emerald-100 text-emerald-700' };
+                case 'great': return { bg: 'bg-blue-50', border: 'border-blue-200', badge: 'bg-blue-100 text-blue-700' };
+                case 'good': return { bg: 'bg-amber-50', border: 'border-amber-200', badge: 'bg-amber-100 text-amber-700' };
+                case 'monitor': return { bg: 'bg-orange-50', border: 'border-orange-200', badge: 'bg-orange-100 text-orange-700' };
+                case 'critical': return { bg: 'bg-red-50', border: 'border-red-200', badge: 'bg-red-100 text-red-700' };
+                default: return { bg: 'bg-gray-50', border: 'border-gray-200', badge: 'bg-gray-100 text-gray-700' };
+              }
+            };
+            const colors = getStatusColor(m.status);
+            return (
+              <article key={i} className={`rounded-2xl transition-all border-2 ${colors.border} ${colors.bg} p-6 flex flex-col hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:-translate-y-1`}>
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] font-semibold text-[#776b5a] mb-1">{m.name}</p>
+                    <p className="text-4xl font-bold text-[#2a2017]">{m.value}</p>
+                  </div>
+                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap ${colors.badge}`}>
+                    {m.status}
+                  </span>
+                </div>
+                
+                <div className="space-y-2 mb-4 pb-4 border-b border-black/5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-[#696156] font-medium">Target:</span>
+                    <span className="text-sm font-semibold text-[#2a2017]">{m.benchmark}</span>
+                  </div>
+                  <p className="text-xs leading-relaxed text-[#5f5344]">{m.description}</p>
+                </div>
+
+                {m.narrative && (
+                  <p className="text-xs text-[#6b5d4f] bg-white/60 p-3 rounded-lg mb-4 flex-grow italic">{m.narrative}</p>
+                )}
+                
+                <button 
+                  onClick={() => openChat(`Help me improve ${m.name}: ${m.narrative || m.description}`)}
+                  className="inline-flex items-center gap-2 text-xs font-bold text-[#8a5a1e] hover:text-[#6b4712] transition-colors hover:bg-black/5 px-2.5 py-1.5 rounded-lg -ml-2.5"
+                >
+                  Get advice 
+                  <ArrowUpRight className="h-3.5 w-3.5" />
+                </button>
+              </article>
+            );
+          })}
         </section>
       </div>
     </div>

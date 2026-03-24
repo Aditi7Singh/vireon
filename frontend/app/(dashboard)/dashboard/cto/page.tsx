@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BarChart, Card, DonutChart, Metric, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Title } from "@tremor/react";
+import { BarChart, Card, DonutChart, Metric, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Title, Badge, AreaChart } from "@tremor/react";
+import { AlertCircle, CheckCircle2, Loader, TrendingUp } from "lucide-react";
+import { Area, AreaChart as RechartAreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import api from "@/lib/api";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -14,86 +16,161 @@ export default function CTODashboardPage() {
   const [techData, setTechData] = useState<any>(null);
   const [recentEntries, setRecentEntries] = useState<any[]>([]);
   const [history, setHistory] = useState<any[]>([]);
-  const [form, setForm] = useState({
-    cost_type: "saas_tool",
+  const [formData, setFormData] = useState({
+    cost_type: "",
     product_tag: "ai_lab",
-    amount_inr: 18000,
+    amount_inr: 0,
     billing_period: new Date().toISOString().slice(0, 7),
-    vendor_name: "Anthropic Claude",
-    description: "Claude subscription",
-    is_recurring: true,
+    vendor_name: "",
+    description: "",
+    is_recurring: false,
   });
-  const [submitState, setSubmitState] = useState<string>("");
+  const [submitError, setSubmitError] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [impact, setImpact] = useState<any>(null);
+  const [hiringForm, setHiringForm] = useState({ annual_ctc: 1800000 });
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [calcError, setCalcError] = useState<string>("");
 
   useEffect(() => {
     const load = async () => {
-      const health = await api.getStartupHealth();
-      const cid = health.default_company_id || "";
-      setCompanyId(cid);
-      if (!cid) return;
+      try {
+        const health = await api.getStartupHealth();
+        const cid = health.default_company_id || "";
+        setCompanyId(cid);
+        if (!cid) return;
 
-      const month = new Date().toISOString().slice(0, 7);
-      const [dashboardRes, entriesRes] = await Promise.all([
-        fetch(`${API_V1}/burn/dashboard/${cid}?month=${month}`),
-        fetch(`${API_V1}/ledger/entries?company_id=${cid}&category=tech_cost&entry_type=debit`),
-      ]);
-      const dashboardData = dashboardRes.ok ? await dashboardRes.json() : null;
-      const ledgerEntries = entriesRes.ok ? await entriesRes.json() : [];
-      const monthList = Array.from({ length: 6 }).map((_, i) => {
-        const d = new Date();
-        d.setMonth(d.getMonth() - (5 - i));
-        return d.toISOString().slice(0, 7);
-      });
+        const historyRes = await fetch(`${API_V1}/metrics/history/${cid}?months=6`);
+        const historyPayload = historyRes.ok ? await historyRes.json() : [];
+        const latestMonth = historyPayload?.[historyPayload.length - 1]?.month || new Date().toISOString().slice(0, 7);
+        setFormData((prev) => ({ ...prev, billing_period: latestMonth }));
 
-      const monthlyDashboardResults = await Promise.all(
-        monthList.map(async (m) => {
-          const res = await fetch(`${API_V1}/burn/dashboard/${cid}?month=${m}`);
-          if (!res.ok) return { month: m, amount: 0 };
-          const payload = await res.json();
-          const tech = payload?.expenses?.tech_costs || {};
-          const amount = Number(tech.aws_total || 0) + Number(tech.licenses_total || 0) + Number(tech.saas_total || 0);
-          return { month: m, amount };
-        })
-      );
-      
-      setTechData(dashboardData);
-      setRecentEntries(ledgerEntries.slice(0, 8));
-      setHistory(monthlyDashboardResults);
+        const month = latestMonth;
+        const [dashboardRes, entriesRes] = await Promise.all([
+          fetch(`${API_V1}/burn/dashboard/${cid}?month=${month}`),
+          fetch(`${API_V1}/ledger/entries?company_id=${cid}&category=tech_cost&entry_type=debit`),
+        ]);
+        
+        const dashboardData = dashboardRes.ok ? await dashboardRes.json() : null;
+        const ledgerEntries = entriesRes.ok ? await entriesRes.json() : [];
+        
+        const monthList = Array.from({ length: 6 }).map((_, i) => {
+          const d = new Date();
+          d.setMonth(d.getMonth() - (5 - i));
+          return d.toISOString().slice(0, 7);
+        });
+
+        const monthlyDashboardResults = await Promise.all(
+          monthList.map(async (m) => {
+            try {
+              const res = await fetch(`${API_V1}/burn/dashboard/${cid}?month=${m}`);
+              if (!res.ok) return { month: m, amount: 0 };
+              const payload = await res.json();
+              const tech = payload?.expenses?.tech_costs || {};
+              const amount = Number(tech.aws_total || 0) + Number(tech.licenses_total || 0) + Number(tech.saas_total || 0);
+              return { month: m, amount };
+            } catch {
+              return { month: m, amount: 0 };
+            }
+          })
+        );
+        
+        setTechData(dashboardData);
+        setRecentEntries(ledgerEntries.slice(0, 8));
+        setHistory(monthlyDashboardResults);
+      } catch (err) {
+        console.error("Failed to load CTO data:", err);
+      }
     };
     load();
   }, []);
 
   async function submitTechCost() {
-    if (!companyId) return;
-    setSubmitState("");
-    const res = await fetch(`${API_V1}/inputs/tech-cost`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-User-Role": "cto" },
-      body: JSON.stringify({ ...form, company_id: companyId }),
-    });
-    if (!res.ok) {
-      const payload = await res.json().catch(() => ({}));
-      setSubmitState(payload?.detail || `Failed to submit tech cost (${res.status})`);
+    if (!companyId) {
+      setSubmitError("Company ID not loaded");
       return;
     }
-    setSubmitState("Tech cost submitted successfully.");
+    if (!formData.cost_type) {
+      setSubmitError("Please select a cost type");
+      return;
+    }
+    if (!formData.amount_inr || formData.amount_inr <= 0) {
+      setSubmitError("Amount must be greater than 0");
+      return;
+    }
+    
+    setSubmitError("");
+    setIsSubmitting(true);
+    try {
+      const res = await fetch(`${API_V1}/inputs/tech-cost`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-User-Role": "cto" },
+        body: JSON.stringify({ ...formData, company_id: companyId }),
+      });
+      
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}));
+        throw new Error(payload?.detail || `Failed to submit tech cost (${res.status})`);
+      }
+      
+      setFormData((prev) => ({ ...prev, cost_type: "", amount_inr: 0, vendor_name: "", description: "", is_recurring: false }));
 
-    const month = new Date().toISOString().slice(0, 7);
-    const dashboardRes = await fetch(`${API_V1}/burn/dashboard/${companyId}?month=${month}`);
-    if (dashboardRes.ok) {
-      setTechData(await dashboardRes.json());
+      const month = new Date().toISOString().slice(0, 7);
+      const dashboardRes = await fetch(`${API_V1}/burn/dashboard/${companyId}?month=${month}`);
+      if (dashboardRes.ok) {
+        setTechData(await dashboardRes.json());
+      }
+      
+      const entriesRes = await fetch(`${API_V1}/ledger/entries?company_id=${companyId}&category=tech_cost&entry_type=debit`);
+      if (entriesRes.ok) {
+        setRecentEntries((await entriesRes.json()).slice(0, 8));
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Failed to submit tech cost. Please try again.";
+      setSubmitError(msg);
+      console.error("Submit error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
   async function calculateImpact() {
-    if (!companyId) return;
-    const res = await fetch(`${API_V1}/forecast/hiring-impact`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ company_id: companyId, annual_ctc_inr: 1800000, join_month: new Date().toISOString().slice(0, 7) }),
-    });
-    setImpact(await res.json());
+    setCalcError("");
+    if (!companyId) {
+      setCalcError("Company ID not loaded");
+      return;
+    }
+    if (!hiringForm.annual_ctc || hiringForm.annual_ctc <= 0) {
+      setCalcError("Annual CTC must be greater than 0");
+      return;
+    }
+    
+    setIsCalculating(true);
+    try {
+      const res = await fetch(`${API_V1}/forecast/hiring-impact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          company_id: companyId, 
+          annual_ctc_inr: hiringForm.annual_ctc, 
+          join_month: new Date().toISOString().slice(0, 7) 
+        }),
+      });
+      
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData?.detail || `Failed to calculate impact (${res.status})`);
+      }
+      
+      const data = await res.json();
+      setImpact(data);
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Failed to calculate hiring impact. Please try again.";
+      setCalcError(msg);
+      console.error("Impact calculation error:", error);
+    } finally {
+      setIsCalculating(false);
+    }
   }
 
   const techCosts = techData?.expenses?.tech_costs || {};
@@ -162,25 +239,166 @@ export default function CTODashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card>
-          <Title>AWS Cost Breakdown by Product</Title>
-          <DonutChart data={donutData.length ? donutData : [{ product: "unallocated", amount: 0 }]} category="amount" index="product" className="mt-4 h-64" />
+        <Card className="rounded-2xl border border-[#ded2c4] bg-[#fffdf8] p-5 sm:p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-semibold text-[#2a2017]">Tech Cost Trend</h2>
+              <p className="text-xs text-[#7e715f] mt-0.5">Last 6 months</p>
+            </div>
+            <TrendingUp className="h-4 w-4 text-[#9a5d34]" />
+          </div>
+          {trendData.length > 0 && (
+            <div className="h-[250px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartAreaChart data={trendData} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
+                  <defs>
+                    <linearGradient id="techCostFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#f97316" stopOpacity={0.01} />
+                    </linearGradient>
+                    <filter id="shadowTechChart">
+                      <feDropShadow dx="0" dy="2" stdDeviation="2" floodOpacity="0.08" />
+                    </filter>
+                  </defs>
+                  <XAxis 
+                    dataKey="month" 
+                    tickLine={false} 
+                    axisLine={{ stroke: "#e8dccf", strokeWidth: 1 }} 
+                    tick={{ fill: "#7b6d5b", fontSize: 12, fontWeight: 500 }}
+                  />
+                  <YAxis 
+                    tickLine={false} 
+                    axisLine={{ stroke: "#e8dccf", strokeWidth: 1 }} 
+                    tick={{ fill: "#7b6d5b", fontSize: 12 }}
+                    tickFormatter={(v) => `₹${Math.round(v / 100000)}L`}
+                    grid={{ vertical: true, stroke: "#f5f1eb", strokeDasharray: "3 3" }}
+                  />
+                  <Tooltip 
+                    contentStyle={{
+                      borderRadius: 12,
+                      border: "1px solid #e0cfc2",
+                      background: "#fffbf5",
+                      boxShadow: "0 4px 12px rgba(63, 45, 24, 0.15)",
+                      color: "#2a2118",
+                    }}
+                    formatter={(value) => [`₹${(Number(value) || 0).toLocaleString()}`, 'Tech Spend']}
+                    labelFormatter={(label) => `${label} 2024`}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="amount" 
+                    stroke="#ea580c" 
+                    strokeWidth={2.4} 
+                    fill="url(#techCostFill)"
+                    filter="url(#shadowTechChart)"
+                  />
+                </RechartAreaChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+          <div className="mt-4 flex items-center justify-between pt-4 border-t border-[#ede8df]">
+            <span className="text-xs text-[#6f6251]">Current month: {trendData?.[trendData.length - 1]?.month || 'N/A'}</span>
+            <span className="text-sm font-semibold text-[#2a2017]">₹{(trendData?.[trendData.length - 1]?.amount || 0).toLocaleString()}</span>
+          </div>
         </Card>
-        <Card>
-          <Title>Tech Cost Trend</Title>
-          <BarChart data={trendData} index="month" categories={["amount"]} className="mt-4 h-64" />
+
+        <Card className="rounded-2xl border border-[#ded2c4] bg-[#fffdf8] p-5 sm:p-6">
+          <h2 className="text-lg font-semibold text-[#2a2017] mb-4">AWS Cost Breakdown by Product</h2>
+          {donutData.length > 0 ? (
+            <div className="space-y-3">
+              {donutData.map((item, idx) => {
+                const colors = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#0ea5e9", "#8b5cf6"];
+                const color = colors[idx % colors.length];
+                const totalAmount = donutData.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+                const percentage = totalAmount > 0 ? ((Number(item.amount) || 0) / totalAmount) * 100 : 0;
+                return (
+                  <div key={item.product} className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="h-3 w-3 rounded-full" style={{ backgroundColor: color }} />
+                        <span className="text-sm font-medium text-[#2a2017]">{item.product}</span>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-[#2a2017]">₹{(Number(item.amount) || 0).toLocaleString()}</p>
+                        <p className="text-xs text-[#7b6d5b]">{percentage.toFixed(1)}%</p>
+                      </div>
+                    </div>
+                    <div className="w-full h-2 bg-[#f0ebe3] rounded-full overflow-hidden">
+                      <div 
+                        className="h-full rounded-full transition-all" 
+                        style={{ width: `${percentage}%`, backgroundColor: color }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+              <div className="pt-3 border-t border-[#ede8df] mt-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-[#6f6251]">Total AWS Cost</span>
+                  <span className="text-lg font-bold text-[#2a2017]">₹{donutData.reduce((sum, d) => sum + (Number(d.amount) || 0), 0).toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-[#7b6d5b]">
+              <p>No AWS cost data available</p>
+              <p className="text-xs mt-1">Add AWS resources to track costs</p>
+            </div>
+          )}
         </Card>
       </div>
 
-      <Card>
+      <Card className="rounded-2xl border border-[#ded2c4] bg-[#fffdf8] p-5 sm:p-6">
         <Title>Quick Entry - Tech Cost</Title>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
-          <input className="bg-white border border-[#e1d3c2] rounded px-3 py-2" value={form.vendor_name} onChange={(e) => setForm({ ...form, vendor_name: e.target.value })} placeholder="Vendor" />
-          <input className="bg-white border border-[#e1d3c2] rounded px-3 py-2" type="number" value={form.amount_inr} onChange={(e) => setForm({ ...form, amount_inr: Number(e.target.value) })} placeholder="Amount INR" />
-          <input className="bg-white border border-[#e1d3c2] rounded px-3 py-2" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Description" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+          <select 
+            className="bg-white border border-[#e1d3c2] rounded px-3 py-2" 
+            value={formData.cost_type} 
+            onChange={(e) => setFormData({ ...formData, cost_type: e.target.value })}
+          >
+            <option value="">Select Cost Type</option>
+            <option value="aws">AWS</option>
+            <option value="saas">SaaS</option>
+            <option value="licenses">Licenses</option>
+            <option value="tools">Tools</option>
+          </select>
+          <input 
+            className="bg-white border border-[#e1d3c2] rounded px-3 py-2" 
+            value={formData.vendor_name} 
+            onChange={(e) => setFormData({ ...formData, vendor_name: e.target.value })} 
+            placeholder="Vendor (e.g., AWS, Slack)" 
+          />
+          <input 
+            className="bg-white border border-[#e1d3c2] rounded px-3 py-2" 
+            type="number" 
+            value={formData.amount_inr} 
+            onChange={(e) => setFormData({ ...formData, amount_inr: Number(e.target.value) })} 
+            placeholder="Amount INR" 
+          />
+          <input 
+            className="bg-white border border-[#e1d3c2] rounded px-3 py-2" 
+            value={formData.description} 
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
+            placeholder="Description" 
+          />
         </div>
-        <button onClick={submitTechCost} className="mt-4 px-4 py-2 rounded bg-[#9a5d34] hover:bg-[#7f4c2a] text-white text-sm font-semibold">Submit Tech Cost</button>
-        {submitState && <p className="mt-3 text-sm text-[#5e5243]">{submitState}</p>}
+        <div className="flex items-center gap-2 mt-4">
+          <button 
+            onClick={submitTechCost} 
+            disabled={isSubmitting}
+            className="px-4 py-2 rounded bg-[#9a5d34] hover:bg-[#7f4c2a] disabled:bg-[#c4a78a] text-white text-sm font-semibold flex items-center gap-2"
+          >
+            {isSubmitting && <Loader className="w-4 h-4 animate-spin" />}
+            {isSubmitting ? "Submitting..." : "Submit Tech Cost"}
+          </button>
+        </div>
+        
+        {submitError && (
+          <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded flex items-start gap-2">
+            <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-red-700">{submitError}</p>
+          </div>
+        )}
 
         <Table className="mt-6">
           <TableHead><TableRow><TableHeaderCell>Recent Entries</TableHeaderCell><TableHeaderCell>Amount</TableHeaderCell></TableRow></TableHead>
@@ -200,11 +418,61 @@ export default function CTODashboardPage() {
 
       <Card>
         <Title>Hiring Impact Calculator</Title>
-        <button onClick={calculateImpact} className="mt-4 px-4 py-2 rounded bg-[#1f1a16] hover:bg-[#151210] text-white text-sm font-semibold">Calculate Impact</button>
+        <p className="text-sm text-[#7f7770] mt-2">Estimate runway impact of adding a new hire</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+          <div>
+            <label className="block text-xs font-semibold text-[#5e5243] mb-1">Annual CTC (₹)</label>
+            <input 
+              className="w-full bg-white border border-[#e1d3c2] rounded px-3 py-2" 
+              type="number" 
+              value={hiringForm.annual_ctc} 
+              onChange={(e) => setHiringForm({ annual_ctc: Number(e.target.value) })} 
+              placeholder="e.g., 1200000" 
+            />
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-2 mt-4">
+          <button 
+            onClick={calculateImpact} 
+            disabled={isCalculating}
+            className="px-4 py-2 rounded bg-[#1f1a16] hover:bg-[#151210] disabled:bg-[#7f7770] text-white text-sm font-semibold flex items-center gap-2"
+          >
+            {isCalculating && <Loader className="w-4 h-4 animate-spin" />}
+            {isCalculating ? "Calculating..." : "Calculate Impact"}
+          </button>
+        </div>
+
+        {calcError && (
+          <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded flex items-start gap-2">
+            <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-red-700">{calcError}</p>
+          </div>
+        )}
+        
         {impact && (
-          <p className="mt-3 text-sm">
-            Current runway: {impact.baseline_runway_months} months - After hire: {impact.new_runway_months} months ({impact.runway_impact_days} days impact)
-          </p>
+          <div className="mt-6 p-4 bg-[#f0ebe4] rounded border border-[#e1d3c2] space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#5e5243]">Current Runway:</span>
+              <span className="font-semibold text-[#1d1b19]">{impact.baseline_runway_months} months</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#5e5243]">After New Hire:</span>
+              <span className="font-semibold text-[#1d1b19]">{impact.new_runway_months} months</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#5e5243]">Impact:</span>
+              <span className={`font-semibold ${impact.runway_impact_days < 0 ? "text-red-600" : "text-green-600"}`}>
+                {impact.runway_impact_days < 0 ? "−" : "+"}{Math.abs(impact.runway_impact_days)} days
+              </span>
+            </div>
+            {impact.projected_12m_costs && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-[#5e5243]">12-Month Cost:</span>
+                <span className="font-semibold text-[#1d1b19]">{formatINR(impact.projected_12m_costs)}</span>
+              </div>
+            )}
+          </div>
         )}
       </Card>
     </div>

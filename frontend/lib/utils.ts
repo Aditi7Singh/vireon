@@ -5,7 +5,25 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatCurrency(amount: number, currency: string = "USD"): string {
+export function formatCurrency(amount: number, currency: string = "INR"): string {
+  const numeric = Number(amount);
+  if (!Number.isFinite(numeric)) {
+    return "-";
+  }
+
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(numeric);
+}
+
+export function formatINR(amount: number): string {
+  return formatCurrency(amount, "INR");
+}
+
+export function formatUSD(amount: number): string {
   const numeric = Number(amount);
   if (!Number.isFinite(numeric)) {
     return "-";
@@ -13,7 +31,7 @@ export function formatCurrency(amount: number, currency: string = "USD"): string
 
   return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency,
+    currency: "USD",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(numeric);

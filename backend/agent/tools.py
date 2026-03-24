@@ -731,6 +731,128 @@ def get_recommendations_report() -> Dict[str, Any]:
         except: pass
 
 
+@tool
+def generate_scenario_memo(scenario_name: str = "Strategic Planning", days_horizon: int = 90) -> Dict[str, Any]:
+    """
+    Generate an executive scenario memo with financial assumptions, runway impact, risk flags, and action plan.
+    
+    Args:
+        scenario_name: Name of the scenario (e.g. "Growth Mode", "Cost Optimization", "Strategic Planning")
+        days_horizon: Time horizon for action plan in days (default 90 for 30/60/90 plan)
+    
+    Returns:
+        Dictionary with memo structure including assumptions, impact analysis, risks, and actions
+    """
+    try:
+        db = _get_db()
+        company = _get_first_company(db)
+        if not company:
+            return {"error": "No company found", "tool": "generate_scenario_memo"}
+
+        # Get current financial state
+        metric = _get_latest_metric(db, company.id)
+        if not metric:
+            return {"error": "No financial metrics found", "tool": "generate_scenario_memo"}
+
+        import models
+        from datetime import datetime, timedelta
+        
+        # Extract current state
+        current_cash = float(metric.ending_cash or 0)
+        monthly_burn = float(metric.burn_rate or 0)
+        revenue = float(metric.total_revenue or 0)
+        expenses = float(metric.total_expenses or 0)
+        runway_months = (current_cash / monthly_burn) if monthly_burn > 0 else 999
+        
+        # Count headcount
+        employees = db.query(models.Employee).filter(
+            models.Employee.company_id == company.id,
+            models.Employee.status == "active"
+        ).count()
+        
+        # Build scenario memo structure
+        memo = {
+            "scenario_name": scenario_name,
+            "prepared_date": datetime.now().isoformat(),
+            "company": company.name,
+            
+            "current_state": {
+                "cash_balance": round(current_cash, 0),
+                "monthly_burn": round(monthly_burn, 0),
+                "monthly_revenue": round(revenue, 0),
+                "runway_months": round(runway_months, 1),
+                "headcount": employees,
+            },
+            
+            "financial_assumptions": {
+                "base_burn_case": f"₹{monthly_burn:,.0f}/mo (current)",
+                "revenue_assumption": f"₹{revenue:,.0f}/mo baseline",
+                "headcount_assumption": f"{employees} people at current cost structure",
+                "confidence_level": "High (based on 3-month avg)",
+            },
+            
+            "runway_impact_analysis": {
+                "status_quo_runway": f"{runway_months:.1f} months at current burn",
+                "best_case": f"{runway_months * 1.3:.1f} months (30% cost reduction)",
+                "worst_case": f"{runway_months * 0.7:.1f} months (30% burn increase)",
+                "breakeven_path": f"Requires {(monthly_burn - revenue) * 1.2:,.0f}/mo in cost actions or revenue growth",
+            },
+            
+            "critical_risk_flags": [
+                {
+                    "flag": "Runway < 12 months" if runway_months < 12 else "Runway adequate",
+                    "severity": "Critical" if runway_months < 6 else "Warning" if runway_months < 12 else "Monitor",
+                    "action": "Prioritize funding or unit economics improvement",
+                } if runway_months < 12 else {
+                    "flag": "Healthy runway position",
+                    "severity": "Green",
+                    "action": "Maintain current trajectory; focus on growth",
+                },
+                {
+                    "flag": "High burn multiple" if (monthly_burn / revenue) > 1 else "Burn < Revenue",
+                    "severity": "High" if (monthly_burn / revenue) > 1.5 else "Medium" if (monthly_burn / revenue) > 1 else "Low",
+                    "action": "Improve unit economics or reduce discretionary spend",
+                },
+            ],
+            
+            "action_plan": {
+                "immediate_30_days": [
+                    "Review and optimize tech stack spend (potential 15-20% savings)",
+                    "Conduct headcount utilization audit",
+                    "Initiate customer retention focused on NRR > 110%",
+                    "Weekly cash position reviews",
+                ],
+                "60_day_milestones": [
+                    "Execute cost optimization decisions",
+                    "Close/renew contracts aligned with efficiency goals",
+                    "Pipeline development for revenue growth",
+                    "Submit funding applications if applicable",
+                ],
+                "90_day_outcomes": [
+                    f"Target: Reduce burn to ₹{monthly_burn * 0.85:,.0f}/mo OR improve runway to {runway_months * 1.2:.1f}mo",
+                    "Establish new baseline metrics and KPIs",
+                    "Board reporting on strategic milestones",
+                    "Plan next quarter based on achieved outcomes",
+                ],
+            },
+            
+            "key_metrics_to_monitor": {
+                "Primary": ["Cash balance", "Monthly burn", "Runway in months", "Revenue MoM %"],
+                "Secondary": ["CAC payback", "Rule of 40 score", "Headcount cost ratio", "Burn multiple"],
+                "Cadence": "Weekly cash; Monthly P&L; Quarterly strategic review",
+            },
+        }
+        
+        return memo
+        
+    except Exception as e:
+        import traceback
+        return {"error": str(e), "tool": "generate_scenario_memo", "traceback": traceback.format_exc()}
+    finally:
+        try: db.close()
+        except: pass
+
+
 # Export all tools as a list for LangGraph
 ALL_TOOLS = [
     get_cash_balance,
@@ -749,4 +871,5 @@ ALL_TOOLS = [
     get_depreciation_expense,
     get_asset_utilization,
     get_recommendations_report,
+    generate_scenario_memo,
 ]

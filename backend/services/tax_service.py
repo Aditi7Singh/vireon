@@ -132,7 +132,8 @@ def calculate_quarterly_tax_summary(db: Session, company_id: UUID, year: int, qu
     total_gst_collected = 0.0
     total_tds_receivable = 0.0
     for inv in invoices:
-        if inv.type == "ACCOUNTS_RECEIVABLE":
+        inv_type = (inv.type or "").upper()
+        if inv_type in {"ACCOUNTS_RECEIVABLE", "AR"}:
             # Very rough estimate of GST/TDS applied if not tracked directly on Invoice model
             tax_data = calculate_tax_for_invoice(db, company_id, float(inv.sub_total))
             total_gst_collected += tax_data["gst_amount"]

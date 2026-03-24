@@ -24,4 +24,5 @@ from . import (
 	system,
 	fx,
 	tax,
+	financial_alerts,
 )

@@ -28,7 +28,8 @@ const categoryMeta: Record<string, { label: string; icon: ElementType; color: st
   aws: { label: "Infrastructure", icon: Globe, color: "#227a66" },
   saas: { label: "SaaS", icon: Layers, color: "#9d6328" },
   marketing: { label: "Marketing", icon: Zap, color: "#ac4e23" },
-  office: { label: "Office", icon: Tag, color: "#5f7c2f" },
+  office: { label: "Office expense", icon: Tag, color: "#5f7c2f" },
+  hiring: { label: "Hiring", icon: Users, color: "#7a5f2e" },
   legal: { label: "Legal", icon: ShieldCheck, color: "#85561a" },
 };
 
@@ -43,6 +44,11 @@ export default function ExpensesPage() {
   const { openChat } = useAppStore();
 
   const totalExpenses = Object.values(expenses.breakdown as Record<string, number>).reduce((a: number, b: number) => a + b, 0);
+  const nonZeroBreakdown = Object.entries(expenses.breakdown as Record<string, number>)
+    .filter(([, amount]) => Number(amount || 0) > 0);
+  const topBreakdown = nonZeroBreakdown
+    .sort((a, b) => Number(b[1] || 0) - Number(a[1] || 0))
+    .slice(0, 2);
 
   const departments = ["all", "Engineering", "Marketing", "Sales", "Operations", "Finance"];
 
@@ -86,8 +92,22 @@ export default function ExpensesPage() {
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { label: "Total Expenses", value: formatCurrency(totalExpenses) },
-            { label: "Payroll Share", value: `${Math.round(((expenses.breakdown.payroll || 0) / Math.max(totalExpenses, 1)) * 100)}%` },
-            { label: "Infra Share", value: `${Math.round(((expenses.breakdown.aws || 0) / Math.max(totalExpenses, 1)) * 100)}%` },
+            {
+              label: topBreakdown[0]
+                ? `${(categoryMeta[topBreakdown[0][0]]?.label || topBreakdown[0][0])} Share`
+                : "Top Category",
+              value: topBreakdown[0]
+                ? `${Math.round((Number(topBreakdown[0][1] || 0) / Math.max(totalExpenses, 1)) * 100)}%`
+                : "No data",
+            },
+            {
+              label: topBreakdown[1]
+                ? `${(categoryMeta[topBreakdown[1][0]]?.label || topBreakdown[1][0])} Share`
+                : "Second Category",
+              value: topBreakdown[1]
+                ? `${Math.round((Number(topBreakdown[1][1] || 0) / Math.max(totalExpenses, 1)) * 100)}%`
+                : "No data",
+            },
             { label: "Compliance", value: "Audited" },
           ].map((item) => (
             <article key={item.label} className="rounded-2xl border border-[#ddd2c2] bg-[#fffdf8] p-5">
@@ -98,26 +118,42 @@ export default function ExpensesPage() {
         </section>
 
         <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {Object.entries(expenses.breakdown as Record<string, number>).map(([key, amount]) => {
+          {nonZeroBreakdown.map(([key, amount]) => {
             const meta = categoryMeta[key] || { label: key, icon: Receipt, color: "#8a6b3f" };
             const Icon = meta.icon;
             const pct = totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0;
             return (
-              <article key={key} className="rounded-2xl border border-[#ded2c4] bg-[#fffdf8] p-5">
-                <div className="flex items-center justify-between">
+              <article key={key} className="rounded-2xl border border-[#ded2c4] bg-[#fffdf8] p-5 hover:border-[#cbb7a1] hover:shadow-[0_8px_16px_rgba(0,0,0,0.06)] transition-all">
+                <div className="flex items-center justify-between mb-3">
                   <div className="inline-flex items-center gap-2 text-[#6f5f4b]">
-                    <Icon className="h-4 w-4" />
-                    <p className="text-sm font-medium">{meta.label}</p>
+                    <div className="p-1.5 rounded-lg" style={{ backgroundColor: `${meta.color}15` }}>
+                      <Icon className="h-4 w-4" style={{ color: meta.color }} />
+                    </div>
+                    <p className="text-sm font-semibold text-[#2a2017]">{meta.label}</p>
                   </div>
-                  <span className="text-xs text-[#7f715f]">{pct.toFixed(0)}%</span>
+                  <span className="text-sm font-bold text-[#2a2017]">{pct.toFixed(1)}%</span>
                 </div>
-                <p className="mt-3 text-xl font-semibold text-[#2a2017]">{formatCurrency(amount)}</p>
-                <div className="mt-3 h-1.5 rounded-full bg-[#efe6d7]">
-                  <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: meta.color }} />
+                <p className="text-2xl font-bold text-[#2a2017] mb-4">{formatCurrency(amount)}</p>
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-[#7b6d5b]">of total spend</span>
+                    <span className="font-medium text-[#5f5344]">₹{(pct).toFixed(0)}%</span>
+                  </div>
+                  <div className="w-full bg-[#f0ebe3] rounded-full h-2 overflow-hidden">
+                    <div 
+                      className="h-full rounded-full transition-all duration-500" 
+                      style={{ width: `${pct}%`, backgroundColor: meta.color }} 
+                    />
+                  </div>
                 </div>
               </article>
             );
           })}
+          {nonZeroBreakdown.length === 0 && (
+            <article className="rounded-2xl border border-[#ded2c4] bg-[#fffdf8] p-5">
+              <p className="text-sm text-[#6f5f4b]">No categorized expense entries found for this period.</p>
+            </article>
+          )}
         </section>
       </div>
 

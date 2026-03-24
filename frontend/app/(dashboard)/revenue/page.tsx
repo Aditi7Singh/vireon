@@ -81,37 +81,92 @@ export default function RevenuePage() {
 
         <section className="grid gap-4 lg:grid-cols-2">
           <Card className="rounded-2xl border border-[#ded2c4] bg-[#fffdf8] p-5 sm:p-6">
-            <h2 className="mb-4 text-lg font-semibold text-[#2a2017]">MRR Momentum</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-[#2a2017]">MRR Momentum</h2>
+              <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">↑ 18.4% YoY</span>
+            </div>
             <div className="h-[250px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={mrrHistory}>
+                <AreaChart data={mrrHistory} margin={{ top: 5, right: 15, left: 0, bottom: 5 }}>
                   <defs>
                     <linearGradient id="mrrFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#2e7b62" stopOpacity={0.35} />
-                      <stop offset="95%" stopColor="#2e7b62" stopOpacity={0.05} />
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.01} />
                     </linearGradient>
+                    <filter id="shadowMrr">
+                      <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.15" />
+                    </filter>
                   </defs>
-                  <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fill: "#7b6d5b", fontSize: 12 }} />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fill: "#7b6d5b", fontSize: 12 }} tickFormatter={(v) => `$${v / 1000}k`} />
-                  <Tooltip contentStyle={{ border: "1px solid #dbcdb9", borderRadius: 12, background: "#fff8ea" }} />
-                  <Area type="monotone" dataKey="value" stroke="#2e7b62" strokeWidth={2.2} fill="url(#mrrFill)" />
+                  <XAxis 
+                    dataKey="month" 
+                    tickLine={false} 
+                    axisLine={{ stroke: "#e0d7cf", strokeWidth: 1 }} 
+                    tick={{ fill: "#7b6d5b", fontSize: 12, fontWeight: 500 }} 
+                    grid={{ horizontal: false }}
+                  />
+                  <YAxis 
+                    tickLine={false} 
+                    axisLine={{ stroke: "#e0d7cf", strokeWidth: 1 }} 
+                    tick={{ fill: "#7b6d5b", fontSize: 12 }} 
+                    tickFormatter={(v) => `$${v / 1000}k`}
+                    grid={{ vertical: true, stroke: "#f0ede8", strokeDasharray: "3 3" }}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      border: "1px solid #d9c9b8", 
+                      borderRadius: 12, 
+                      background: "#fffbf5",
+                      boxShadow: "0 4px 12px rgba(63, 45, 24, 0.1)"
+                    }}
+                    formatter={(value) => [`$${Number(value).toLocaleString()}`, 'MRR']}
+                    labelFormatter={(label) => `${label} 2024`}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="value" 
+                    stroke="#059669" 
+                    strokeWidth={2.5} 
+                    fill="url(#mrrFill)"
+                    filter="url(#shadowMrr)"
+                  />
                 </AreaChart>
               </ResponsiveContainer>
+            </div>
+            <div className="mt-4 flex items-center justify-between pt-4 border-t border-[#ede8e0]">
+              <span className="text-xs text-[#716556]">Last 6 months</span>
+              <span className="text-sm font-semibold text-[#2a2017]">${mrrHistory[mrrHistory.length - 1].value.toLocaleString()}</span>
             </div>
           </Card>
 
           <Card className="rounded-2xl border border-[#ded2c4] bg-[#fffdf8] p-5 sm:p-6">
-            <h2 className="mb-4 text-lg font-semibold text-[#2a2017]">Product Allocation</h2>
-            <div className="flex h-[250px] items-center justify-center">
-              <div className="h-full w-full max-w-[200px]">
-                {/* Simplified Donut via SVG or Placeholder for now if no Tremor here */}
-                <div className="flex items-center justify-center h-full text-[#7b6d5b] text-sm">
-                  <div className="space-y-2">
-                    <p className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-[#2e7b62]" /> Orchard (65%)</p>
-                    <p className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-[#ac4e23]" /> Vineyard (25%)</p>
-                    <p className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-[#8a6b3f]" /> Others (10%)</p>
+            <h2 className="mb-6 text-lg font-semibold text-[#2a2017]">Revenue by Segment</h2>
+            <div className="space-y-4">
+              {[
+                { name: "Orchard", value: 65, color: "#10b981", bar: "bg-emerald-500" },
+                { name: "Vineyard", value: 25, color: "#f97316", bar: "bg-orange-500" },
+                { name: "Others", value: 10, color: "#8b7355", bar: "bg-amber-700/50" },
+              ].map((item) => (
+                <div key={item.name} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-[#2a2017]">{item.name}</span>
+                    <span className="text-sm font-semibold text-[#5f5344]">{item.value}%</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-2.5 bg-[#ede8e0] rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full transition-all ${item.bar}`}
+                        style={{ width: `${item.value}%` }}
+                      />
+                    </div>
+                    <span className="text-xs text-[#7b6d5b]">${Math.round(45000 * item.value / 100).toLocaleString()}</span>
                   </div>
                 </div>
+              ))}
+            </div>
+            <div className="mt-6 pt-6 border-t border-[#ede8e0]">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-[#716556]">Total Monthly</span>
+                <span className="text-lg font-bold text-[#2a2017]">${45000.toLocaleString()}</span>
               </div>
             </div>
           </Card>
@@ -120,18 +175,34 @@ export default function RevenuePage() {
         <section className="rounded-2xl border border-[#ddd2c2] bg-rose-50/20 p-5 sm:p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-[#211b15]">Retention & Churn Health</h2>
-            <span className="text-xs font-medium text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full">Caution: Retaining 92%</span>
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+              (revenue?.nrr || 0) >= 110 ? 'text-emerald-600 bg-emerald-100' :
+              (revenue?.nrr || 0) >= 100 ? 'text-amber-600 bg-amber-100' :
+              'text-rose-600 bg-rose-100'
+            }`}>
+              {(revenue?.nrr || 0) >= 110 ? '✓ Strong Retention' : `${revenue?.churn_rate || 0}% churn`}
+            </span>
           </div>
-          <div className="h-48 w-full flex items-end gap-2 px-2">
-            {[4.2, 3.8, 5.1, 4.5, 4.1, 4.8].map((v, i) => (
-              <div key={i} className="flex-1 bg-rose-500/10 rounded-t-lg group hover:bg-rose-500/20 transition-colors relative">
-                <div className="absolute bottom-0 left-0 right-0 bg-rose-400 rounded-t-lg transition-all" style={{ height: `${v * 15}%` }} />
-                <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-rose-700 opacity-0 group-hover:opacity-100">{v}%</span>
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-between mt-2 text-[10px] text-[#716556] font-medium px-2">
-            <span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span><span>Mar</span>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-[#5f5344]">NRR: {revenue?.nrr || 0}%</span>
+              <span className="text-xs text-[#7b6d5b]">Target: >110%</span>
+            </div>
+            <div className="w-full bg-[#ddd2c2]/20 rounded-full h-2">
+              <div 
+                className={`h-full rounded-full transition-all ${
+                  (revenue?.nrr || 0) >= 110 ? 'bg-emerald-500' :
+                  (revenue?.nrr || 0) >= 100 ? 'bg-amber-500' :
+                  'bg-rose-500'
+                }`}
+                style={{ width: `${Math.min((revenue?.nrr || 0) / 150 * 100, 100)}%` }}
+              />
+            </div>
+            <div className="text-xs text-[#716556] italic">
+              {(revenue?.nrr || 0) >= 110 ? '✓ Excellent retention - customers expanding' :
+               (revenue?.nrr || 0) >= 100 ? 'Good - maintaining existing customers' :
+               'Monitor - customer contraction or churn'}
+            </div>
           </div>
         </section>
       </div>

@@ -22,6 +22,13 @@ export default function FinanceDashboardPage() {
       const health = await api.getStartupHealth();
       const cid = health.default_company_id || "";
       setCompanyId(cid);
+      if (!cid) return;
+      const historyRes = await fetch(`${API_V1}/metrics/history/${cid}?months=6`);
+      if (historyRes.ok) {
+        const history = await historyRes.json();
+        const latestMonth = history?.[history.length - 1]?.month;
+        if (latestMonth) setMonth(latestMonth);
+      }
     };
     load();
   }, []);
@@ -102,33 +109,71 @@ export default function FinanceDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f6f3ee] text-[#1d1b19] p-8 space-y-6">
-      <Title>Finance Team Dashboard</Title>
-
-      <div className="flex items-center gap-3">
-        <input
-          type="month"
-          value={month}
-          onChange={(e) => setMonth(e.target.value)}
-          className="bg-white border border-[#e1d3c2] rounded px-3 py-2"
-        />
-        <button onClick={exportLedgerCsv} className="px-4 py-2 rounded bg-[#9a5d34] hover:bg-[#7f4c2a] text-white text-sm font-semibold">Export CSV</button>
-        <button onClick={exportSummaryPdf} className="px-4 py-2 rounded bg-[#1f1a16] hover:bg-[#151210] text-white text-sm font-semibold">Export PDF</button>
+    <div className="min-h-screen bg-[#f6f3ee] text-[#1d1b19] p-6 md:p-8 space-y-8">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-bold text-[#1d1b19]">Finance Control</h1>
+          <p className="text-[#6f655a] mt-1">Detailed ledger analysis & reconciliation for {month}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="month"
+            value={month}
+            onChange={(e) => setMonth(e.target.value)}
+            className="bg-white border border-[#e1d3c2] rounded-lg px-3 py-2 font-medium text-sm"
+          />
+          <button onClick={exportLedgerCsv} className="px-4 py-2 rounded-lg bg-[#9a5d34] hover:bg-[#7f4c2a] text-white text-sm font-semibold transition">Export CSV</button>
+          <button onClick={exportSummaryPdf} className="px-4 py-2 rounded-lg bg-[#1f1a16] hover:bg-[#151210] text-white text-sm font-semibold transition">Export PDF</button>
+        </div>
       </div>
 
-      <Card>
-        <Title>6-Month Trend</Title>
+      {/* Summary Cards */}
+      {reconciliation && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100/50 border-blue-200">
+            <div>
+              <p className="text-[#6f655a] text-xs font-semibold uppercase">Net Burn</p>
+              <p className="mt-2 text-3xl font-bold text-[#1d1b19]">{formatINR(reconciliation.netBurn)}</p>
+              <p className="text-xs text-[#6f655a] mt-1">Monthly cash burn rate</p>
+            </div>
+          </Card>
+          <Card className="bg-gradient-to-br from-amber-50 to-amber-100/50 border-amber-200">
+            <div>
+              <p className="text-[#6f655a] text-xs font-semibold uppercase">Total Expenses</p>
+              <p className="mt-2 text-3xl font-bold text-[#1d1b19]">{formatINR(reconciliation.expenseTotal)}</p>
+              <p className="text-xs text-[#6f655a] mt-1">Tech + Non-tech costs</p>
+            </div>
+          </Card>
+          <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 border-emerald-200">
+            <div>
+              <p className="text-[#6f655a] text-xs font-semibold uppercase">Variance</p>
+              <p className={`mt-2 text-3xl font-bold ${Math.abs(reconciliation.variance) < 50000 ? "text-emerald-600" : "text-red-600"}`}>
+                {Math.abs(reconciliation.variance) < 50000 ? "✓ Reconciled" : `${formatINR(reconciliation.variance)}`}
+              </p>
+              <p className="text-xs text-[#6f655a] mt-1">Burn vs expenses</p>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Trends Chart */}
+      <Card className="bg-white border-[#e4d8cb]">
+        <Title className="text-[#2a231d]">6-Month Financial Trends</Title>
         <BarChart
-          className="mt-4 h-64"
+          className="mt-6 h-80"
           data={trendSeries.length ? trendSeries : [{ month, revenue: 0, net_burn: 0, cash: 0 }]}
           index="month"
           categories={["revenue", "net_burn", "cash"]}
+          colors={["emerald", "red", "blue"]}
+          valueFormatter={(v) => `${(v / 100000).toFixed(1)}L`}
         />
       </Card>
 
-      <Card>
-        <Title>Expense Breakdown</Title>
-        <Table className="mt-4">
+      {/* Expense Breakdown Table */}
+      <Card className="bg-white border-[#e4d8cb]">
+        <Title className="text-[#2a231d]">Expense Breakdown by Category</Title>
+        <Table className="mt-6">
           <TableHead>
             <TableRow>
               <TableHeaderCell>Category</TableHeaderCell>
@@ -140,45 +185,44 @@ export default function FinanceDashboardPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((r, idx) => (
+            {rows.length > 0 ? rows.map((r, idx) => (
               <TableRow key={idx}>
-                <TableCell>{r.category}</TableCell>
-                <TableCell>{r.product}</TableCell>
-                <TableCell>{formatINR(r.amount)}</TableCell>
-                <TableCell>{r.type}</TableCell>
-                <TableCell>{r.source}</TableCell>
+                <TableCell className="capitalize font-semibold">{r.category.replace(/_/g, " ")}</TableCell>
+                <TableCell className="capitalize">{r.product}</TableCell>
+                <TableCell className="font-semibold">{formatINR(r.amount)}</TableCell>
+                <TableCell className="capitalize">{r.type}</TableCell>
+                <TableCell className="capitalize">{r.source}</TableCell>
                 <TableCell>{r.date}</TableCell>
               </TableRow>
-            ))}
+            )) : (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-6 text-[#7a6f62]">No expense data available for this period</TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </Card>
 
-      <Card>
-        <Title>Pending Review</Title>
-        <div className="mt-3 space-y-3">
-          {Object.keys(pendingReview).length === 0 && <p className="text-sm text-[#6f655a]">No pending manual entries in last 7 days.</p>}
-          {Object.entries(pendingReview as Record<string, any[]>).map(([role, entries]: [string, any[]]) => (
-            <div key={role} className="rounded-lg border border-[#e4d8cb] bg-white/70 p-3">
-              <p className="text-xs font-black uppercase tracking-[0.12em] text-[#7f6d59]">{role}</p>
-              <p className="mt-1 text-sm text-[#2a231d]">{entries.length} entries</p>
-            </div>
-          ))}
-        </div>
-      </Card>
+      {/* Pending Review Items */}
+      {Object.keys(pendingReview).length > 0 && (
+        <Card className="bg-white border-[#e4d8cb]">
+          <Title className="text-[#2a231d]">Items Pending Review</Title>
+          <div className="mt-6 space-y-3">
+            {Object.entries(pendingReview).map(([category, items]: any) => (
+              <div key={category} className="border-l-4 border-amber-400 pl-4 py-2">
+                <p className="font-semibold text-[#2a231d] capitalize">{category.replace(/_/g, " ")}</p>
+                <p className="text-sm text-[#6f655a] mt-1">{items.length} items requiring approval</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
-      <Card>
-        <Title>Net Burn Reconciliation</Title>
-        <div className="mt-3 text-sm text-[#3a3128] space-y-1">
-          <p>Net burn (ledger): {formatINR(reconciliation?.netBurn || 0)}</p>
-          <p>Expense total (breakdown): {formatINR(reconciliation?.expenseTotal || 0)}</p>
-          <p className={Math.abs(reconciliation?.variance || 0) > 50000 ? "text-rose-700 font-semibold" : "text-emerald-700 font-semibold"}>
-            Variance: {formatINR(reconciliation?.variance || 0)}
-          </p>
+      {isLoading && (
+        <div className="flex items-center justify-center py-12">
+          <p className="text-[#7a6f62]">Loading financial data...</p>
         </div>
-      </Card>
-
-      {isLoading && <p className="text-sm text-[#7a6f62]">Loading finance data...</p>}
+      )}
     </div>
   );
 }

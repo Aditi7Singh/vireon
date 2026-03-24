@@ -82,9 +82,9 @@ const moduleCards = [
 ];
 
 function formatCurrencyShort(value: number): string {
-  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}M`;
-  if (value >= 1_000) return `$${(value / 1_000).toFixed(1)}K`;
-  return `$${value.toFixed(0)}`;
+  if (value >= 1_000_000) return `₹${(value / 1_000_000).toFixed(2)}M`;
+  if (value >= 1_000) return `₹${(value / 1_000).toFixed(1)}K`;
+  return `₹${value.toFixed(0)}`;
 }
 
 export default function DashboardHomePage() {
@@ -207,34 +207,73 @@ export default function DashboardHomePage() {
               <AreaChart data={burnTrendData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="burnFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#bf7b1a" stopOpacity={0.42} />
-                    <stop offset="95%" stopColor="#bf7b1a" stopOpacity={0.05} />
+                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.35} />
+                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0.02} />
                   </linearGradient>
                   <linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2a7f5f" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#2a7f5f" stopOpacity={0.05} />
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.28} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.02} />
                   </linearGradient>
+                  <filter id="shadowChart">
+                    <feDropShadow dx="0" dy="2" stdDeviation="2" floodOpacity="0.08" />
+                  </filter>
                 </defs>
-                <XAxis axisLine={false} tickLine={false} dataKey="month" tick={{ fill: "#7f6f5e", fontSize: 12 }} />
+                <XAxis 
+                  axisLine={{ stroke: "#e8dccf", strokeWidth: 1 }} 
+                  tickLine={false} 
+                  dataKey="month" 
+                  tick={{ fill: "#7f6f5e", fontSize: 12, fontWeight: 500 }} 
+                  grid={{ horizontal: false }}
+                />
                 <YAxis
-                  axisLine={false}
+                  axisLine={{ stroke: "#e8dccf", strokeWidth: 1 }}
                   tickLine={false}
                   tickFormatter={(v) => `$${Math.round(v / 1000)}k`}
                   tick={{ fill: "#7f6f5e", fontSize: 12 }}
+                  grid={{ vertical: true, stroke: "#f5f1eb", strokeDasharray: "3 3" }}
                 />
                 <Tooltip
                   contentStyle={{
                     borderRadius: 12,
-                    border: "1px solid #d8c9b3",
-                    background: "#fffaf0",
+                    border: "1px solid #e0cfc2",
+                    background: "#fffbf5",
+                    boxShadow: "0 4px 12px rgba(63, 45, 24, 0.15)",
                     color: "#2a2118",
                   }}
                   formatter={(value: number) => [formatCurrencyShort(value)]}
+                  labelFormatter={(label) => `${label} 2024`}
                 />
-                <Area type="monotone" dataKey="burn" stroke="#b96f12" strokeWidth={2.3} fill="url(#burnFill)" />
-                <Area type="monotone" dataKey="revenue" stroke="#2c805f" strokeWidth={2.3} fill="url(#revenueFill)" />
+                <Area 
+                  type="monotone" 
+                  dataKey="burn" 
+                  stroke="#dc2626" 
+                  strokeWidth={2.4} 
+                  fill="url(#burnFill)"
+                  filter="url(#shadowChart)"
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="revenue" 
+                  stroke="#059669" 
+                  strokeWidth={2.4} 
+                  fill="url(#revenueFill)"
+                  filter="url(#shadowChart)"
+                />
               </AreaChart>
             </ResponsiveContainer>
+          </div>
+          <div className="mt-4 flex items-center justify-between gap-6 pt-4 border-t border-[#ede8df]">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="h-2.5 w-6 rounded-full bg-red-500" />
+                <span className="text-xs font-medium text-[#7a6d5d]">Monthly Burn</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-2.5 w-6 rounded-full bg-emerald-500" />
+                <span className="text-xs font-medium text-[#7a6d5d]">Revenue</span>
+              </div>
+            </div>
+            <span className="text-xs text-[#6f6251]">Sep forecast: burn declining 3.2%</span>
           </div>
         </article>
 

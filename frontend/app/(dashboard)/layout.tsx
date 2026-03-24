@@ -25,8 +25,8 @@ export default function DashboardLayout({
           const isDemoUser = user.username === "vireon_demo";
           // Map backend User model to frontend store user format
           setUser({
-            name: isDemoUser ? "Yagnasri" : user.username,
-            email: isDemoUser ? "yagnasri@vireon.ai" : (user.email || `${user.username}@vireon.ai`),
+            name: isDemoUser ? "VIREON AI" : user.username,
+            email: isDemoUser ? "ai@vireon.finance" : (user.email || `${user.username}@vireon.ai`),
             role: isDemoUser ? "CFO" : user.role
           });
         }

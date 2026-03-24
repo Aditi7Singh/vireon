@@ -75,7 +75,7 @@ export default function AgentPage() {
     <div className="min-h-screen bg-[#ece3d4] pb-10 text-[#1d1b17]">
       <TopBar title="Vireon AI Assistant" />
 
-      <div className="mx-auto grid max-w-7xl gap-5 px-4 pt-6 sm:px-6 lg:grid-cols-[1fr_300px] lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
         <section className="rounded-2xl border border-[#cfbfa9] bg-[#f8efe3] shadow-[0_16px_36px_rgba(63,45,24,0.12)]">
           <header className="border-b border-[#deceb8] p-5">
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -122,19 +122,6 @@ export default function AgentPage() {
             </form>
           </div>
         </section>
-
-        <aside className="rounded-2xl border border-[#ccbca6] bg-[#f4e8d8] p-5 h-fit space-y-4">
-          <h3 className="text-sm font-semibold text-[#2a2017]">Capabilities</h3>
-          <ul className="space-y-2 text-sm text-[#5f5243]">
-            <li>Runway and burn diagnostics</li>
-            <li>Revenue and retention insights</li>
-            <li>Scenario planning narratives</li>
-            <li>Anomaly triage with recommendations</li>
-          </ul>
-          <div className="rounded-xl border border-[#deccb5] bg-[#fff7eb] p-3 text-xs text-[#6d5a3d]">
-            Ask precise questions for better output, for example: "What changed in burn this month and why?"
-          </div>
-        </aside>
       </div>
     </div>
   );

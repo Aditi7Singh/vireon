@@ -126,3 +126,10 @@ def _send_email(recipients: List[str], subject: str, body: str) -> Tuple[bool, O
         return True, None
     except Exception as exc:
         return False, f"SMTP send failed: {exc}"
+
+
+def send_email(recipient: str, subject: str, body: str) -> Tuple[bool, Optional[str]]:
+    """Public helper for single-recipient email sends from API routes."""
+    if not recipient or "@" not in recipient:
+        return False, "Invalid email recipient"
+    return _send_email([recipient], subject, body)
