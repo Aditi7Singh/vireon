@@ -1,5 +1,5 @@
 # Vireon Feature Verification Report
-**Generated:** March 22, 2026  
+**Generated:** March 27, 2026  
 **Methodology:** Comprehensive codebase audit across backend API routers, models, services, and frontend components
 
 ---
@@ -8,13 +8,44 @@
 
 | Category | Count | Status |
 |----------|-------|--------|
-| **Fully Implemented** | 41 | ✅ Core & Intelligent features complete |
-| **Partially Implemented** | 0 | 🚧 All major milestones reached |
+| **Fully Implemented** | 34 | ✅ Core financial + AI modules complete |
+| **Partially Implemented** | 6 | 🚧 Connector depth and model/compliance depth gaps |
 | **Stubbed/Planned** | 0 | ⚠️ Mostly external connector depth |
 | **Not Started** | 0 | ✅ No major roadmap item is fully unstarted |
 | **TOTAL** | 41 | |
 
-> **Verdict:** ~95% production-ready with remaining gaps concentrated in connector depth and advanced ML sophistication
+> **Verdict:** ~92-96% pilot production-ready with remaining gaps concentrated in connector productionization, compliance controls, and advanced model depth.
+
+---
+
+## March 27, 2026 Delta (Newest Verified Implementations)
+
+### Backend completions verified
+- ✅ Invoice lifecycle module routed and live (`/api/v1/invoices/queue|dso|{id}/mark-paid|write-off|remind`)
+- ✅ Collections aging endpoint live (`GET /api/v1/collections/aging/{company_id}`)
+- ✅ Live FX sync + rates endpoints live (`POST /api/v1/fx/sync-live`, `GET /api/v1/fx/rates`)
+- ✅ Forecasting ensemble/monitor/retrain endpoints live + weekly retrain task
+- ✅ Document classify/workflow endpoints live
+- ✅ Merge conflict governance enforced during sync write-time
+- ✅ Alerts channel decision finalized: email + SMS (WhatsApp removed)
+- ✅ Plaid connector backend flow implemented:
+	- `POST /api/v1/banking/plaid/link-token`
+	- `POST /api/v1/banking/plaid/exchange-public-token`
+	- `POST /api/v1/banking/plaid/sync-transactions`
+
+### Focused regression evidence
+- ✅ `backend/tests/test_partial_features_progress.py`
+- ✅ `backend/tests/test_invoice_lifecycle.py`
+- ✅ `backend/tests/test_analytics_finance_quality.py`
+- ✅ `backend/tests/test_plaid_sync.py`
+- ✅ Latest focused run: 7 passed
+
+### Frontend parity completed
+- ✅ Operations Center UI added and linked in navigation (`/operations`) for:
+	- live FX sync + rates review
+	- forecast monitor + retrain actions
+	- collections aging + invoice queue/DSO visibility
+	- document classify/workflow actions
 
 ---
 
@@ -49,8 +80,8 @@
 
 ---
 
-### 3. **Forecasting** → ✅ 85% (NOT 60%)
-**Status:** Fully functional with multiple models  
+### 3. **Forecasting** → ✅ 90%
+**Status:** Fully functional backend with ensemble, monitoring, and retraining  
 **Evidence:**
 - ✅ SARIMA model with seasonal & non-seasonal variants
 - ✅ Prophet integration for time-series forecasting
@@ -59,10 +90,13 @@
 - ✅ Product-level & category-level breakdowns
 - ✅ Runway projection from forecast (`calculate_dynamic_runway()`)
 - ✅ API: `POST /api/v1/planning/forecasts/generate`
-- ❌ ML models (ARIMA, XGBoost) not integrated yet
-- ❌ Seasonality detection could be more sophisticated
+- ✅ Ensemble endpoint: `GET /api/v1/forecast/ensemble/{company_id}`
+- ✅ Monitoring endpoint: `GET /api/v1/forecast/monitor/{company_id}`
+- ✅ Retrain endpoint: `POST /api/v1/forecast/retrain/{company_id}`
+- ✅ Weekly retraining wired in Celery Beat
+- ⚠️ Model sophistication can still be improved (feature engineering + product granularity)
 
-**Verdict:** Linear regression baseline + Prophet = solid. Ready for production use.
+**Verdict:** Production-capable backend forecasting with ongoing model quality improvements.
 
 ---
 
@@ -108,15 +142,18 @@
 
 ---
 
-### 7. **Multi-Currency Support** → ✅ 100%
-**Status:** Complete multi-currency reporting and revaluation
+### 7. **Multi-Currency Support** → ✅ 90%
+**Status:** Backend-complete with live sync and close workflows; UI controls still partial
 **Evidence:**
 - ✅ `fx_service.py`: Full revaluation workflow with snapshots
 - ✅ **Consolidated P&L**: `generate_multi_currency_pl` aggregates Ledger in INR with source tracking
 - ✅ API: `GET /api/v1/reports/pl/multi-currency`
+- ✅ API: `POST /api/v1/fx/sync-live`
+- ✅ API: `GET /api/v1/fx/rates`
 - ✅ Unit Tests: Multi-currency aggregation verified in `test_phase2.py`
+- ⚠️ UI controls for conversion/revaluation workflows are not fully surfaced across dashboards
 
-**Verdict:** Ready for production.
+**Verdict:** Backend production-ready; frontend parity pending.
 
 ---
 
@@ -127,9 +164,10 @@
 - ✅ API endpoints active: `GET /banking/transactions`, `POST /banking/sync/{feed_id}`
 - ✅ Local sync enrichment implemented: category inference + SaaS-like tagging
 - ✅ Duplicate candidate detection heuristic implemented (merchant/amount/date)
-- ❌ No Plaid integration
-- ❌ No production-grade bank connector ingestion yet
-- **Effort:** Medium-High (connectorization + reconciliation hardening)
+- ✅ Plaid backend connector flow implemented (link token, token exchange, transaction ingestion)
+- ✅ Plaid ingested transactions persist to `BankFeed` and `BankingTransaction`
+- ⚠️ Secure token vaulting + full reconciliation UX still pending
+- **Effort:** Medium (credentials hardening + reconciliation workflow UX)
 
 ---
 
@@ -176,7 +214,7 @@
 
 ---
 
-### **Depreciation** → See above (20%)
+### **Depreciation** → See above (100%)
 
 ---
 
@@ -255,7 +293,7 @@
 
 ### **Headcount Costs** → ✅ 70%
 - ✅ Active employees rolled up
-- ⚠️ Pending hires NOT included (needs `hire_date` forecasting)
+- ✅ Pending hire forecasting support implemented via `hire_date`-aware cost projections
 - ⚠️ No benefits/overhead breakdown
 - **Effort:** Low (4-6 hours)
 
@@ -294,13 +332,13 @@
 
 ---
 
-### **Runway Alerts** → ✅ 85%
+### **Runway Alerts** → ✅ 90%
 - ✅ Daily Celery task checks runway vs. threshold
 - ✅ Creates `RunwayAlert` (WARNING/CRITICAL levels)
-- ✅ Notification routing is email-based with SMTP and fallback recipient handling
+- ✅ Notification routing supports email (SMTP) + SMS (Twilio)
 - ✅ API: `GET /alerts/active/{company_id}`
-- ⚠️ WhatsApp alerts not implemented (email placeholder only)
-- **Verdict:** Email-first notifications are operational; extensible.
+- ✅ WhatsApp intentionally removed as an active channel
+- **Verdict:** Email+SMS notifications are operational.
 
 ---
 
@@ -342,7 +380,8 @@
 - ✅ Circuit breaker pattern for reliability
 - ✅ Auto-scheduled daily via Celery Beat (4:00 AM UTC)
 - ✅ Token/API key management via environment
-- ❌ No conflict resolution for manual vs sync overrides
+- ✅ Conflict policy enforcement for manual vs sync overrides
+- ✅ Conflict skip telemetry in sync response stats
 
 **Roadmap Note:** Merge.dev is now fully functional for QuickBooks/Xero data ingestion.
 
@@ -496,15 +535,13 @@
 
 ---
 
-### 🚧 Partially Working (8 features)
+### 🚧 Partially Working (6 features)
 1. Cloud cost tracking (schema, no cloud API) 🚧
 2. SaaS detection (basic, no ML) 🚧
 3. Recommendations (rule-based, no advanced ML ranker) 🚧
-4. Merge.dev accounting 🚧 (client class only)
-5. Runway alerts (email-first, no WhatsApp) 🚧
-6. Document Upload (provider hardening pending) 🚧
-7. Hiring Calculator (Advanced burden logic wired) 🚧
-8. P&L drill-down (partial) 🚧
+4. Document Upload (provider hardening pending) 🚧
+5. Hiring Calculator (Advanced burden logic wired) 🚧
+6. P&L drill-down (partial) 🚧
 
 ---
 
@@ -527,14 +564,14 @@ No top-level roadmap feature is fully unstarted; multi-company has baseline grou
 
 ### 🟠 HIGH (Product gaps)
 4. **Cloud API connectors** (3-4 days) - Pull AWS/GCP cost data automatically
-5. **Merge.dev conflict governance** (2-3 days) - Resolve manual vs sync override policy with auditability
+5. **Plaid connector productionization** (3-5 days) - Auth/token exchange, account linking, transaction ingest, reconciliation
 6. **SaaS ML Classifier** (2 days) - Move from heuristics to ML
 
 ### 🟡 MEDIUM (Polish)
 7. **ProductML forecasting** (3-4 days) - Replace linear regression with ARIMA/Prophet by product
 8. **Budget variance drill-down** (1 day) - Complete UI integration
 9. **PDF reporting enhancements** (1-2 days) - Improve layout depth and additional statement sections
-10. **WhatsApp alerts** (1 day)
+10. **Collections and forecasting UX depth (charts/workflow depth)** (2-4 days)
 
 ---
 
@@ -563,7 +600,7 @@ No top-level roadmap feature is fully unstarted; multi-company has baseline grou
 |-------|----------|--------|-----------|
 | OCR/storage requires production credentials | 🟠 High | Managed OCR + object storage unavailable in production until secrets are set | 3-5 days |
 | ERPNext sync issues | 🟡 Medium | Data staleness risk | 3 days |
-| Merge.dev policy conflict handling | 🟠 High | Manual vs connector updates can drift without strong governance | 3-4 days |
+| Plaid secure token vaulting + reconciliation UX | 🟠 High | Connector works but still needs hardened token storage and user-facing matching workflow | 3-5 days |
 | Forecast not by product | 🟡 Medium | Runway accuracy ~±30% | 1 week |
 | Consolidation elimination heuristics | 🟡 Medium | Intercompany elimination may over/under-eliminate without stricter rules | 1 week |
 
@@ -599,16 +636,44 @@ No top-level roadmap feature is fully unstarted; multi-company has baseline grou
 
 ## Conclusion
 
-**Vireon is ~95% complete** based on the core financial automation roadmap. 
+**Vireon is ~90-95% complete** based on the core financial automation roadmap. 
 - Core burn/runway calculations are solid ✅
 - Automated ledger posting for Depreciation & Loans is operational ✅
 - Advanced anomaly detection covers Revenue, Expense, and Data Integrity ✅
 - Scheduled integration sync ensures data freshness ✅
-- Test coverage and CI depth have improved with startup, dashboard API, and full-suite backend runs.
+- Test coverage depth improved with focused analytics quality, invoice lifecycle, and partial-feature closure suites.
 
 **For the next milestone, prioritize:**
 1. Integration with Cloud APIs (AWS/GCP) for real-time cost tracking (~1 week)
-2. Expanding ML forecasting to product-level granularity (~1-2 weeks)
-3. Merge.dev policy and reconciliation hardening (~3-4 days)
-4. Advanced ML layer (forecasting/recommendation sophistication) (~1-2 weeks)
+2. Plaid secure token vaulting + reconciliation workflow UX (~1 week)
+3. Advanced ML layer (forecasting/recommendation sophistication) (~1-2 weeks)
+4. Compliance/audit controls hardening (~1-2 weeks)
+
+---
+
+## Updated Known Limitations Checklist (March 27, 2026)
+
+- [ ] Advanced tax optimization algorithms
+- [ ] Real-time Stripe/payment gateway integration
+- [x] Invoice lifecycle management (backend APIs)
+- [ ] Purchase order automation
+- [x] Budget vs actual analysis
+- [x] Comparative period analysis
+- [x] Custom report builder
+- [x] Data export to BigQuery/Snowflake (provider-compatible warehouse export hook)
+- [x] Multi-currency backend support completion (UI controls pending)
+- [x] Advanced forecasting with ML ensemble (monitoring + retraining wired)
+- [x] Document processing with OCR (classification + workflow actions)
+- [x] Vendor performance scoring
+- [x] Cash flow forecasting
+- [x] Working capital optimization
+- [x] Credit analysis and risk scoring
+- [ ] Audit trail and compliance logging
+- [ ] Machine learning model marketplace integration
+- [ ] Advanced anomaly detection with auto-correction suggestions
+- [ ] Blockchain-based audit trail
+- [ ] Real-time ERP sync (vs periodic)
+- [ ] Voice-based financial commands
+- [ ] Regulatory compliance automation (SOX, GDPR, etc.)
+- [ ] White-label SaaS platform
 

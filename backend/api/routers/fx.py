@@ -12,6 +12,7 @@ import database
 import models
 from services.fx_service import run_revaluation
 from services.fx_close_service import preview_fx_close, post_fx_close_entries, approve_fx_close_batch
+from services.fx_provider_service import fetch_live_inr_rates, upsert_rates_for_today
 
 
 router = APIRouter(prefix="/fx", tags=["fx"])
@@ -30,6 +31,10 @@ class FxClosePostRequest(BaseModel):
 
 class FxCloseApproveRequest(BaseModel):
     approved_by: str = "finance"
+
+
+class LiveFxSyncRequest(BaseModel):
+    currencies: list[str] = ["USD", "EUR", "GBP"]
 
 
 @router.post("/sync-default")
@@ -74,6 +79,67 @@ def sync_default_rates(
     db.commit()
 
     return {"synced": upserted, "effective_date": today.isoformat()}
+
+
+@router.post("/sync-live")
+def sync_live_rates(
+    payload: LiveFxSyncRequest,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    """Sync live FX rates from an external provider; falls back to defaults on provider failure."""
+    try:
+        rates = fetch_live_inr_rates(payload.currencies)
+        synced = upsert_rates_for_today(db, rates)
+        return {
+            "success": True,
+            "source": "live_provider",
+            "synced": synced,
+            "effective_date": date.today().isoformat(),
+            "rates": {k: float(v) for k, v in rates.items()},
+        }
+    except Exception as exc:
+        # Fallback path keeps production operations resilient.
+        fallback = {
+            "USD": Decimal("83.000000"),
+            "EUR": Decimal("90.000000"),
+            "GBP": Decimal("105.000000"),
+            "INR": Decimal("1.000000"),
+        }
+        synced = upsert_rates_for_today(db, fallback)
+        return {
+            "success": True,
+            "source": "fallback_defaults",
+            "synced": synced,
+            "effective_date": date.today().isoformat(),
+            "warning": f"Live provider unavailable: {exc}",
+            "rates": {k: float(v) for k, v in fallback.items()},
+        }
+
+
+@router.get("/rates")
+def list_rates(
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    rows = (
+        db.query(models.ExchangeRate)
+        .filter(models.ExchangeRate.target_currency == "INR", models.ExchangeRate.status == "active")
+        .order_by(models.ExchangeRate.effective_date.desc(), models.ExchangeRate.base_currency.asc())
+        .all()
+    )
+    return {
+        "count": len(rows),
+        "rates": [
+            {
+                "base_currency": r.base_currency,
+                "target_currency": r.target_currency,
+                "exchange_rate": float(r.exchange_rate or 0),
+                "effective_date": r.effective_date.isoformat(),
+            }
+            for r in rows
+        ],
+    }
 
 
 @router.post("/convert")

@@ -1,8 +1,112 @@
 # Vireon Project Status & Roadmap
 
-**Version**: 1.0.0  
-**Last Updated**: March 24, 2026  
-**Status**: ✅ **STABLE - Production Ready**
+**Version**: 1.1.0  
+**Last Updated**: March 27, 2026  
+**Status**: ✅ **STABLE - Pilot Production Ready (Commercialization In Progress)**
+
+---
+
+## March 27, 2026 Verification Update (Code + Test Aligned)
+
+This snapshot aligns project status with implemented code paths and focused regression evidence.
+
+### Verified Since Last Update
+- Live FX sync and rates listing are active:
+  - `POST /api/v1/fx/sync-live`
+  - `GET /api/v1/fx/rates`
+- Forecasting quality controls are active:
+  - `GET /api/v1/forecast/ensemble/{company_id}`
+  - `GET /api/v1/forecast/monitor/{company_id}`
+  - `POST /api/v1/forecast/retrain/{company_id}`
+  - weekly scheduled retraining task in Celery Beat
+- Document pipeline is now workflow-capable:
+  - `POST /api/v1/documents/{document_id}/classify`
+  - `POST /api/v1/documents/{document_id}/workflow`
+- Invoice lifecycle backend is active:
+  - queue/DSO/mark-paid/write-off/remind endpoints available under `/api/v1/invoices/*`
+- Collections endpoint is active:
+  - `GET /api/v1/collections/aging/{company_id}`
+- Alerting channels are email + SMS (WhatsApp removed by product decision).
+- Frontend Operations Center is now available at `/operations` and wired to:
+  - live FX sync/rates,
+  - forecast monitor/retrain,
+  - collections aging and invoice queue/DSO,
+  - document classify/workflow actions.
+- Plaid connector backend flow is active for bank ingest:
+  - `POST /api/v1/banking/plaid/link-token`
+  - `POST /api/v1/banking/plaid/exchange-public-token`
+  - `POST /api/v1/banking/plaid/sync-transactions`
+
+### Focused Test Evidence (Current)
+- `backend/tests/test_partial_features_progress.py`
+- `backend/tests/test_invoice_lifecycle.py`
+- `backend/tests/test_analytics_finance_quality.py`
+- `backend/tests/test_plaid_sync.py`
+- Latest focused run: **7 passed**.
+
+---
+
+## March 26, 2026 Hardening Update (Sellability Focus)
+
+This update reflects a deeper productization review against buyer expectations for QuickBooks-class financial software.
+
+### What Was Rectified In Code (Now Implemented)
+- Deterministic revenue dynamics replaced placeholder values in analytics API:
+  - growth % now computed from latest vs previous month
+  - churn proxy and NRR derived from observed revenue contraction/expansion
+- Cash position API now derives AR/AP from real open invoices instead of fixed numbers.
+- Runway API now computes a real zero-cash date and confidence level from available history depth.
+- New collections endpoint added for operations teams:
+  - `GET /api/v1/collections/aging/{company_id}`
+  - returns AR/AP aging buckets and overdue receivables worklist
+- Invoice lifecycle automation module added:
+  - `GET /api/v1/invoices/queue/{company_id}` collections priority queue
+  - `GET /api/v1/invoices/dso/{company_id}` DSO calculation
+  - `POST /api/v1/invoices/{invoice_id}/mark-paid` partial/full settlement
+  - `POST /api/v1/invoices/{invoice_id}/write-off` controlled write-off closure
+  - `POST /api/v1/invoices/{invoice_id}/remind` reminder dispatch (email)
+- Notification channels now follow product requirement change:
+  - WhatsApp removed
+  - email + SMS remain supported
+- Merge.dev conflict policy now enforced at sync write-time (source_of_truth / latest_timestamp_wins / manual_review).
+
+### Test Evidence (Post-Rectification)
+- Added focused analytics quality tests in `backend/tests/test_analytics_finance_quality.py`.
+- Added invoice lifecycle tests in `backend/tests/test_invoice_lifecycle.py`.
+- Existing regression tests still pass.
+- Current focused suite result: superseded by March 27 focused run (**6 passed** across the latest tri-suite).
+
+### Commercial Readiness: Honest Assessment
+Vireon is strong for AI-assisted financial intelligence, but for broad SMB accounting replacement it still needs a few must-have operational modules.
+
+#### Ready/Strong
+- CFO analytics (burn, runway, scenario simulation)
+- AI financial copilot experience
+- Alerting, anomaly detection, and reporting exports
+- ERP-centric sync architecture with background workers
+
+#### Must-Have For QuickBooks-Competitive Sales Motion
+1. Bank connector productionization (Plaid auth + transaction ingest + reconciliation workflow)
+2. Full invoice lifecycle (draft/send/reminders/payment matching/write-off)
+3. Collections module (DSO, collector queue, promises-to-pay, dispute states)
+4. Accounting close controls (period lock, close checklist, approvals, audit-grade immutability)
+5. Stronger compliance posture (role segregation, immutable logs, controls evidence)
+
+### Recommended Build Plan (Revenue-First)
+#### Phase A (2-3 weeks)
+- Bank feeds production rollout (Plaid)
+- Collections operations UI + collector workflow (backend endpoints implemented)
+- Invoice lifecycle frontend UX polish (backend automation implemented)
+
+#### Phase B (2-4 weeks)
+- Cloud billing live connectors (AWS/GCP)
+- Product-level forecasting with retraining scheduler
+- Close workflow hardening (period lock + approval chain)
+
+#### Phase C (4-6 weeks)
+- Compliance controls package (SOX-lite controls map, immutable audit events)
+- Multi-entity consolidation hardening + intercompany eliminations
+- Partner-ready deployment packaging and onboarding templates
 
 ---
 
@@ -127,23 +231,23 @@ Vireon is a fully functional AI-powered financial intelligence platform integrat
 ### Multi-currency Support
 - ✅ Currency capture in transactions
 - ✅ INR normalization logic
-- ⏳ FX rate sync from external APIs
-- ⏳ Currency conversion UI controls
-- ⏳ Revaluation workflows
+- ✅ FX rate sync from external APIs (`POST /api/v1/fx/sync-live`, fallback-safe)
+- ✅ Operations UI controls for FX sync/rates surfaced in frontend (`/operations`)
+- ✅ Revaluation workflows (snapshot + close preview/post/approve APIs)
 
 ### Advanced ML Forecasting
 - ✅ SARIMA model implementation
 - ✅ Prophet fallback model
-- ⏳ Model performance monitoring
-- ⏳ Automated retraining pipeline
-- ⏳ Ensemble forecasting
+- ✅ Model performance monitoring endpoint (`GET /api/v1/forecast/monitor/{company_id}`)
+- ✅ Automated retraining pipeline (weekly Celery task + on-demand API)
+- ✅ Ensemble forecasting (`GET /api/v1/forecast/ensemble/{company_id}`)
 
 ### Document Processing
 - ✅ Backend upload/status pipeline
 - ✅ File storage infrastructure
-- ⏳ OCR extraction implementation
-- ⏳ Document classification
-- ⏳ Workflow automation
+- ✅ OCR extraction implementation (local + optional Textract path)
+- ✅ Document classification (`POST /api/v1/documents/{document_id}/classify`)
+- ✅ Workflow automation actions (`POST /api/v1/documents/{document_id}/workflow`)
 
 ---
 
@@ -152,21 +256,21 @@ Vireon is a fully functional AI-powered financial intelligence platform integrat
 ### Short-term (Q2 2026)
 - [ ] Advanced tax optimization algorithms
 - [ ] Real-time Stripe/payment gateway integration
-- [ ] Invoice lifecycle management
+- [x] Invoice lifecycle management (backend APIs)
 - [ ] Purchase order automation
-- [ ] Budget vs actual analysis
-- [ ] Comparative period analysis
-- [ ] Custom report builder
-- [ ] Data export to BigQuery/Snowflake
+- [x] Budget vs actual analysis
+- [x] Comparative period analysis (`GET /api/v1/metrics/comparative/{company_id}`)
+- [x] Custom report builder (`POST /api/v1/reports/custom/build`)
+- [x] Data export to BigQuery/Snowflake (`POST /api/v1/reports/export/warehouse`, provider-compatible CSV export hook)
 
 ### Medium-term (Q3-Q4 2026)
-- [ ] Multi-currency support completion
-- [ ] Advanced forecasting with ML ensemble
-- [ ] Document processing with OCR
-- [ ] Vendor performance scoring
-- [ ] Cash flow forecasting
-- [ ] Working capital optimization
-- [ ] Credit analysis and risk scoring
+- [x] Multi-currency backend support completion (UI controls pending)
+- [x] Advanced forecasting with ML ensemble (monitoring + retraining wired)
+- [x] Document processing with OCR (classification + workflow actions)
+- [x] Vendor performance scoring (`GET /api/v1/vendors/performance/{company_id}`)
+- [x] Cash flow forecasting (`GET /api/v1/cash-flow/forecast/{company_id}`)
+- [x] Working capital optimization (`GET /api/v1/working-capital/optimize/{company_id}`)
+- [x] Credit analysis and risk scoring (`GET /api/v1/credit/risk/{company_id}`)
 - [ ] Audit trail and compliance logging
 
 ### Long-term (2027+)
@@ -217,7 +321,7 @@ Vireon is a fully functional AI-powered financial intelligence platform integrat
 
 ### Backend
 - **FastAPI**: Latest
-- **Python**: 3.11
+- **Python**: 3.9+
 - **ORM**: SQLAlchemy
 - **Migrations**: Alembic
 - **Job Queue**: Celery + Redis
@@ -274,7 +378,7 @@ Vireon is a fully functional AI-powered financial intelligence platform integrat
 
 ## 📈 Deployment Readiness
 
-### Current Status: ✅ **PRODUCTION READY**
+### Current Status: ✅ **PILOT PRODUCTION READY**
 
 **Tested Deployment Scenarios**:
 - ✅ Local Docker Compose (dev environment)
@@ -361,5 +465,5 @@ Vireon is a fully functional AI-powered financial intelligence platform integrat
 
 ---
 
-**Last Updated**: March 24, 2026  
+**Last Updated**: March 27, 2026  
 **Next Review**: Q2 2026

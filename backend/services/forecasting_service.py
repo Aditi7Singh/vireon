@@ -331,13 +331,118 @@ def save_forecast_to_db(company_id: UUID, forecast_data: dict, db: Session):
     projections = forecast_data.get("monthly_projections", [])
     for row in projections:
         forecast_date = datetime.strptime(row["month"], "%Y-%m-%d").date()
-        item = models.Forecast(
-            company_id=company_id,
-            forecast_date=forecast_date,
-            mrr_predicted=row.get("projected_revenue", 0),
-            cash_predicted=row.get("cumulative_cash", 0),
-            confidence_lower=row.get("cumulative_cash", 0) * 0.9,
-            confidence_upper=row.get("cumulative_cash", 0) * 1.1,
+        existing = (
+            db.query(models.Forecast)
+            .filter(models.Forecast.company_id == company_id, models.Forecast.forecast_date == forecast_date)
+            .first()
         )
-        db.add(item)
+        if existing:
+            existing.mrr_predicted = row.get("projected_revenue", 0)
+            existing.cash_predicted = row.get("cumulative_cash", 0)
+            existing.confidence_lower = row.get("cumulative_cash", 0) * 0.9
+            existing.confidence_upper = row.get("cumulative_cash", 0) * 1.1
+        else:
+            item = models.Forecast(
+                company_id=company_id,
+                forecast_date=forecast_date,
+                mrr_predicted=row.get("projected_revenue", 0),
+                cash_predicted=row.get("cumulative_cash", 0),
+                confidence_lower=row.get("cumulative_cash", 0) * 0.9,
+                confidence_upper=row.get("cumulative_cash", 0) * 1.1,
+            )
+            db.add(item)
     db.commit()
+
+
+def _moving_average_forecast(df: pd.DataFrame, periods: int = 12) -> pd.DataFrame:
+    if df.empty:
+        dates = pd.date_range(start=pd.Timestamp.today().normalize(), periods=periods, freq="MS")
+        return pd.DataFrame({"ds": dates, "yhat": [0.0] * periods})
+    window = min(3, len(df))
+    base = float(df["y"].tail(window).mean())
+    start = pd.to_datetime(df["ds"].iloc[-1])
+    dates = pd.date_range(start=start, periods=periods, freq="MS")
+    return pd.DataFrame({"ds": dates, "yhat": [base] * periods})
+
+
+def calculate_ensemble_runway(company_id: UUID, db: Session) -> dict:
+    """Blend SARIMA-family forecast with moving-average baseline for robustness."""
+    current_cash = _current_cash_inr(company_id, db)
+    burn_df = prepare_monthly_timeseries(company_id, db, entry_type="debit")
+    revenue_df = prepare_monthly_timeseries(company_id, db, entry_type="credit")
+
+    burn_model = fit_sarima_model(burn_df)
+    rev_model = fit_sarima_model(revenue_df)
+    burn_ma = _moving_average_forecast(burn_df)
+    rev_ma = _moving_average_forecast(revenue_df)
+
+    burn_fc = burn_model["forecast_df"].copy()
+    rev_fc = rev_model["forecast_df"].copy()
+    burn_fc["yhat"] = (burn_fc["yhat"] * 0.7) + (burn_ma["yhat"] * 0.3)
+    rev_fc["yhat"] = (rev_fc["yhat"] * 0.7) + (rev_ma["yhat"] * 0.3)
+
+    runway_data = _runway_from_projection(current_cash, burn_fc, rev_fc)
+    return {
+        "current_cash_inr": current_cash,
+        "runway_months": runway_data["runway_months"],
+        "runway_date": runway_data["runway_date"],
+        "monthly_projections": runway_data["monthly_projections"],
+        "model_used": f"ensemble({burn_model['model_type']}+moving_average, {rev_model['model_type']}+moving_average)",
+        "weights": {"primary": 0.7, "moving_average": 0.3},
+        "last_updated": datetime.utcnow().isoformat(),
+    }
+
+
+def monitor_forecast_accuracy(company_id: UUID, db: Session, lookback_months: int = 6) -> dict:
+    """Calculate lightweight forecast monitoring metrics (MAE/MAPE) for predicted cash."""
+    if lookback_months <= 0:
+        lookback_months = 6
+
+    actuals = (
+        db.query(models.MonthlyMetric)
+        .filter(models.MonthlyMetric.company_id == company_id)
+        .order_by(models.MonthlyMetric.metric_month.desc())
+        .limit(lookback_months)
+        .all()
+    )
+    if not actuals:
+        return {"company_id": str(company_id), "samples": 0, "mae_cash": 0.0, "mape_cash": 0.0}
+
+    actual_map = {a.metric_month: float(a.ending_cash or 0) for a in actuals}
+    forecasts = (
+        db.query(models.Forecast)
+        .filter(models.Forecast.company_id == company_id, models.Forecast.forecast_date.in_(list(actual_map.keys())))
+        .all()
+    )
+    if not forecasts:
+        return {
+            "company_id": str(company_id),
+            "samples": 0,
+            "mae_cash": 0.0,
+            "mape_cash": 0.0,
+            "message": "No overlapping forecast snapshots for monitoring window",
+        }
+
+    errors = []
+    ape_values = []
+    for f in forecasts:
+        actual_cash = actual_map.get(f.forecast_date)
+        if actual_cash is None:
+            continue
+        predicted = float(f.cash_predicted or 0)
+        err = abs(actual_cash - predicted)
+        errors.append(err)
+        if actual_cash != 0:
+            ape_values.append((err / abs(actual_cash)) * 100)
+
+    mae = float(np.mean(errors)) if errors else 0.0
+    mape = float(np.mean(ape_values)) if ape_values else 0.0
+    health = "healthy" if mape <= 15 else "watch" if mape <= 30 else "degraded"
+
+    return {
+        "company_id": str(company_id),
+        "samples": len(errors),
+        "mae_cash": round(mae, 2),
+        "mape_cash": round(mape, 2),
+        "health": health,
+    }

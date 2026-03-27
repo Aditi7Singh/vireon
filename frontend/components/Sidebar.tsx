@@ -21,7 +21,8 @@ import {
   LogOut,
   Landmark,
   Grid3X3,
-  Cpu
+  Cpu,
+  Workflow
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -31,6 +32,7 @@ import { Logo } from "./Logo";
 const navItems = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { name: "Feature Hub", path: "/features", icon: Grid3X3 },
+  { name: "Operations", path: "/operations", icon: Workflow },
   { name: "CTO Planner", path: "/dashboard/cto", icon: Cpu },
   { name: "Runway", path: "/runway", icon: Wallet },
   { name: "Expenses", path: "/expenses", icon: Receipt },

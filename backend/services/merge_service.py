@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 import models
 from integrations.merge_client import MergeAccountingClient
+from services.connector_policy import load_connector_policy, parse_timestamp, should_apply_connector_update
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,9 @@ class MergeService:
         if not self.company:
             return {"error": "Company not found"}
             
-        stats = {"accounts": 0, "invoices": 0, "gl_entries": 0}
+        stats = {"accounts": 0, "invoices": 0, "gl_entries": 0, "conflicts_skipped": 0}
+        policy = load_connector_policy().get("merge", "source_of_truth")
+        conflict_samples: List[dict] = []
         
         try:
             # 1. Sync GL Accounts
@@ -32,12 +35,35 @@ class MergeService:
             for acc in merge_accounts:
                 remote_id = acc.get("id")
                 db_acc = self.db.query(models.Account).filter(models.Account.remote_id == remote_id).first()
+                incoming_modified = parse_timestamp(
+                    acc.get("remote_modified_at") or acc.get("updated_at") or acc.get("modified_at")
+                )
                 if not db_acc:
                     db_acc = models.Account(remote_id=remote_id, company_id=self.company_id)
                     self.db.add(db_acc)
+                else:
+                    should_apply, reason = should_apply_connector_update(
+                        policy=policy,
+                        connector="merge",
+                        incoming_ts=incoming_modified,
+                        local_updated_at=db_acc.updated_at,
+                        local_remote_modified_at=db_acc.remote_modified_at,
+                    )
+                    if not should_apply:
+                        stats["conflicts_skipped"] += 1
+                        if len(conflict_samples) < 20:
+                            conflict_samples.append({
+                                "entity": "account",
+                                "remote_id": remote_id,
+                                "reason": reason,
+                            })
+                        continue
+
                 db_acc.name = acc.get("name")
                 db_acc.classification = acc.get("classification")
                 db_acc.type = acc.get("type")
+                if incoming_modified:
+                    db_acc.remote_modified_at = incoming_modified
                 account_map[remote_id] = db_acc
                 stats["accounts"] += 1
             
@@ -48,6 +74,9 @@ class MergeService:
             for entry in journal_entries:
                 remote_id = entry.get("id")
                 db_gl = self.db.query(models.GeneralLedger).filter(models.GeneralLedger.reference_id == remote_id).first()
+                incoming_modified = parse_timestamp(
+                    entry.get("updated_at") or entry.get("modified_at") or entry.get("transaction_date")
+                )
                 if not db_gl:
                     # In a real sync, we'd handle debits/credits from line items
                     # For this prototype, we'll map the main entry
@@ -57,6 +86,24 @@ class MergeService:
                         source_type="merge"
                     )
                     self.db.add(db_gl)
+                else:
+                    should_apply, reason = should_apply_connector_update(
+                        policy=policy,
+                        connector="merge",
+                        incoming_ts=incoming_modified,
+                        local_updated_at=db_gl.updated_at,
+                        local_remote_modified_at=None,
+                        local_source=db_gl.source_type,
+                    )
+                    if not should_apply:
+                        stats["conflicts_skipped"] += 1
+                        if len(conflict_samples) < 20:
+                            conflict_samples.append({
+                                "entity": "general_ledger",
+                                "remote_id": remote_id,
+                                "reason": reason,
+                            })
+                        continue
                 
                 db_gl.transaction_date = datetime.strptime(entry["transaction_date"][:10], "%Y-%m-%d").date() if entry.get("transaction_date") else datetime.utcnow().date()
                 db_gl.description = entry.get("memo") or f"Merge Sync: {remote_id}"
@@ -86,6 +133,9 @@ class MergeService:
             for inv in merge_invoices:
                 remote_id = inv.get("id")
                 db_inv = self.db.query(models.Invoice).filter(models.Invoice.remote_id == remote_id).first()
+                incoming_modified = parse_timestamp(
+                    inv.get("remote_modified_at") or inv.get("updated_at") or inv.get("modified_at")
+                )
                 
                 inv_type = "ACCOUNTS_RECEIVABLE" if inv.get("type") == "SALES_INVOICE" else "ACCOUNTS_PAYABLE"
                 
@@ -102,15 +152,34 @@ class MergeService:
                 }
                 
                 if db_inv:
+                    should_apply, reason = should_apply_connector_update(
+                        policy=policy,
+                        connector="merge",
+                        incoming_ts=incoming_modified,
+                        local_updated_at=db_inv.updated_at,
+                        local_remote_modified_at=db_inv.remote_modified_at,
+                    )
+                    if not should_apply:
+                        stats["conflicts_skipped"] += 1
+                        if len(conflict_samples) < 20:
+                            conflict_samples.append({
+                                "entity": "invoice",
+                                "remote_id": remote_id,
+                                "reason": reason,
+                            })
+                        continue
                     for k, v in inv_data.items(): setattr(db_inv, k, v)
+                    if incoming_modified:
+                        db_inv.remote_modified_at = incoming_modified
                 else:
                     db_inv = models.Invoice(remote_id=remote_id, company_id=self.company_id, **inv_data)
+                    db_inv.remote_modified_at = incoming_modified
                     self.db.add(db_inv)
                 stats["invoices"] += 1
 
             self.company.last_sync_merge = datetime.utcnow()
             self.db.commit()
-            return {"status": "success", "stats": stats}
+            return {"status": "success", "stats": stats, "policy": policy, "conflicts": conflict_samples}
             
         except Exception as e:
             logger.error(f"Merge Sync Failed: {e}")

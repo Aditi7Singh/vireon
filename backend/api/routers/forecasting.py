@@ -11,6 +11,8 @@ from services.forecasting_service import (
     prepare_monthly_timeseries,
     fit_sarima_model,
     save_forecast_to_db,
+    calculate_ensemble_runway,
+    monitor_forecast_accuracy,
 )
 
 router = APIRouter(prefix="/forecast", tags=["forecast"])
@@ -51,3 +53,26 @@ def refresh_forecast(company_id: UUID, db: Session = Depends(database.get_db)):
     forecast = calculate_dynamic_runway(company_id, db)
     save_forecast_to_db(company_id, forecast, db)
     return {"success": True, "message": "Forecast refreshed", "company_id": str(company_id)}
+
+
+@router.get("/ensemble/{company_id}")
+def ensemble_runway(company_id: UUID, db: Session = Depends(database.get_db)):
+    return calculate_ensemble_runway(company_id, db)
+
+
+@router.get("/monitor/{company_id}")
+def forecast_monitor(company_id: UUID, lookback_months: int = 6, db: Session = Depends(database.get_db)):
+    return monitor_forecast_accuracy(company_id, db, lookback_months=lookback_months)
+
+
+@router.post("/retrain/{company_id}")
+def retrain_forecast(company_id: UUID, db: Session = Depends(database.get_db)):
+    forecast = calculate_ensemble_runway(company_id, db)
+    save_forecast_to_db(company_id, forecast, db)
+    monitor = monitor_forecast_accuracy(company_id, db, lookback_months=6)
+    return {
+        "success": True,
+        "company_id": str(company_id),
+        "message": "Ensemble forecast retrained and persisted",
+        "monitoring": monitor,
+    }

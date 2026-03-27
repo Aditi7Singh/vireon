@@ -5,8 +5,10 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from fastapi.responses import StreamingResponse
 import io
-from typing import Optional
-from datetime import date
+from typing import Optional, List, Dict
+from datetime import date, datetime, timedelta
+from pydantic import BaseModel
+from sqlalchemy import func
 
 import models
 import schemas
@@ -20,11 +22,85 @@ from services import burn_service
 router = APIRouter(prefix="", tags=["analytics", "scenarios"])
 
 
+class ComparativePeriodRequest(BaseModel):
+    current_month: Optional[str] = None
+    previous_month: Optional[str] = None
+
+
+def _parse_month(month_text: str) -> date:
+    return datetime.strptime(month_text, "%Y-%m").date().replace(day=1)
+
+
+def _safe_metric(metric: Optional[models.MonthlyMetric]) -> Dict[str, float]:
+    if not metric:
+        return {"revenue": 0.0, "expenses": 0.0, "cash": 0.0, "net_burn": 0.0}
+    revenue = float(metric.total_revenue or 0)
+    expenses = float(metric.total_expenses or 0)
+    return {
+        "revenue": revenue,
+        "expenses": expenses,
+        "cash": float(metric.ending_cash or 0),
+        "net_burn": float(expenses - revenue),
+    }
+
+
 def _default_company_id(db: Session) -> UUID:
     company_row = db.query(models.Company.id).order_by(models.Company.created_at.asc()).first()
     if not company_row:
         raise HTTPException(status_code=404, detail="No company found")
     return company_row[0]
+
+
+def _format_runway_zero_date(runway_months: float) -> str:
+    if runway_months <= 0:
+        return "N/A"
+    days = int(runway_months * 30.44)
+    return (datetime.utcnow().date() + timedelta(days=days)).isoformat()
+
+
+def _runway_confidence(db: Session, company_id: UUID) -> str:
+    metric_count = db.query(models.MonthlyMetric).filter(models.MonthlyMetric.company_id == company_id).count()
+    if metric_count >= 12:
+        return "High"
+    if metric_count >= 6:
+        return "Medium"
+    return "Low"
+
+
+def _compute_revenue_dynamics(db: Session, company_id: UUID) -> dict:
+    rows = (
+        db.query(models.MonthlyMetric)
+        .filter(models.MonthlyMetric.company_id == company_id)
+        .order_by(models.MonthlyMetric.metric_month.desc())
+        .limit(2)
+        .all()
+    )
+
+    if not rows:
+        return {"mrr": 0.0, "arr": 0.0, "growth_pct": 0.0, "churn_rate": 0.0, "nrr": 0.0}
+
+    current_revenue = float(rows[0].total_revenue or 0)
+    previous_revenue = float(rows[1].total_revenue or 0) if len(rows) > 1 else current_revenue
+
+    growth_pct = 0.0
+    if previous_revenue > 0:
+        growth_pct = ((current_revenue - previous_revenue) / previous_revenue) * 100
+
+    # Proxy metrics when subscription telemetry is unavailable.
+    churn_rate = 0.0
+    nrr = 100.0 if previous_revenue > 0 else 0.0
+    if previous_revenue > 0:
+        nrr = (current_revenue / previous_revenue) * 100
+        if current_revenue < previous_revenue:
+            churn_rate = ((previous_revenue - current_revenue) / previous_revenue) * 100
+
+    return {
+        "mrr": current_revenue,
+        "arr": current_revenue * 12,
+        "growth_pct": round(growth_pct, 2),
+        "churn_rate": round(churn_rate, 2),
+        "nrr": round(nrr, 2),
+    }
 
 @router.get("/metrics/financials/{company_id}")
 def get_financial_summary(
@@ -242,14 +318,19 @@ def get_runway(
     current_user: str = Depends(auth.get_current_user)
 ):
     latest_metric = db.query(models.MonthlyMetric).filter(models.MonthlyMetric.company_id == company_id).order_by(models.MonthlyMetric.metric_month.desc()).first()
-    if not latest_metric: return {"runway_months": 0, "zero_date": "N/A", "confidence_interval": "Low"}
+    if not latest_metric:
+        return {"runway_months": 0, "zero_date": "N/A", "confidence_interval": "Low"}
     
-    runway = metrics.calculate_runway(float(latest_metric.ending_cash), metrics.calculate_net_burn(float(latest_metric.total_revenue), float(latest_metric.total_expenses)))
+    runway = metrics.calculate_runway(
+        float(latest_metric.ending_cash),
+        metrics.calculate_net_burn(float(latest_metric.total_revenue), float(latest_metric.total_expenses)),
+    )
+    runway_value = float(runway if isinstance(runway, (int, float)) else 999)
     
     return {
-        "runway_months": runway if isinstance(runway, (int, float)) else 999,
-        "zero_date": "2027-04-01",
-        "confidence_interval": "High"
+        "runway_months": runway_value,
+        "zero_date": _format_runway_zero_date(runway_value),
+        "confidence_interval": _runway_confidence(db, company_id),
     }
 
 
@@ -266,17 +347,7 @@ def get_revenue(
     db: Session = Depends(database.get_db),
     current_user: str = Depends(auth.get_current_user)
 ):
-    latest_metric = db.query(models.MonthlyMetric).filter(models.MonthlyMetric.company_id == company_id).order_by(models.MonthlyMetric.metric_month.desc()).first()
-    if not latest_metric: return {"mrr": 0, "arr": 0, "growth_pct": 0, "churn_rate": 0, "nrr": 0}
-    
-    rev = float(latest_metric.total_revenue)
-    return {
-        "mrr": rev,
-        "arr": rev * 12,
-        "growth_pct": 12.5,
-        "churn_rate": 2.1,
-        "nrr": 105.0
-    }
+    return _compute_revenue_dynamics(db, company_id)
 
 
 @router.get("/revenue")
@@ -369,13 +440,111 @@ def get_cash_balance(
     current_user: str = Depends(auth.get_current_user)
 ):
     latest_metric = db.query(models.MonthlyMetric).filter(models.MonthlyMetric.company_id == company_id).order_by(models.MonthlyMetric.metric_month.desc()).first()
-    if not latest_metric: return {"cash": 0, "ar": 0, "ap": 0, "net_cash": 0}
+    if not latest_metric:
+        return {"cash": 0, "ar": 0, "ap": 0, "net_cash": 0}
+
+    # Use deterministic AR/AP sums from open invoices to avoid hard-coded values.
+    ar_open = float(
+        sum(
+            float(x[0] or 0)
+            for x in db.query(models.Invoice.amount_due)
+            .filter(
+                models.Invoice.company_id == company_id,
+                models.Invoice.type == "ACCOUNTS_RECEIVABLE",
+                models.Invoice.amount_due > 0,
+            )
+            .all()
+        )
+    )
+    ap_open = float(
+        sum(
+            float(x[0] or 0)
+            for x in db.query(models.Invoice.amount_due)
+            .filter(
+                models.Invoice.company_id == company_id,
+                models.Invoice.type == "ACCOUNTS_PAYABLE",
+                models.Invoice.amount_due > 0,
+            )
+            .all()
+        )
+    )
+    cash = float(latest_metric.ending_cash)
     
     return {
-        "cash": float(latest_metric.ending_cash),
-        "ar": 45000,
-        "ap": 12000,
-        "net_cash": float(latest_metric.ending_cash) + 45000 - 12000
+        "cash": cash,
+        "ar": ar_open,
+        "ap": ap_open,
+        "net_cash": cash + ar_open - ap_open,
+    }
+
+
+@router.get("/collections/aging/{company_id}")
+def get_collections_aging(
+    company_id: UUID,
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user),
+):
+    """QuickBooks-style AR/AP aging summary with overdue worklist."""
+    as_of = date.today()
+
+    ar_buckets = metrics.calculate_ar_aging(db, company_id, as_of)
+
+    ap_buckets = {"0_30": 0.0, "31_60": 0.0, "61_90": 0.0, "90_plus": 0.0}
+    ap_open = (
+        db.query(models.Invoice)
+        .filter(
+            models.Invoice.company_id == company_id,
+            models.Invoice.type == "ACCOUNTS_PAYABLE",
+            models.Invoice.amount_due > 0,
+            models.Invoice.issue_date <= as_of,
+        )
+        .all()
+    )
+    for inv in ap_open:
+        age_days = (as_of - inv.issue_date).days
+        amount = float(inv.amount_due or 0)
+        if age_days <= 30:
+            ap_buckets["0_30"] += amount
+        elif age_days <= 60:
+            ap_buckets["31_60"] += amount
+        elif age_days <= 90:
+            ap_buckets["61_90"] += amount
+        else:
+            ap_buckets["90_plus"] += amount
+
+    overdue_ar = (
+        db.query(models.Invoice)
+        .filter(
+            models.Invoice.company_id == company_id,
+            models.Invoice.type == "ACCOUNTS_RECEIVABLE",
+            models.Invoice.amount_due > 0,
+            models.Invoice.due_date < as_of,
+        )
+        .order_by(models.Invoice.due_date.asc())
+        .limit(20)
+        .all()
+    )
+
+    return {
+        "as_of": as_of.isoformat(),
+        "ar": {
+            "buckets": ar_buckets,
+            "total_open": round(sum(ar_buckets.values()), 2),
+        },
+        "ap": {
+            "buckets": ap_buckets,
+            "total_open": round(sum(ap_buckets.values()), 2),
+        },
+        "overdue_receivables": [
+            {
+                "invoice_id": str(inv.id),
+                "invoice_number": inv.invoice_number,
+                "due_date": inv.due_date.isoformat() if inv.due_date else None,
+                "days_overdue": (as_of - inv.due_date).days if inv.due_date else None,
+                "amount_due": float(inv.amount_due or 0),
+            }
+            for inv in overdue_ar
+        ],
     }
 
 
@@ -466,3 +635,397 @@ def get_vc_metrics_dashboard(
 ):
     """Get high-level VC/Investor metrics."""
     return metrics.get_vc_metrics(db, company_id)
+
+
+@router.get("/metrics/comparative/{company_id}")
+def get_comparative_period_analysis(
+    company_id: UUID,
+    current_month: Optional[str] = None,
+    previous_month: Optional[str] = None,
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user),
+):
+    """Comparative period analysis for revenue, expenses, cash, and burn."""
+    current_date: Optional[date] = None
+    previous_date: Optional[date] = None
+
+    if current_month:
+        try:
+            current_date = _parse_month(current_month)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="current_month must be YYYY-MM")
+
+    if previous_month:
+        try:
+            previous_date = _parse_month(previous_month)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="previous_month must be YYYY-MM")
+
+    if current_date is None:
+        latest = (
+            db.query(models.MonthlyMetric)
+            .filter(models.MonthlyMetric.company_id == company_id)
+            .order_by(models.MonthlyMetric.metric_month.desc())
+            .first()
+        )
+        if not latest:
+            return {
+                "company_id": str(company_id),
+                "current_month": None,
+                "previous_month": None,
+                "metrics": {},
+            }
+        current_date = latest.metric_month.replace(day=1)
+
+    if previous_date is None:
+        previous_date = (current_date - timedelta(days=1)).replace(day=1)
+
+    current_metric = (
+        db.query(models.MonthlyMetric)
+        .filter(models.MonthlyMetric.company_id == company_id, models.MonthlyMetric.metric_month == current_date)
+        .first()
+    )
+    previous_metric = (
+        db.query(models.MonthlyMetric)
+        .filter(models.MonthlyMetric.company_id == company_id, models.MonthlyMetric.metric_month == previous_date)
+        .first()
+    )
+
+    current_vals = _safe_metric(current_metric)
+    previous_vals = _safe_metric(previous_metric)
+
+    metrics_out = {}
+    for key in ["revenue", "expenses", "cash", "net_burn"]:
+        cur = current_vals[key]
+        prev = previous_vals[key]
+        delta = cur - prev
+        pct = (delta / prev) * 100 if prev != 0 else 0.0
+        metrics_out[key] = {
+            "current": round(cur, 2),
+            "previous": round(prev, 2),
+            "delta": round(delta, 2),
+            "delta_pct": round(pct, 2),
+        }
+
+    return {
+        "company_id": str(company_id),
+        "current_month": current_date.isoformat(),
+        "previous_month": previous_date.isoformat(),
+        "metrics": metrics_out,
+    }
+
+
+@router.get("/vendors/performance/{company_id}")
+def get_vendor_performance_scoring(
+    company_id: UUID,
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user),
+):
+    """Score vendor reliability and payment quality from AP behavior."""
+    vendor_contacts = (
+        db.query(models.Contact)
+        .filter(models.Contact.company_id == company_id, models.Contact.type == "VENDOR")
+        .all()
+    )
+
+    scores = []
+    for vendor in vendor_contacts:
+        invoices = (
+            db.query(models.Invoice)
+            .filter(
+                models.Invoice.company_id == company_id,
+                models.Invoice.contact_id == vendor.id,
+                models.Invoice.type == "ACCOUNTS_PAYABLE",
+            )
+            .all()
+        )
+        if not invoices:
+            continue
+
+        total = len(invoices)
+        paid = 0
+        overdue = 0
+        late_paid = 0
+        total_spend = 0.0
+        today = date.today()
+        for inv in invoices:
+            total_spend += float(inv.total_amount or 0)
+            status = (inv.status or "").upper()
+            if status == "PAID":
+                paid += 1
+                if inv.payment_date and inv.due_date and inv.payment_date > inv.due_date:
+                    late_paid += 1
+            if float(inv.amount_due or 0) > 0 and inv.due_date and inv.due_date < today:
+                overdue += 1
+
+        late_ratio = late_paid / total if total else 0.0
+        overdue_ratio = overdue / total if total else 0.0
+        paid_ratio = paid / total if total else 0.0
+
+        score = 100.0
+        score -= late_ratio * 35
+        score -= overdue_ratio * 35
+        score += paid_ratio * 10
+        score = max(0.0, min(100.0, score))
+
+        tier = "A" if score >= 85 else "B" if score >= 70 else "C" if score >= 50 else "D"
+        scores.append(
+            {
+                "vendor_id": str(vendor.id),
+                "vendor_name": vendor.name,
+                "score": round(score, 2),
+                "tier": tier,
+                "invoice_count": total,
+                "total_spend": round(total_spend, 2),
+                "overdue_count": overdue,
+                "late_paid_count": late_paid,
+            }
+        )
+
+    scores.sort(key=lambda x: x["score"], reverse=True)
+    return {"company_id": str(company_id), "count": len(scores), "vendors": scores}
+
+
+@router.get("/cash-flow/forecast/{company_id}")
+def get_cash_flow_forecast(
+    company_id: UUID,
+    months: int = 6,
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user),
+):
+    """Cash-flow forecast built from forecast table with fallback to planning service."""
+    if months <= 0:
+        raise HTTPException(status_code=400, detail="months must be positive")
+
+    rows = (
+        db.query(models.Forecast)
+        .filter(models.Forecast.company_id == company_id)
+        .order_by(models.Forecast.forecast_date.asc())
+        .limit(months)
+        .all()
+    )
+
+    if not rows:
+        generated = calculate_forecast(db, company_id, months_ahead=months)
+        return {
+            "company_id": str(company_id),
+            "source": "planning_service_fallback",
+            "months": months,
+            "forecast": [
+                {
+                    "month": x["forecast_date"].isoformat(),
+                    "projected_revenue": float(x["mrr_predicted"]),
+                    "projected_cash": float(x["cash_predicted"]),
+                }
+                for x in generated
+            ],
+        }
+
+    latest_metric = (
+        db.query(models.MonthlyMetric)
+        .filter(models.MonthlyMetric.company_id == company_id)
+        .order_by(models.MonthlyMetric.metric_month.desc())
+        .first()
+    )
+    baseline_net_burn = float((latest_metric.total_expenses or 0) - (latest_metric.total_revenue or 0)) if latest_metric else 0.0
+
+    out = []
+    for r in rows:
+        projected_revenue = float(r.mrr_predicted or 0)
+        projected_cash = float(r.cash_predicted or 0)
+        projected_net_burn = max(0.0, baseline_net_burn - (projected_revenue * 0.05))
+        out.append(
+            {
+                "month": r.forecast_date.isoformat(),
+                "projected_revenue": round(projected_revenue, 2),
+                "projected_net_burn": round(projected_net_burn, 2),
+                "projected_cash": round(projected_cash, 2),
+            }
+        )
+
+    return {
+        "company_id": str(company_id),
+        "source": "forecast_table",
+        "months": months,
+        "forecast": out,
+    }
+
+
+@router.get("/working-capital/optimize/{company_id}")
+def get_working_capital_optimization(
+    company_id: UUID,
+    lookback_days: int = 90,
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user),
+):
+    """Working capital KPIs and optimization suggestions."""
+    today = date.today()
+    start = today - timedelta(days=max(lookback_days, 1))
+
+    open_ar = float(
+        sum(
+            float(x[0] or 0)
+            for x in db.query(models.Invoice.amount_due)
+            .filter(
+                models.Invoice.company_id == company_id,
+                models.Invoice.type == "ACCOUNTS_RECEIVABLE",
+                models.Invoice.amount_due > 0,
+            )
+            .all()
+        )
+    )
+    open_ap = float(
+        sum(
+            float(x[0] or 0)
+            for x in db.query(models.Invoice.amount_due)
+            .filter(
+                models.Invoice.company_id == company_id,
+                models.Invoice.type == "ACCOUNTS_PAYABLE",
+                models.Invoice.amount_due > 0,
+            )
+            .all()
+        )
+    )
+
+    ar_sales = float(
+        sum(
+            float(x[0] or 0)
+            for x in db.query(models.Invoice.total_amount)
+            .filter(
+                models.Invoice.company_id == company_id,
+                models.Invoice.type == "ACCOUNTS_RECEIVABLE",
+                models.Invoice.issue_date >= start,
+                models.Invoice.issue_date <= today,
+            )
+            .all()
+        )
+    )
+    ap_purchases = float(
+        sum(
+            float(x[0] or 0)
+            for x in db.query(models.Invoice.total_amount)
+            .filter(
+                models.Invoice.company_id == company_id,
+                models.Invoice.type == "ACCOUNTS_PAYABLE",
+                models.Invoice.issue_date >= start,
+                models.Invoice.issue_date <= today,
+            )
+            .all()
+        )
+    )
+
+    daily_sales = ar_sales / lookback_days if lookback_days > 0 else 0.0
+    daily_purchases = ap_purchases / lookback_days if lookback_days > 0 else 0.0
+    dso = open_ar / daily_sales if daily_sales > 0 else 0.0
+    dpo = open_ap / daily_purchases if daily_purchases > 0 else 0.0
+    ccc = dso - dpo
+
+    recommendations: List[str] = []
+    if dso > 45:
+        recommendations.append("Reduce DSO: tighten credit terms and automate dunning for >30 day invoices.")
+    if dpo < 25:
+        recommendations.append("Increase DPO: renegotiate payment terms with strategic vendors.")
+    if ccc > 30:
+        recommendations.append("Cash conversion cycle is high; prioritize collections and AP term optimization.")
+    if not recommendations:
+        recommendations.append("Working capital posture is healthy; maintain collection cadence and vendor term discipline.")
+
+    return {
+        "company_id": str(company_id),
+        "lookback_days": lookback_days,
+        "open_ar": round(open_ar, 2),
+        "open_ap": round(open_ap, 2),
+        "dso_days": round(dso, 2),
+        "dpo_days": round(dpo, 2),
+        "cash_conversion_cycle_days": round(ccc, 2),
+        "recommendations": recommendations,
+    }
+
+
+@router.get("/credit/risk/{company_id}")
+def get_credit_risk_scoring(
+    company_id: UUID,
+    db: Session = Depends(database.get_db),
+    current_user: str = Depends(auth.get_current_user),
+):
+    """Credit analysis and risk scoring from liquidity, runway, and volatility signals."""
+    latest = (
+        db.query(models.MonthlyMetric)
+        .filter(models.MonthlyMetric.company_id == company_id)
+        .order_by(models.MonthlyMetric.metric_month.desc())
+        .first()
+    )
+    if not latest:
+        return {
+            "company_id": str(company_id),
+            "score": 0,
+            "rating": "D",
+            "signals": {"reason": "No monthly metrics available"},
+        }
+
+    revenue_series = [
+        float(x.total_revenue or 0)
+        for x in db.query(models.MonthlyMetric)
+        .filter(models.MonthlyMetric.company_id == company_id)
+        .order_by(models.MonthlyMetric.metric_month.desc())
+        .limit(6)
+        .all()
+    ]
+    mean_revenue = sum(revenue_series) / len(revenue_series) if revenue_series else 0.0
+    revenue_volatility = 0.0
+    if len(revenue_series) >= 2 and mean_revenue > 0:
+        variance = sum((x - mean_revenue) ** 2 for x in revenue_series) / len(revenue_series)
+        revenue_volatility = (variance ** 0.5) / mean_revenue
+
+    cash = float(latest.ending_cash or 0)
+    monthly_expenses = float(latest.total_expenses or 0)
+    runway_months = float(latest.runway_months or 0)
+
+    open_ap = float(
+        sum(
+            float(x[0] or 0)
+            for x in db.query(models.Invoice.amount_due)
+            .filter(
+                models.Invoice.company_id == company_id,
+                models.Invoice.type == "ACCOUNTS_PAYABLE",
+                models.Invoice.amount_due > 0,
+            )
+            .all()
+        )
+    )
+    current_ratio_proxy = (cash / open_ap) if open_ap > 0 else 2.0
+
+    score = 100.0
+    if runway_months < 6:
+        score -= 25
+    elif runway_months < 9:
+        score -= 10
+
+    if current_ratio_proxy < 1:
+        score -= 25
+    elif current_ratio_proxy < 1.5:
+        score -= 10
+
+    if revenue_volatility > 0.35:
+        score -= 20
+    elif revenue_volatility > 0.2:
+        score -= 10
+
+    if monthly_expenses > 0 and cash < monthly_expenses:
+        score -= 10
+
+    score = max(0.0, min(100.0, score))
+    rating = "A" if score >= 85 else "B" if score >= 70 else "C" if score >= 55 else "D"
+
+    return {
+        "company_id": str(company_id),
+        "score": round(score, 2),
+        "rating": rating,
+        "signals": {
+            "runway_months": round(runway_months, 2),
+            "cash": round(cash, 2),
+            "open_ap": round(open_ap, 2),
+            "current_ratio_proxy": round(current_ratio_proxy, 2),
+            "revenue_volatility": round(revenue_volatility, 4),
+        },
+    }

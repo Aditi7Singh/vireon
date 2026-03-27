@@ -17,10 +17,10 @@ import auth
 import database
 import models
 import bootstrap
+from services.connector_policy import load_connector_policy, save_connector_policy
 
 
 router = APIRouter(prefix="/system", tags=["system"])
-POLICY_FILE = Path(__file__).resolve().parents[2] / "data" / "connector_conflict_policy.json"
 
 
 def _is_missing(value: Optional[str]) -> bool:
@@ -39,32 +39,6 @@ def _is_missing(value: Optional[str]) -> bool:
         "replace-me",
     }
     return clean.lower() in placeholders
-
-
-def _load_connector_policy() -> dict:
-    default_policy = {
-        "merge": "source_of_truth",
-        "plaid": "source_of_truth",
-        "cloud_costs": "latest_timestamp_wins",
-    }
-    if not POLICY_FILE.exists():
-        return default_policy
-    try:
-        with POLICY_FILE.open("r", encoding="utf-8") as handle:
-            payload = json.load(handle)
-            return {
-                "merge": payload.get("merge", default_policy["merge"]),
-                "plaid": payload.get("plaid", default_policy["plaid"]),
-                "cloud_costs": payload.get("cloud_costs", default_policy["cloud_costs"]),
-            }
-    except Exception:
-        return default_policy
-
-
-def _save_connector_policy(policy: dict) -> None:
-    POLICY_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with POLICY_FILE.open("w", encoding="utf-8") as handle:
-        json.dump(policy, handle, indent=2, sort_keys=True)
 
 
 class RemediationRequest(BaseModel):
@@ -144,7 +118,7 @@ def startup_health(
         issues.append("Production connector credentials are incomplete")
         actions.append("configure_production_secrets")
 
-    conflict_policy = _load_connector_policy()
+    conflict_policy = load_connector_policy()
 
     table_readiness = {
         "companies": company_count > 0,
@@ -177,7 +151,7 @@ def startup_health(
 def get_connector_conflict_policy(
     current_user: models.User = Depends(auth.get_current_user),
 ):
-    return {"policy": _load_connector_policy()}
+    return {"policy": load_connector_policy()}
 
 
 @router.put("/connectors/conflict-policy")
@@ -186,7 +160,7 @@ def update_connector_conflict_policy(
     current_user: models.User = Depends(auth.get_current_user),
 ):
     allowed = {"source_of_truth", "latest_timestamp_wins", "manual_review"}
-    next_policy = _load_connector_policy()
+    next_policy = load_connector_policy()
     for key, value in payload.model_dump(exclude_none=True).items():
         if value not in allowed:
             return {
@@ -195,7 +169,7 @@ def update_connector_conflict_policy(
             }
         next_policy[key] = value
 
-    _save_connector_policy(next_policy)
+    save_connector_policy(next_policy)
     return {"success": True, "policy": next_policy}
 
 

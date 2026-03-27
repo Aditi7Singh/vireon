@@ -169,10 +169,101 @@ export interface ScenarioSnapshot {
 
 export interface NotificationContacts {
   email_recipients: string[];
+  phone_recipients?: string[];
   ceo?: string;
   founders?: string[];
   finance?: string[];
   cto?: string;
+}
+
+export interface FxRateRow {
+  base_currency: string;
+  target_currency: string;
+  exchange_rate: number;
+  effective_date: string;
+}
+
+export interface FxRatesResponse {
+  count: number;
+  rates: FxRateRow[];
+}
+
+export interface FxSyncResponse {
+  success: boolean;
+  source: string;
+  synced: number;
+  effective_date: string;
+  warning?: string;
+  rates: Record<string, number>;
+}
+
+export interface ForecastMonitor {
+  company_id: string;
+  samples: number;
+  mae_cash: number;
+  mape_cash: number;
+  health?: string;
+  message?: string;
+}
+
+export interface ForecastEnsemble {
+  current_cash_inr: number;
+  runway_months: number;
+  runway_date: string;
+  model_used: string;
+  weights: Record<string, number>;
+  monthly_projections: Array<Record<string, unknown>>;
+  last_updated: string;
+}
+
+export interface CollectionsAging {
+  as_of: string;
+  ar: {
+    buckets: Record<string, number>;
+    total_open: number;
+  };
+  ap: {
+    buckets: Record<string, number>;
+    total_open: number;
+  };
+  overdue_receivables: Array<{
+    invoice_id: string;
+    invoice_number: string;
+    due_date: string | null;
+    days_overdue: number | null;
+    amount_due: number;
+  }>;
+}
+
+export interface InvoiceQueueItem {
+  invoice_id: string;
+  invoice_number: string;
+  due_date: string | null;
+  days_overdue: number;
+  amount_due: number;
+  priority: string;
+  status: string;
+}
+
+export interface InvoiceQueueResponse {
+  as_of: string;
+  count: number;
+  queue: InvoiceQueueItem[];
+}
+
+export interface InvoiceDsoResponse {
+  as_of: string;
+  lookback_days: number;
+  open_ar: number;
+  period_credit_sales: number;
+  average_daily_sales: number;
+  dso_days: number;
+}
+
+export interface DocumentWriteResponse {
+  success: boolean;
+  message: string;
+  document_id: string;
 }
 
 export interface InvoiceTaxBreakdown {
@@ -293,6 +384,37 @@ export const api = {
     fetchAPI<HiringImpactResponse>("/forecast/hiring-impact", {
       method: "POST",
       body: JSON.stringify(payload),
+    }),
+
+  // Ops Center (new backend endpoint wiring)
+  syncLiveFx: (currencies: string[]) =>
+    fetchAPI<FxSyncResponse>('/fx/sync-live', {
+      method: 'POST',
+      body: JSON.stringify({ currencies }),
+    }),
+  getFxRates: () => fetchAPI<FxRatesResponse>('/fx/rates'),
+  getForecastEnsemble: (companyId: string) => fetchAPI<ForecastEnsemble>(`/forecast/ensemble/${companyId}`),
+  getForecastMonitor: (companyId: string, lookbackMonths: number = 6) =>
+    fetchAPI<ForecastMonitor>(`/forecast/monitor/${companyId}`, {
+      params: { lookback_months: lookbackMonths },
+    }),
+  retrainForecast: (companyId: string) =>
+    fetchAPI<{ success: boolean; company_id: string; message: string; monitoring: ForecastMonitor }>(
+      `/forecast/retrain/${companyId}`,
+      { method: 'POST' }
+    ),
+  getCollectionsAging: (companyId: string) => fetchAPI<CollectionsAging>(`/collections/aging/${companyId}`),
+  getInvoiceQueue: (companyId: string) => fetchAPI<InvoiceQueueResponse>(`/invoices/queue/${companyId}`),
+  getInvoiceDso: (companyId: string, lookbackDays: number = 90) =>
+    fetchAPI<InvoiceDsoResponse>(`/invoices/dso/${companyId}`, {
+      params: { lookback_days: lookbackDays },
+    }),
+  classifyDocument: (documentId: string) =>
+    fetchAPI<DocumentWriteResponse>(`/documents/${documentId}/classify`, { method: 'POST' }),
+  workflowDocument: (documentId: string, action: 'approve' | 'reject' | 'post_ledger', note?: string) =>
+    fetchAPI<DocumentWriteResponse>(`/documents/${documentId}/workflow`, {
+      method: 'POST',
+      body: JSON.stringify({ action, note }),
     }),
 
   getBenchmarks: () => fetchAPI<any>("/benchmarks/sass-health"),

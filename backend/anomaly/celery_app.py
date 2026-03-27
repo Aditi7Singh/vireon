@@ -16,7 +16,7 @@ app = Celery(
     "vireon_anomaly",
     broker=REDIS_URL,
     backend=REDIS_URL,
-    include=["anomaly.tasks", "tasks.alert_tasks", "tasks.document_tasks", "tasks.fx_tasks", "tasks.sync_tasks"]
+    include=["anomaly.tasks", "tasks.alert_tasks", "tasks.document_tasks", "tasks.fx_tasks", "tasks.sync_tasks", "tasks.forecast_tasks"]
 )
 
 # Configure Celery
@@ -80,6 +80,11 @@ app.conf.beat_schedule = {
     "daily-loan-payment-posting": {
         "task": "anomaly.tasks.auto_post_loan_payments",
         "schedule": crontab(hour=3, minute=0),
+    },
+    # Weekly forecast retraining for all companies at 05:00 UTC Monday
+    "weekly-forecast-retraining": {
+        "task": "tasks.forecast_tasks.retrain_forecasts_all_companies",
+        "schedule": crontab(hour=5, minute=0, day_of_week=1),
     },
 }
 

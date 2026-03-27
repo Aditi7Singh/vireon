@@ -65,6 +65,26 @@ def _map_fields_regex(text: str) -> dict:
 
     return data
 
+
+def classify_document(text: str | None, filename: str | None, content_type: str | None) -> dict:
+    """Classify uploaded document into accounting workflow buckets."""
+    name = (filename or "").lower()
+    ctype = (content_type or "").lower()
+    raw = (text or "").lower()
+
+    if "invoice" in raw or "bill to" in raw or "tax invoice" in raw or "invoice" in name:
+        return {"document_type": "invoice", "workflow": "ap_ar_review", "confidence": 0.85}
+    if "receipt" in raw or "card payment" in raw or "receipt" in name:
+        return {"document_type": "receipt", "workflow": "expense_review", "confidence": 0.8}
+    if "statement" in raw or "account summary" in raw or "bank" in name:
+        return {"document_type": "bank_statement", "workflow": "bank_reconciliation", "confidence": 0.75}
+    if "payroll" in raw or "salary" in raw:
+        return {"document_type": "payroll", "workflow": "payroll_review", "confidence": 0.7}
+    if "pdf" in ctype:
+        return {"document_type": "unclassified_pdf", "workflow": "manual_review", "confidence": 0.5}
+    return {"document_type": "unclassified", "workflow": "manual_review", "confidence": 0.4}
+
+
 def extract_structured_fields(text: str) -> dict | None:
     """Use AI to extract high-fidelity structured data from OCR text."""
     from config.settings import get_llm
@@ -150,10 +170,13 @@ def extract_document_content(raw: bytes, filename: str | None, content_type: str
         if extracted_text:
             if not extracted_data:
                 extracted_data = _map_fields_regex(extracted_text)
-            
+
+            extracted_data = extracted_data or {}
+            extracted_data["classification"] = classify_document(extracted_text, filename, content_type)
+
             # AI Refinement
             structured_data = extract_structured_fields(extracted_text)
-            
+
     except Exception:
         status = "failed"
 

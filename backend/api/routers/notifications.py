@@ -29,12 +29,16 @@ def _sanitize_contacts(contacts: Optional[dict]) -> dict:
     contacts = dict(contacts or {})
     contacts.pop("slack_webhook", None)
     contacts.pop("whatsapp", None)
+    contacts.pop("whatsapp_recipients", None)
 
     recipients = list(contacts.get("email_recipients") or [])
     if not recipients:
         recipients = [DEFAULT_ALERT_EMAIL]
     contacts["email_recipients"] = list(dict.fromkeys(recipients))
-    
+
+    phone_recipients = list(contacts.get("phone_recipients") or [])
+    contacts["phone_recipients"] = list(dict.fromkeys(phone_recipients))
+
     # Preserve ceo and finance fields for email alert configuration
     if "ceo" not in contacts:
         contacts["ceo"] = None
@@ -65,6 +69,7 @@ def update_contacts(
     incoming = payload.model_dump(exclude_none=True)
     incoming.pop("slack_webhook", None)
     incoming.pop("whatsapp", None)
+    incoming.pop("whatsapp_recipients", None)
     company.notification_contacts = _sanitize_contacts({**(company.notification_contacts or {}), **incoming})
     db.commit()
     return {"success": True, "notification_contacts": company.notification_contacts}
