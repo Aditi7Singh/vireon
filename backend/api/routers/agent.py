@@ -9,6 +9,7 @@ import database
 import auth
 from agent.cfo_agent import run_cfo_query, build_graph
 from agent.memory import build_config, build_enhanced_context
+from agent.routing import classify_query
 from langchain_core.messages import HumanMessage, AIMessage
 
 router = APIRouter(prefix="/agent", tags=["agent"])
@@ -19,6 +20,8 @@ async def chat_with_cfo(
     db: Session = Depends(database.get_db),
     current_user: Optional[models.User] = Depends(auth.get_current_user)
 ):
+    query_type = classify_query(request.message)
+
     # Get session ID or generate one
     session_id = request.session_id or f"session_{datetime.now().strftime('%Y%m%d%H%M%S')}"
     
@@ -53,7 +56,7 @@ async def chat_with_cfo(
     return {
         "response": answer,
         "session_id": session_id,
-        "query_type": "complex", # Can be more dynamic if needed
+        "query_type": query_type,
         "timestamp": datetime.now().isoformat()
     }
 

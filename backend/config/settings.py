@@ -29,7 +29,10 @@ OPENROUTER_MODEL = "meta-llama/llama-3.3-70b-instruct"
 
 # Ollama Configuration (Local/Privacy Fallback)
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:1b")
+OLLAMA_MODEL_FAST = os.getenv("OLLAMA_MODEL_FAST", "llama3.1:8b")
+OLLAMA_MODEL_THINK = os.getenv("OLLAMA_MODEL_THINK", "qwen2.5:14b")
+# Backward compatibility with older single-model env var
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", OLLAMA_MODEL_FAST)
 
 # Backend API Configuration
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
@@ -95,8 +98,9 @@ def get_llm(thinking: bool = False):
     """
     if USE_LOCAL_LLM:
         from langchain_ollama import ChatOllama
+        local_model = OLLAMA_MODEL_THINK if thinking else OLLAMA_MODEL
         return ChatOllama(
-            model=OLLAMA_MODEL,
+            model=local_model,
             temperature=0,
             base_url=OLLAMA_BASE_URL
         )

@@ -45,6 +45,13 @@ jobs:
         run: |
           pytest tests/test_dashboard_api.py -q
 
+      - name: Run readiness and agent quality regression tests
+        env:
+          DATABASE_URL: sqlite:///./vireon_ci.db
+          REDIS_URL: redis://localhost:6379/0
+        run: |
+          pytest tests/test_health_readiness.py tests/test_agent_response_evaluator.py -q
+
       - name: Run full backend test suite
         env:
           DATABASE_URL: sqlite:///./vireon_ci.db

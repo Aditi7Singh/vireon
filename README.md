@@ -155,6 +155,14 @@ While Vireon provides robust financial intelligence, here are some areas that ar
    - API Docs: http://localhost:8000/docs
    - Mailhog (Email Testing): http://localhost:1025
 
+### Production Deployment (AWS + Ollama)
+
+For production deployment guidance with AWS networking, security, and Ollama setup options, see:
+- `docs/deployment/aws-ollama-deployment-guide.md`
+
+For one-command EC2 bootstrap (Docker install, env setup, compose deploy, model pull), use:
+- `scripts/ec2_bootstrap.sh`
+
 ### Configuration
 
 #### Email Alerts (SMTP)

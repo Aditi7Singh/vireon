@@ -12,7 +12,7 @@ from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolNode
 from langgraph.graph.message import add_messages
 
-from config.settings import get_llm, USE_LOCAL_LLM, GROQ_MODEL_FAST
+from config.settings import get_llm
 from config.company_profile import get_company_context
 from agent.tools import ALL_TOOLS
 from agent.prompts import build_cfo_system_prompt
@@ -59,7 +59,7 @@ def agent_node(state: AgentState) -> AgentState:
     """
     # Decide which model to use based on query type
     thinking = should_use_thinking_mode(state["query_type"])
-    use_thinking = USE_LOCAL_LLM or thinking
+    use_thinking = thinking
     
     print(f"[AGENT] Using {'thinking' if use_thinking else 'fast'} mode")
     llm = get_llm(thinking=use_thinking)
@@ -142,7 +142,7 @@ def safety_node(state: AgentState) -> AgentState:
     """
     if state.get("tool_error_count", 0) >= 3:
         print(f"[AGENT] Safety: {state['tool_error_count']} tool errors, stopping")
-        error_message = HumanMessage(
+        error_message = AIMessage(
             content="I've encountered multiple errors retrieving data. "
                    "Please check the backend connection and try again."
         )
@@ -151,7 +151,7 @@ def safety_node(state: AgentState) -> AgentState:
     return state
 
 
-def should_continue_tools(state: AgentState) -> Literal["agent_node", "end"]:
+def should_continue_tools(state: AgentState) -> Literal["tools_node", "end"]:
     """
     Determine whether to continue to tools or end.
     

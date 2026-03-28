@@ -82,14 +82,18 @@ def get_burn_rate(period_days: int = 30) -> Dict[str, Any]:
         Dictionary with monthly_burn, breakdown_by_category, trend
     """
     try:
+        from datetime import date, timedelta
         import models
         db = _get_db()
         company = _get_first_company(db)
         if not company:
             return {"monthly_burn": 0, "breakdown_by_category": {}, "trend": 0}
 
+        lookback_days = max(1, int(period_days))
+        cutoff_date = date.today() - timedelta(days=lookback_days)
         expenses = db.query(models.Expense).filter(
-            models.Expense.company_id == company.id
+            models.Expense.company_id == company.id,
+            models.Expense.transaction_date >= cutoff_date
         ).all()
 
         breakdown: Dict[str, float] = {}
@@ -99,15 +103,18 @@ def get_burn_rate(period_days: int = 30) -> Dict[str, Any]:
             breakdown[cat] = breakdown.get(cat, 0) + float(exp.total_amount)
             total += float(exp.total_amount)
 
-        # Fall back to latest metric if no expense rows
+        # Fall back to latest metric if no recent expense rows
         if not breakdown:
             metric = _get_latest_metric(db, company.id)
             if metric:
                 total = float(metric.burn_rate) or float(metric.total_expenses)
                 breakdown = {"Operations": total}
 
+        # Normalize any lookback window to 30-day monthly equivalent.
+        monthly_equivalent = (total * 30.0) / float(lookback_days)
+
         return {
-            "monthly_burn": round(total / 3, 2) if total > 0 else 0,
+            "monthly_burn": round(monthly_equivalent, 2) if total > 0 else 0,
             "breakdown_by_category": breakdown,
             "trend": -4.2
         }

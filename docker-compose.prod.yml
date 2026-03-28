@@ -1,0 +1,118 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-vireon}
+      POSTGRES_USER: ${POSTGRES_USER:-vireon}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vireon} -d ${POSTGRES_DB:-vireon}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    profiles: ["with-ollama"]
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      BACKEND_URL: http://backend:8000
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-vireon}:${POSTGRES_PASSWORD:-change-me}@postgres:5432/${POSTGRES_DB:-vireon}
+      USE_LOCAL_LLM: ${USE_LOCAL_LLM:-true}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
+      OLLAMA_MODEL_FAST: ${OLLAMA_MODEL_FAST:-llama3.1:8b}
+      OLLAMA_MODEL_THINK: ${OLLAMA_MODEL_THINK:-qwen2.5:14b}
+      STRICT_STARTUP_CHECKS: ${STRICT_STARTUP_CHECKS:-true}
+      REQUIRE_REDIS_FOR_READINESS: ${REQUIRE_REDIS_FOR_READINESS:-true}
+      STARTUP_MAX_RETRIES: ${STARTUP_MAX_RETRIES:-30}
+      STARTUP_RETRY_DELAY_SECONDS: ${STARTUP_RETRY_DELAY_SECONDS:-2}
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready', timeout=2)\""]
+      interval: 15s
+      timeout: 5s
+      retries: 6
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      BACKEND_URL: http://backend:8000
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-vireon}:${POSTGRES_PASSWORD:-change-me}@postgres:5432/${POSTGRES_DB:-vireon}
+    command: celery -A anomaly.celery_app worker -l info
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  beat:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      BACKEND_URL: http://backend:8000
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-vireon}:${POSTGRES_PASSWORD:-change-me}@postgres:5432/${POSTGRES_DB:-vireon}
+    command: celery -A anomaly.celery_app beat -l info
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  redis_data:
+  ollama_data:
