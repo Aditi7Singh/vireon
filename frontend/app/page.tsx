@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 const highlights = [
   {
@@ -72,7 +72,7 @@ export default function Home() {
             <div className="mt-4 border-2 border-[#2f2820] bg-[#efe4d1] p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#4f4336]">AI Chat Insight</p>
               <p className="mt-3 text-sm leading-relaxed text-[#2d251d]">
-                "Why did expenses spike last month?"
+                &quot;Why did expenses spike last month?&quot;
               </p>
               <p className="mt-2 text-sm leading-relaxed text-[#2d251d]">
                 Spend rose on marketing and cloud usage. Vireon flags the delta and recommends corrective actions.

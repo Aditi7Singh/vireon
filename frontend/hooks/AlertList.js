@@ -1,4 +1,4 @@
-import { Card, Title, Text, List, ListItem, Flex, Badge } from '@tremor/react';
+﻿import { Card, Title, Text, List, ListItem, Flex, Badge } from '@tremor/react';
 
 const severityColors = {
   critical: 'red',

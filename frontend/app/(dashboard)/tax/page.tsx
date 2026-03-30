@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
@@ -293,8 +293,8 @@ export default function TaxDashboard() {
             TDS on Salary & Vendors
           </h3>
           <div className="space-y-2 text-sm text-[#4f463c]">
-            <p><strong>Rate:</strong> 10% on salaries (>₹50k/month)</p>
-            <p><strong>Rate:</strong> 10% on vendor payments (>₹50k/vendor)</p>
+            <p><strong>Rate:</strong> 10% on salaries (&gt;₹50k/month)</p>
+            <p><strong>Rate:</strong> 10% on vendor payments (&gt;₹50k/vendor)</p>
             <p><strong>Filing:</strong> Quarterly (Form 24Q/26AS)</p>
             <p><strong>Note:</strong> Must reconcile with employee PF records</p>
           </div>

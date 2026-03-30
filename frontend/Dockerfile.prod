@@ -7,6 +7,14 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+# Strip Windows CRLF line endings that break SWC/webpack on Linux
+RUN find . -not -path "*/node_modules/*" \( -name "*.tsx" -o -name "*.ts" -o -name "*.js" -o -name "*.mjs" \) -exec sed -i 's/\r$//' {} +
+
+# NEXT_PUBLIC_* vars must be present at build time to be embedded in client bundles
+ARG NEXT_PUBLIC_API_URL=http://localhost:8000
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 RUN npm run build
 
 FROM node:20-alpine AS runner

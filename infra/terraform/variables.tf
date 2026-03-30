@@ -125,3 +125,9 @@ variable "secret_key" {
   type        = string
   sensitive   = true
 }
+
+variable "ollama_ssh_public_key" {
+  description = "SSH public key for Ollama EC2 instance (run: ssh-keygen -t ed25519 -f ollama_key)"
+  type        = string
+  default     = ""
+}

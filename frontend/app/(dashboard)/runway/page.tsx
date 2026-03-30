@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import TopBar from "@/components/TopBar";
 import { useRunway, useScorecard } from "@/hooks/useFinancialData";

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import TopBar from "@/components/TopBar";
@@ -207,7 +207,7 @@ export default function OperationsPage() {
                 <div className="mt-4 space-y-2 text-sm text-[#5f5243]">
                   {(fxRates?.rates || []).slice(0, 6).map((row) => (
                     <div key={`${row.base_currency}-${row.effective_date}`} className="flex items-center justify-between rounded-lg border border-[#eadfcd] bg-white px-3 py-2">
-                      <span>{row.base_currency} -> {row.target_currency}</span>
+                      <span>{row.base_currency} {"->"} {row.target_currency}</span>
                       <strong>{row.exchange_rate.toFixed(4)}</strong>
                     </div>
                   ))}

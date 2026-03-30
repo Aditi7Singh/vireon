@@ -1,9 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
-import { BarChart, Card, DonutChart, Metric, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Title, Badge, AreaChart } from "@tremor/react";
+import { BarChart, Card, DonutChart, Metric, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Title, Badge } from "@tremor/react";
 import { AlertCircle, CheckCircle2, Loader, TrendingUp } from "lucide-react";
-import { Area, AreaChart as RechartAreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import api from "@/lib/api";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -250,7 +250,7 @@ export default function CTODashboardPage() {
           {trendData.length > 0 && (
             <div className="h-[250px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <RechartAreaChart data={trendData} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
+                <AreaChart data={trendData} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
                   <defs>
                     <linearGradient id="techCostFill" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
@@ -271,7 +271,6 @@ export default function CTODashboardPage() {
                     axisLine={{ stroke: "#e8dccf", strokeWidth: 1 }} 
                     tick={{ fill: "#7b6d5b", fontSize: 12 }}
                     tickFormatter={(v) => `₹${Math.round(v / 100000)}L`}
-                    grid={{ vertical: true, stroke: "#f5f1eb", strokeDasharray: "3 3" }}
                   />
                   <Tooltip 
                     contentStyle={{
@@ -292,7 +291,7 @@ export default function CTODashboardPage() {
                     fill="url(#techCostFill)"
                     filter="url(#shadowTechChart)"
                   />
-                </RechartAreaChart>
+                </AreaChart>
               </ResponsiveContainer>
             </div>
           )}

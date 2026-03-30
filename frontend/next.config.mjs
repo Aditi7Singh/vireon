@@ -1,6 +1,7 @@
-/** @type {import('next').NextConfig} */
+﻿/** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
+  // Tremor v3 requires transpilation in Next.js 14 App Router
+  transpilePackages: ["@tremor/react"],
 };
 
 export default nextConfig;

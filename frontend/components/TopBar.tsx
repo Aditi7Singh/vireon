@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Search, Bell, RefreshCw, Settings, User, Command } from "lucide-react";
 import { useAppStore } from "@/lib/store";
