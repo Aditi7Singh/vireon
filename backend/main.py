@@ -130,10 +130,13 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# Configure CORS (allow local frontend)
+# Configure CORS
+_raw_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:3001")
+_allowed_origins = [o.strip() for o in _raw_origins.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],
+    allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -205,7 +208,6 @@ app.include_router(tax.router, prefix="/api/v1")
 app.include_router(financial_alerts.router, prefix="/api/v1")
 app.include_router(merge.router, prefix="/api/v1")
 app.include_router(invoice_lifecycle.router, prefix="/api/v1")
-app.include_router(reports.router, prefix="/api/v1")
 
 # API routes are intentionally versioned under /api/v1
 
