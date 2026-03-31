@@ -223,14 +223,12 @@ export default function DashboardHomePage() {
                   tickLine={false} 
                   dataKey="month" 
                   tick={{ fill: "#7f6f5e", fontSize: 12, fontWeight: 500 }} 
-                  grid={{ horizontal: false }}
                 />
                 <YAxis
                   axisLine={{ stroke: "#e8dccf", strokeWidth: 1 }}
                   tickLine={false}
                   tickFormatter={(v) => `$${Math.round(v / 1000)}k`}
                   tick={{ fill: "#7f6f5e", fontSize: 12 }}
-                  grid={{ vertical: true, stroke: "#f5f1eb", strokeDasharray: "3 3" }}
                 />
                 <Tooltip
                   contentStyle={{
