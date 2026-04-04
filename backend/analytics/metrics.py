@@ -13,6 +13,11 @@ import hashlib
 import importlib.util
 import sys
 from pathlib import Path
+import logging
+import math
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 # Import config.py as a module
 config_path = Path(__file__).parent.parent / "config.py"
@@ -693,7 +698,7 @@ def scenario_hire_india(
     """
     ctc_breakdown = decompose_ctc(avg_annual_ctc, num_hires)
 
-    monthly_cost_per_hire = ctc_breakdown["per_employee_monthly"]["employer_total_cost"]
+    monthly_cost_per_hire = ctc_breakdown["per_employee_monthly"]["employer_monthly_total"]
     monthly_cost_total = ctc_breakdown["totals_monthly"]["total_employer_cost"]
 
     # Apply productivity ramp (Spec Section 8.1)
@@ -947,122 +952,477 @@ def create_math_result(function_name: str, inputs: Dict[str, Any], result: Dict[
 def calculate_gross_burn(expenses: List[float]) -> float:
     """
     Gross Burn = Total monthly operating expenses.
+    
+    Args:
+        expenses: List of individual expense amounts (all should be >= 0)
+        
+    Returns:
+        Total gross burn (sum of all expenses, always >= 0)
+        
+    Note:
+        - Malformed expenses (NaN, Inf, negative) are logged and converted to 0
+        - Empty list returns 0
     """
-    return sum(expenses)
+    # Validate input
+    if expenses is None:
+        logger.warning("calculate_gross_burn: expenses is None, treating as empty list")
+        return 0.0
+    
+    if not isinstance(expenses, list):
+        logger.error(f"calculate_gross_burn: Expected list but got {type(expenses)}")
+        raise TypeError("expenses must be a list")
+    
+    if len(expenses) == 0:
+        logger.debug("calculate_gross_burn: Empty expenses list, gross_burn = 0")
+        return 0.0
+    
+    total_burn = 0.0
+    skipped_count = 0
+    
+    for idx, expense in enumerate(expenses):
+        # Validate expense is numeric
+        if not isinstance(expense, (int, float)):
+            logger.warning(f"calculate_gross_burn: Expense at index {idx} is not numeric: {expense} (type={type(expense)}), skipping")
+            skipped_count += 1
+            continue
+        
+        # Handle NaN/Inf
+        if math.isnan(expense) or math.isinf(expense):
+            logger.warning(f"calculate_gross_burn: Expense at index {idx} is NaN/Inf: {expense}, treating as 0")
+            expense = 0.0
+        
+        # Validate range
+        if expense < 0:
+            logger.warning(f"calculate_gross_burn: Expense at index {idx} is negative: {expense}, treating as 0")
+            expense = 0.0
+        
+        total_burn += expense
+    
+    if skipped_count > 0:
+        logger.info(f"calculate_gross_burn: Skipped {skipped_count} malformed expenses out of {len(expenses)}")
+    
+    logger.info(f"calculate_gross_burn: Total gross_burn = {total_burn} from {len(expenses) - skipped_count} valid expenses")
+    
+    return round(total_burn, 2)
 
 def calculate_net_burn(revenue: float, gross_burn: float) -> float:
     """
     Net Burn = Total monthly revenue - Gross burn.
     (Usually expressed as a positive number for cash loss)
+    
+    Args:
+        revenue: Monthly revenue (should be >= 0)
+        gross_burn: Monthly gross burn/expenses (should be >= 0)
+        
+    Returns:
+        Net monthly burn rate (always >= 0)
+        
+    Raises:
+        ValueError: If inputs are invalid (NaN, Inf, negative)
     """
-    return max(0, gross_burn - revenue)
+    # Validate inputs
+    if revenue is None or gross_burn is None:
+        logger.warning(f"calculate_net_burn: None values detected - revenue={revenue}, gross_burn={gross_burn}")
+        raise ValueError("Revenue and gross_burn cannot be None")
+    
+    if not isinstance(revenue, (int, float)) or not isinstance(gross_burn, (int, float)):
+        logger.error(f"calculate_net_burn: Invalid types - revenue type={type(revenue)}, gross_burn type={type(gross_burn)}")
+        raise TypeError("Revenue and gross_burn must be numeric")
+    
+    # Check for NaN or Infinity
+    if math.isnan(revenue) or math.isinf(revenue):
+        logger.warning(f"calculate_net_burn: Revenue is NaN/Inf: {revenue}")
+        revenue = 0.0
+    
+    if math.isnan(gross_burn) or math.isinf(gross_burn):
+        logger.warning(f"calculate_net_burn: Gross burn is NaN/Inf: {gross_burn}")
+        gross_burn = 0.0
+    
+    # Validate ranges (revenue and burn should not be negative)
+    if revenue < 0:
+        logger.warning(f"calculate_net_burn: Negative revenue detected: {revenue}, capping to 0")
+        revenue = 0.0
+    
+    if gross_burn < 0:
+        logger.warning(f"calculate_net_burn: Negative gross_burn detected: {gross_burn}, capping to 0")
+        gross_burn = 0.0
+    
+    # Calculate net burn (cash loss)
+    net_burn = max(0, gross_burn - revenue)
+    
+    logger.info(f"calculate_net_burn: revenue={revenue}, gross_burn={gross_burn}, net_burn={net_burn}")
+    
+    return net_burn
 
 def calculate_runway(cash_balance: float, net_burn: float) -> Union[float, str]:
     """
     Runway (months) = Cash balance / Monthly net burn.
     If net burn is <= 0, runway is 'Infinite'.
+    
+    Args:
+        cash_balance: Current cash available (should be >= 0)
+        net_burn: Monthly net burn rate (should be >= 0)
+        
+    Returns:
+        Runway in months (float) or "Infinite" if burn is <= 0
+        Capped at 120 months to avoid misleading high values
+        
+    Raises:
+        ValueError: If inputs are invalid (NaN, Inf, negative)
     """
+    # Validate inputs
+    if cash_balance is None or net_burn is None:
+        logger.warning(f"calculate_runway: None values detected - cash_balance={cash_balance}, net_burn={net_burn}")
+        raise ValueError("Cash balance and net_burn cannot be None")
+    
+    if not isinstance(cash_balance, (int, float)) or not isinstance(net_burn, (int, float)):
+        logger.error(f"calculate_runway: Invalid types - cash_balance type={type(cash_balance)}, net_burn type={type(net_burn)}")
+        raise TypeError("Cash balance and net_burn must be numeric")
+    
+    # Check for NaN or Infinity
+    if math.isnan(cash_balance) or math.isinf(cash_balance):
+        logger.warning(f"calculate_runway: Cash balance is NaN/Inf: {cash_balance}, using 0")
+        cash_balance = 0.0
+    
+    if math.isnan(net_burn) or math.isinf(net_burn):
+        logger.warning(f"calculate_runway: Net burn is NaN/Inf: {net_burn}, using 0")
+        net_burn = 0.0
+    
+    # Validate ranges
+    if cash_balance < 0:
+        logger.warning(f"calculate_runway: Negative cash_balance detected: {cash_balance}, capping to 0")
+        cash_balance = 0.0
+    
+    if net_burn < 0:
+        logger.warning(f"calculate_runway: Negative net_burn detected: {net_burn}, capping to 0")
+        net_burn = 0.0
+    
+    # If burn is zero or negative, runway is infinite
     if net_burn <= 0:
+        logger.info(f"calculate_runway: net_burn={net_burn} <= 0, runway is Infinite")
         return "Infinite"
-    return round(cash_balance / net_burn, 2)
+    
+    # Calculate runway in months
+    runway_months = cash_balance / net_burn
+    
+    # Cap at 120 months to avoid unrealistic values
+    if runway_months > 120:
+        logger.info(f"calculate_runway: Runway {runway_months} months exceeds 120 month cap, capping to 120")
+        runway_months = 120.0
+    
+    runway_rounded = round(runway_months, 2)
+    logger.info(f"calculate_runway: cash_balance={cash_balance}, net_burn={net_burn}, runway={runway_rounded} months")
+    
+    return runway_rounded
 
 def calculate_mrr(subscription_invoices: List[Dict]) -> float:
     """
     MRR = Combined value of all recurring subscription invoices in a month.
+    
+    Args:
+        subscription_invoices: List of subscription invoice dictionaries
+                              Each should have an 'amount' field
+        
+    Returns:
+        Monthly recurring revenue (float, >= 0)
+        
+    Note:
+        - Malformed invoices (missing amount or negative amounts) are skipped with warnings
+        - NaN/Inf amounts are converted to 0
+        - Empty list returns 0
     """
-    return sum(inv.get('amount', 0) for inv in subscription_invoices)
+    # Validate input
+    if subscription_invoices is None:
+        logger.warning("calculate_mrr: subscription_invoices is None, treating as empty list")
+        return 0.0
+    
+    if not isinstance(subscription_invoices, list):
+        logger.error(f"calculate_mrr: Expected list but got {type(subscription_invoices)}")
+        raise TypeError("subscription_invoices must be a list")
+    
+    if len(subscription_invoices) == 0:
+        logger.debug("calculate_mrr: Empty subscription_invoices list, MRR = 0")
+        return 0.0
+    
+    total_mrr = 0.0
+    skipped_count = 0
+    
+    for idx, invoice in enumerate(subscription_invoices):
+        # Validate invoice is a dict
+        if not isinstance(invoice, dict):
+            logger.warning(f"calculate_mrr: Invoice at index {idx} is not a dict, skipping")
+            skipped_count += 1
+            continue
+        
+        # Extract and validate amount
+        amount = invoice.get('amount', None)
+        
+        if amount is None:
+            logger.warning(f"calculate_mrr: Invoice at index {idx} missing 'amount' field, skipping")
+            skipped_count += 1
+            continue
+        
+        # Validate amount is numeric
+        if not isinstance(amount, (int, float)):
+            logger.warning(f"calculate_mrr: Invoice at index {idx} has non-numeric amount: {amount} (type={type(amount)}), skipping")
+            skipped_count += 1
+            continue
+        
+        # Handle NaN/Inf
+        if math.isnan(amount) or math.isinf(amount):
+            logger.warning(f"calculate_mrr: Invoice at index {idx} has NaN/Inf amount: {amount}, treating as 0")
+            amount = 0.0
+        
+        # Validate amount is not negative
+        if amount < 0:
+            logger.warning(f"calculate_mrr: Invoice at index {idx} has negative amount: {amount}, treating as 0")
+            amount = 0.0
+        
+        total_mrr += amount
+    
+    if skipped_count > 0:
+        logger.info(f"calculate_mrr: Skipped {skipped_count} malformed invoices out of {len(subscription_invoices)}")
+    
+    logger.info(f"calculate_mrr: Calculated MRR = {total_mrr} from {len(subscription_invoices) - skipped_count} valid invoices")
+    
+    return round(total_mrr, 2)
 
 def calculate_arr(mrr: float) -> float:
     """
     ARR = MRR * 12.
+    Annual Recurring Revenue calculation.
+    
+    Args:
+        mrr: Monthly Recurring Revenue (should be >= 0)
+        
+    Returns:
+        Annual Recurring Revenue (float, >= 0)
+        
+    Raises:
+        ValueError: If MRR is invalid (NaN, Inf, negative)
     """
-    return mrr * 12
+    # Validate input
+    if mrr is None:
+        logger.warning("calculate_arr: MRR is None, treating as 0")
+        mrr = 0.0
+    
+    if not isinstance(mrr, (int, float)):
+        logger.error(f"calculate_arr: MRR is not numeric, type={type(mrr)}")
+        raise TypeError("MRR must be numeric")
+    
+    # Handle NaN/Inf
+    if math.isnan(mrr) or math.isinf(mrr):
+        logger.warning(f"calculate_arr: MRR is NaN/Inf: {mrr}, treating as 0")
+        mrr = 0.0
+    
+    # Validate range
+    if mrr < 0:
+        logger.warning(f"calculate_arr: Negative MRR detected: {mrr}, capping to 0")
+        mrr = 0.0
+    
+    arr = mrr * 12
+    logger.info(f"calculate_arr: MRR={mrr}, ARR={arr}")
+    
+    return round(arr, 2)
 
 def calculate_gross_margin(revenue: float, cogs: float) -> float:
     """
     Gross Margin = (Revenue - COGS) / Revenue.
+    Expressed as a decimal (0.0 to 1.0), not percentage.
+    
+    Args:
+        revenue: Total revenue (should be > 0 for meaningful calculation)
+        cogs: Cost of goods sold (should be >= 0)
+        
+    Returns:
+        Gross margin as decimal (0.0 to 1.0)
+        Returns 0.0 if revenue is 0 or negative
+        
+    Raises:
+        ValueError: If COGS is invalid (NaN, Inf, negative)
     """
+    # Validate inputs
+    if revenue is None or cogs is None:
+        logger.warning(f"calculate_gross_margin: None values detected - revenue={revenue}, cogs={cogs}")
+        return 0.0
+    
+    if not isinstance(revenue, (int, float)) or not isinstance(cogs, (int, float)):
+        logger.error(f"calculate_gross_margin: Invalid types - revenue type={type(revenue)}, cogs type={type(cogs)}")
+        raise TypeError("Revenue and COGS must be numeric")
+    
+    # Handle NaN/Inf
+    if math.isnan(revenue) or math.isinf(revenue):
+        logger.warning(f"calculate_gross_margin: Revenue is NaN/Inf: {revenue}, returning 0")
+        return 0.0
+    
+    if math.isnan(cogs) or math.isinf(cogs):
+        logger.warning(f"calculate_gross_margin: COGS is NaN/Inf: {cogs}, treating as 0")
+        cogs = 0.0
+    
+    # Validate ranges
+    if revenue < 0:
+        logger.warning(f"calculate_gross_margin: Negative revenue detected: {revenue}, returning 0")
+        return 0.0
+    
+    if cogs < 0:
+        logger.warning(f"calculate_gross_margin: Negative COGS detected: {cogs}, capping to 0")
+        cogs = 0.0
+    
+    # Avoid division by zero
     if revenue == 0:
-        return 0
-    return round((revenue - cogs) / revenue, 4)
+        logger.info("calculate_gross_margin: Revenue is 0, gross margin is 0")
+        return 0.0
+    
+    # Calculate gross margin
+    gross_margin = (revenue - cogs) / revenue
+    
+    # Cap at valid range [0, 1]
+    gross_margin = max(0.0, min(1.0, gross_margin))
+    
+    gross_margin_rounded = round(gross_margin, 4)
+    logger.info(f"calculate_gross_margin: revenue={revenue}, cogs={cogs}, gross_margin={gross_margin_rounded}")
+    
+    return gross_margin_rounded
 
 def detect_anomaly(current_value: float, moving_average: float, threshold: float = 1.2) -> bool:
     """
     Simple threshold-based anomaly detection.
     Returns True if current_value is more than [threshold]% of moving_average.
+    
+    Args:
+        current_value: Current measurement (should be >= 0)
+        moving_average: Moving average baseline (should be > 0)
+        threshold: Anomaly threshold multiplier (default 1.2 = 20% above average)
+                  Must be > 1.0 to be meaningful
+        
+    Returns:
+        True if current_value exceeds threshold * moving_average, False otherwise
+        
+    Raises:
+        ValueError: If inputs are invalid
     """
-    if moving_average == 0:
+    # Validate inputs
+    if current_value is None or moving_average is None or threshold is None:
+        logger.warning(f"detect_anomaly: None values detected - current={current_value}, avg={moving_average}, threshold={threshold}")
         return False
-    return current_value > (moving_average * threshold)
-
-# ... existing functions continue ...
-
-def calculate_gross_burn(expenses: List[float]) -> float:
-    """
-    Gross Burn = Total monthly operating expenses.
-    """
-    return sum(expenses)
-
-def calculate_net_burn(revenue: float, gross_burn: float) -> float:
-    """
-    Net Burn = Total monthly revenue - Gross burn.
-    (Usually expressed as a positive number for cash loss)
-    """
-    return max(0, gross_burn - revenue)
-
-def calculate_runway(cash_balance: float, net_burn: float) -> Union[float, str]:
-    """
-    Runway (months) = Cash balance / Monthly net burn.
-    If net burn is <= 0, runway is 'Infinite'.
-    """
-    if net_burn <= 0:
-        return "Infinite"
-    return round(cash_balance / net_burn, 2)
-
-def calculate_mrr(subscription_invoices: List[Dict]) -> float:
-    """
-    MRR = Combined value of all recurring subscription invoices in a month.
-    """
-    return sum(inv.get('amount', 0) for inv in subscription_invoices)
-
-def calculate_arr(mrr: float) -> float:
-    """
-    ARR = MRR * 12.
-    """
-    return mrr * 12
-
-def calculate_gross_margin(revenue: float, cogs: float) -> float:
-    """
-    Gross Margin = (Revenue - COGS) / Revenue.
-    """
-    if revenue == 0:
-        return 0
-    return round((revenue - cogs) / revenue, 4)
-
-def detect_anomaly(current_value: float, moving_average: float, threshold: float = 1.2) -> bool:
-    """
-    Simple threshold-based anomaly detection.
-    Returns True if current_value is more than [threshold]% of moving_average.
-    """
-    if moving_average == 0:
+    
+    if not isinstance(current_value, (int, float)) or not isinstance(moving_average, (int, float)):
+        logger.error(f"detect_anomaly: Invalid value types - current type={type(current_value)}, avg type={type(moving_average)}")
+        raise TypeError("current_value and moving_average must be numeric")
+    
+    if not isinstance(threshold, (int, float)):
+        logger.error(f"detect_anomaly: Threshold is not numeric, type={type(threshold)}")
+        raise TypeError("Threshold must be numeric")
+    
+    # Handle NaN/Inf in values
+    if math.isnan(current_value) or math.isinf(current_value):
+        logger.warning(f"detect_anomaly: current_value is NaN/Inf: {current_value}, treating as 0")
+        current_value = 0.0
+    
+    if math.isnan(moving_average) or math.isinf(moving_average):
+        logger.warning(f"detect_anomaly: moving_average is NaN/Inf: {moving_average}, no anomaly")
         return False
-    return current_value > (moving_average * threshold)
+    
+    if math.isnan(threshold) or math.isinf(threshold):
+        logger.warning(f"detect_anomaly: threshold is NaN/Inf: {threshold}, using default 1.2")
+        threshold = 1.2
+    
+    # Validate ranges
+    if current_value < 0:
+        logger.warning(f"detect_anomaly: Negative current_value: {current_value}, capping to 0")
+        current_value = 0.0
+    
+    if moving_average < 0:
+        logger.warning(f"detect_anomaly: Negative moving_average: {moving_average}, capping to 0")
+        moving_average = 0.0
+    
+    if threshold <= 0:
+        logger.warning(f"detect_anomaly: Invalid threshold {threshold}, must be > 0, using 1.2")
+        threshold = 1.2
+    
+    # Cannot detect anomaly if baseline is zero
+    if moving_average == 0:
+        logger.debug("detect_anomaly: moving_average is 0, cannot detect meaningful anomaly")
+        return False
+    
+    # Check if current value exceeds threshold
+    anomaly_threshold = moving_average * threshold
+    is_anomaly = current_value > anomaly_threshold
+    
+    logger.debug(f"detect_anomaly: current={current_value}, avg={moving_average}, threshold_multiplier={threshold}, computed_threshold={anomaly_threshold}, is_anomaly={is_anomaly}")
+    
+    return is_anomaly
+
 
 def calculate_budget_variance(actual: float, budget: float) -> Dict[str, Union[float, str]]:
     """
     Variance analysis: Actual vs Budget.
     - Positive variance for revenue is favorable.
     - Positive variance for expenses is unfavorable.
-    """
-    variance = actual - budget
-    percent_variance = (variance / budget) if budget != 0 else 0
     
-    return {
-        "actual": actual,
-        "budget": budget,
+    Args:
+        actual: Actual amount/value (should be >= 0)
+        budget: Budgeted amount/value (should be >= 0)
+        
+    Returns:
+        Dictionary with:
+        - actual: Actual amount
+        - budget: Budgeted amount
+        - variance: Actual - Budget (can be positive or negative)
+        - percent_variance: Variance as percentage of budget
+        
+    Note:
+        - Returns 0% variance if budget is 0
+        - NaN/Inf values are logged and converted to 0
+    """
+    # Validate inputs
+    if actual is None or budget is None:
+        logger.warning(f"calculate_budget_variance: None values detected - actual={actual}, budget={budget}")
+        actual = 0.0 if actual is None else actual
+        budget = 0.0 if budget is None else budget
+    
+    if not isinstance(actual, (int, float)) or not isinstance(budget, (int, float)):
+        logger.error(f"calculate_budget_variance: Invalid types - actual={type(actual)}, budget={type(budget)}")
+        raise TypeError("Actual and budget must be numeric")
+    
+    # Handle NaN/Inf
+    if math.isnan(actual) or math.isinf(actual):
+        logger.warning(f"calculate_budget_variance: Actual is NaN/Inf: {actual}, treating as 0")
+        actual = 0.0
+    
+    if math.isnan(budget) or math.isinf(budget):
+        logger.warning(f"calculate_budget_variance: Budget is NaN/Inf: {budget}, treating as 0")
+        budget = 0.0
+    
+    # Validate ranges
+    if actual < 0:
+        logger.warning(f"calculate_budget_variance: Negative actual: {actual}, capping to 0")
+        actual = 0.0
+    
+    if budget < 0:
+        logger.warning(f"calculate_budget_variance: Negative budget: {budget}, capping to 0")
+        budget = 0.0
+    
+    # Calculate variance
+    variance = actual - budget
+    
+    # Calculate percentage variance safely
+    if budget == 0:
+        percent_variance = 0.0
+        logger.debug("calculate_budget_variance: Budget is 0, percent_variance = 0%")
+    else:
+        percent_variance = (variance / budget) * 100
+    
+    result = {
+        "actual": round(actual, 2),
+        "budget": round(budget, 2),
         "variance": round(variance, 2),
-        "percent_variance": round(percent_variance * 100, 2)
+        "percent_variance": round(percent_variance, 2)
     }
+    
+    logger.info(f"calculate_budget_variance: actual={actual}, budget={budget}, variance={variance}, pct={percent_variance}%")
+    
+    return result
 
 
 def calculate_tax_rate(total_amount: float, tax_amount: float) -> float:
@@ -1070,15 +1430,58 @@ def calculate_tax_rate(total_amount: float, tax_amount: float) -> float:
     Calculate effective tax rate.
     
     Args:
-        total_amount: Total amount including tax
-        tax_amount: Tax portion
+        total_amount: Total amount including tax (should be >= tax_amount)
+        tax_amount: Tax portion (should be >= 0)
         
     Returns:
-        Tax rate as percentage
+        Tax rate as percentage (0.0 to 100.0)
+        Returns 0.0 if total_amount is 0 or negative
+        
+    Raises:
+        ValueError: If inputs are invalid (NaN, Inf)
     """
-    if total_amount == 0:
+    # Validate inputs
+    if total_amount is None or tax_amount is None:
+        logger.warning(f"calculate_tax_rate: None values detected - total={total_amount}, tax={tax_amount}")
         return 0.0
-    return (tax_amount / total_amount) * 100
+    
+    if not isinstance(total_amount, (int, float)) or not isinstance(tax_amount, (int, float)):
+        logger.error(f"calculate_tax_rate: Invalid types - total type={type(total_amount)}, tax type={type(tax_amount)}")
+        raise TypeError("Amounts must be numeric")
+    
+    # Handle NaN/Inf
+    if math.isnan(total_amount) or math.isinf(total_amount):
+        logger.warning(f"calculate_tax_rate: total_amount is NaN/Inf: {total_amount}, assuming 0")
+        return 0.0
+    
+    if math.isnan(tax_amount) or math.isinf(tax_amount):
+        logger.warning(f"calculate_tax_rate: tax_amount is NaN/Inf: {tax_amount}, treating as 0")
+        tax_amount = 0.0
+    
+    # Validate ranges
+    if total_amount < 0:
+        logger.warning(f"calculate_tax_rate: Negative total_amount: {total_amount}, returning 0%")
+        return 0.0
+    
+    if tax_amount < 0:
+        logger.warning(f"calculate_tax_rate: Negative tax_amount: {tax_amount}, treating as 0")
+        tax_amount = 0.0
+    
+    # Avoid division by zero
+    if total_amount == 0:
+        logger.debug("calculate_tax_rate: total_amount is 0, tax rate = 0%")
+        return 0.0
+    
+    # Calculate tax rate
+    tax_rate = (tax_amount / total_amount) * 100
+    
+    # Cap at valid range [0, 100]
+    tax_rate = max(0.0, min(100.0, tax_rate))
+    
+    tax_rate_rounded = round(tax_rate, 2)
+    logger.info(f"calculate_tax_rate: total={total_amount}, tax={tax_amount}, tax_rate={tax_rate_rounded}%")
+    
+    return tax_rate_rounded
 
 
 def calculate_total_tax(db: Session, company_id: str, start_date: date, end_date: date) -> float:
@@ -1514,25 +1917,26 @@ def calculate_monthly_payroll_cost(db: Session, company_id: str, month: date) ->
         elif emp.pay_frequency == "weekly":
             monthly_salaries += float(emp.salary) * 52 / 12  # 52 weekly periods per year
             
-    # Include pending hires (future hire_date) for forecasting
-    pending_hires = db.query(Employee).filter(
-        Employee.company_id == company_id,
-        Employee.status == "active",
-        Employee.hire_date > end_of_month if 'end_of_month' in locals() else date.today()
-    ).all()
-    
-    forecast_pending_cost = 0
-    for emp in pending_hires:
-        decomp = decompose_ctc(float(emp.salary))
-        forecast_pending_cost += decomp["per_employee_monthly"]["employer_monthly_total"]
-    
-    # Get actual payroll entries for the month
     start_of_month = month.replace(day=1)
     # Correct end of month calculation
     if start_of_month.month == 12:
         end_of_month = date(start_of_month.year + 1, 1, 1) - timedelta(days=1)
     else:
         end_of_month = date(start_of_month.year, start_of_month.month + 1, 1) - timedelta(days=1)
+
+    # Include pending hires (future hire_date) for forecasting
+    pending_hires = db.query(Employee).filter(
+        Employee.company_id == company_id,
+        Employee.status == "active",
+        Employee.hire_date > end_of_month,
+    ).all()
+
+    forecast_pending_cost = 0
+    for emp in pending_hires:
+        decomp = decompose_ctc(float(emp.salary))
+        forecast_pending_cost += decomp["per_employee_monthly"]["employer_monthly_total"]
+
+    # Get actual payroll entries for the month
     
     payroll_entries = db.query(PayrollEntry).join(Employee).filter(
         Employee.company_id == company_id,
@@ -1549,7 +1953,7 @@ def calculate_monthly_payroll_cost(db: Session, company_id: str, month: date) ->
         total_outflow = 0
         for emp in employees:
             decomp = decompose_ctc(float(emp.salary))
-            total_outflow += decomp["per_employee_monthly"]["employer_total_cost"]
+            total_outflow += decomp["per_employee_monthly"]["employer_monthly_total"]
         
         return {
             "total_employer_outflow": total_outflow,

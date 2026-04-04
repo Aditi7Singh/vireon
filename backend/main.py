@@ -16,7 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import models
 import database
 import bootstrap
-from api.routers import auth, analytics, agent, ingest, erpnext, alerts, benchmarks, planning, loans, payroll, depreciation, documents, reports, banking, cloud_costs, ledger, inputs, forecasting, burn, recommendations, notifications, system, fx, tax, merge, financial_alerts, invoice_lifecycle
+from api.routers import auth, analytics, agent, ingest, erpnext, alerts, benchmarks, planning, loans, payroll, depreciation, documents, reports, banking, cloud_costs, ledger, inputs, forecasting, burn, recommendations, notifications, system, fx, tax, merge, financial_alerts, invoice_lifecycle, financial
 
 # Basic generic logging config
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
@@ -208,6 +208,7 @@ app.include_router(tax.router, prefix="/api/v1")
 app.include_router(financial_alerts.router, prefix="/api/v1")
 app.include_router(merge.router, prefix="/api/v1")
 app.include_router(invoice_lifecycle.router, prefix="/api/v1")
+app.include_router(financial.router, prefix="/api/v1")
 
 # API routes are intentionally versioned under /api/v1
 

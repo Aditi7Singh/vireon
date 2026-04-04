@@ -737,3 +737,63 @@ class ScenarioSnapshot(Base):
     input_data = Column(JSON, nullable=False)
     result_data = Column(JSON, nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class AgentConversation(Base):
+    __tablename__ = "agent_conversations"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    session_id = Column(String(100), nullable=False, unique=True, index=True)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=True, index=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True)
+    title = Column(String(255), nullable=True)
+    summary = Column(Text, nullable=True)
+    query_count = Column(Integer, default=0)
+    last_message_at = Column(DateTime, nullable=True, index=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+    messages = relationship("AgentConversationMessage", back_populates="conversation", cascade="all, delete-orphan")
+    tool_audits = relationship("AgentToolAudit", back_populates="conversation", cascade="all, delete-orphan")
+
+
+class AgentConversationMessage(Base):
+    __tablename__ = "agent_conversation_messages"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    conversation_id = Column(UUID(as_uuid=True), ForeignKey("agent_conversations.id", ondelete="CASCADE"), nullable=False, index=True)
+    role = Column(String(20), nullable=False)
+    content = Column(Text, nullable=False)
+    message_metadata = Column("metadata", JSON, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow, index=True)
+
+    conversation = relationship("AgentConversation", back_populates="messages")
+
+
+class AgentToolAudit(Base):
+    __tablename__ = "agent_tool_audit"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    conversation_id = Column(UUID(as_uuid=True), ForeignKey("agent_conversations.id", ondelete="CASCADE"), nullable=False, index=True)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=True, index=True)
+    tool_name = Column(String(255), nullable=False, index=True)
+    tool_input = Column(JSON, nullable=True)
+    tool_output = Column(JSON, nullable=True)
+    chain_id = Column(String(100), nullable=True, index=True)
+    status = Column(String(50), nullable=False, default="ok")
+    data_timestamp = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow, index=True)
+
+    conversation = relationship("AgentConversation", back_populates="tool_audits")
+
+
+class AgentPreference(Base):
+    __tablename__ = "agent_preferences"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=True, index=True)
+    preference_key = Column(String(100), nullable=False, index=True)
+    preference_value = Column(JSON, nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)

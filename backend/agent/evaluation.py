@@ -4,9 +4,14 @@ Agent Response Evaluation
 Lightweight heuristic evaluator to catch answer-quality regressions in CI.
 """
 
+from datetime import datetime
 from dataclasses import dataclass
+import logging
 from typing import Iterable, Optional
 import re
+
+
+logger = logging.getLogger(__name__)
 
 
 DEFAULT_FORBIDDEN_PHRASES = {
@@ -109,4 +114,50 @@ def evaluate_agent_response(
         passed=(score >= min_score) and (not hard_fail),
         checks=checks,
         feedback=feedback,
+    )
+
+
+def log_agent_trace(
+    *,
+    session_id: str,
+    chain_id: str,
+    query: str,
+    tools_used: Iterable[str],
+    response: str,
+    company_id: Optional[str] = None,
+) -> None:
+    """Emit a structured trace line for agent debugging and auditability."""
+    logger.info(
+        "agent_trace",
+        extra={
+            "timestamp": datetime.utcnow().isoformat(),
+            "session_id": session_id,
+            "chain_id": chain_id,
+            "company_id": company_id,
+            "query": query,
+            "tools_used": list(tools_used),
+            "response_preview": (response or "")[:240],
+        },
+    )
+
+
+def log_tool_call(
+    *,
+    session_id: str,
+    chain_id: str,
+    tool_name: str,
+    status: str,
+    data_timestamp: Optional[str] = None,
+) -> None:
+    """Emit a structured log line for a tool call."""
+    logger.info(
+        "tool_call",
+        extra={
+            "timestamp": datetime.utcnow().isoformat(),
+            "session_id": session_id,
+            "chain_id": chain_id,
+            "tool_name": tool_name,
+            "status": status,
+            "data_timestamp": data_timestamp,
+        },
     )
