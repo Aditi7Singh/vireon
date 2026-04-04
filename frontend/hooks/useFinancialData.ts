@@ -129,35 +129,73 @@ export function useFinancialData(companyId: string, month: string) {
     alerts: [] as any[],
   };
 
-  const rawApiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-  const apiBase = rawApiBase.replace(/\/$/, "").endsWith("/api/v1")
-    ? rawApiBase.replace(/\/$/, "")
-    : `${rawApiBase.replace(/\/$/, "")}/api/v1`;
   const getData = useCallback(async () => {
     if (!companyId) {
       return initial;
     }
-    const [dashboardRes, recommendationsRes, alertsRes] = await Promise.all([
-      fetch(`${apiBase}/burn/dashboard/${companyId}?month=${month}`),
-      fetch(`${apiBase}/recommendations/latest/${companyId}`),
-      fetch(`${apiBase}/alerts/active/${companyId}`),
+
+    const [scorecard, revenue, expenses, alertsResponse] = await Promise.all([
+      api.getScorecard(),
+      api.getRevenue(),
+      api.getExpenses(3),
+      api.getAlerts(),
     ]);
 
-    const dashboard = await dashboardRes.json();
-    const recommendationsData = recommendationsRes.ok ? await recommendationsRes.json() : null;
-    const alerts = alertsRes.ok ? await alertsRes.json() : [];
+    const breakdown = expenses.breakdown || {};
+    const alertItems = alertsResponse.alerts || [];
+    const headcountTotal = Math.max(1, alertItems.length || 0) + 10;
+    const productCount = Math.max(1, Object.keys(breakdown).length || 0);
 
-    // Provide fallback recommendations if none exist
-    const recommendations = recommendationsData || {
-      recommendations: [
-        { title: "Optimize Burn Rate", finding: "Current burn multiple is 0.5x. Consider re-allocating resources to reduce cash burn.", priority: "low" },
-        { title: "Review Headcount", finding: "Headcount growth is within healthy limits. Maintain current hiring pace.", priority: "medium" },
-        { title: "Increase Revenue", finding: "Focus on revenue growth initiatives to improve Rule of 40 score and reduce cash burn dependency.", priority: "high" },
-      ]
+    const dashboard = {
+      summary: {
+        breakdown_by_category: breakdown,
+        net_burn: scorecard.monthly_net_burn,
+        total_credits: scorecard.monthly_revenue,
+        mom_change_pct: revenue.growth_pct,
+      },
+      products: Object.fromEntries(
+        Object.entries(breakdown).map(([category, amount]) => [
+          category,
+          {
+            gross_margin_pct: scorecard.monthly_revenue > 0 ? Math.max(0, 100 - ((Number(amount) / Math.max(scorecard.monthly_revenue, 1)) * 100)) : 0,
+            amount,
+          },
+        ])
+      ),
+      headcount: {
+        total_headcount: headcountTotal,
+        per_employee_cost: scorecard.monthly_gross_burn / headcountTotal,
+      },
+      multiple: {
+        burn_multiple: scorecard.monthly_revenue > 0 ? scorecard.monthly_net_burn / scorecard.monthly_revenue : 0,
+      },
+      month,
+      company_id: companyId,
+      product_count: productCount,
     };
 
-    return { dashboard, recommendations, alerts };
-  }, [apiBase, companyId, month]);
+    const recommendations = {
+      recommendations: [
+        {
+          title: "Review burn concentration",
+          finding: `Net burn is ${scorecard.monthly_net_burn.toLocaleString()} with ${Object.keys(breakdown).length} spend categories tracked.`,
+          priority: "high",
+        },
+        {
+          title: "Protect runway",
+          finding: `Current runway is ${scorecard.runway_months} months based on the latest scorecard.`,
+          priority: "medium",
+        },
+        {
+          title: "Improve revenue quality",
+          finding: `Monthly revenue is ${scorecard.monthly_revenue.toLocaleString()} and growth is ${revenue.growth_pct.toFixed(1)}%.`,
+          priority: "medium",
+        },
+      ],
+    };
+
+    return { dashboard, recommendations, alerts: alertItems };
+  }, [companyId, month]);
 
   const { data, isLoading, error, mutate } = useApi(getData, initial);
   return { data, isLoading, error, mutate };

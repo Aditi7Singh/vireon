@@ -4,7 +4,7 @@ LangGraph CFO Agent
 Main LangGraph StateGraph for the AI CFO agent.
 """
 
-from typing import TypedDict, Annotated, Literal
+from typing import TypedDict, Annotated, Literal, Optional
 from datetime import datetime
 import json
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, SystemMessage, ToolMessage
@@ -15,9 +15,29 @@ from langgraph.graph.message import add_messages
 from config.settings import get_llm
 from config.company_profile import get_company_context
 from agent.tools import ALL_TOOLS
+from agent.tools import (
+    get_cash_flow_statement,
+    get_cash_runway_analysis,
+    get_comprehensive_analysis,
+    get_efficiency_metrics,
+    get_financial_health_score,
+    get_leverage_metrics,
+    get_profitability_metrics,
+    get_recommendations,
+    get_working_capital_metrics,
+    explain_financial_concept,
+)
 from agent.prompts import build_cfo_system_prompt
 from agent.routing import classify_query, should_use_thinking_mode
-from agent.memory import get_checkpointer, build_config, new_session_id
+from agent.memory import (
+    get_checkpointer,
+    build_config,
+    new_session_id,
+    load_session_messages,
+    persist_session_turn,
+    persist_tool_audit,
+)
+from agent.tools import set_active_company_context, clear_active_company_context
 
 
 # Define the agent state
@@ -27,6 +47,9 @@ class AgentState(TypedDict):
     query_type: str  # "simple" | "complex" | "alert"
     company_context: dict  # Live financial snapshot
     session_id: str
+    company_id: Optional[str]
+    chain_id: str
+    analysis_summary: str
     tool_error_count: int  # Safety: stop if tools fail 3+ times
 
 
@@ -44,7 +67,10 @@ def classify_node(state: AgentState) -> AgentState:
     last_message = state["messages"][-1].content if state["messages"] else ""
     query_type = classify_query(last_message)
     print(f"[AGENT] Query classified as: {query_type}")
-    return {"query_type": query_type}
+    return {
+        "query_type": query_type,
+        "chain_id": state.get("chain_id") or f"{state.get('session_id', 'session')}-{datetime.utcnow().strftime('%Y%m%d%H%M%S%f')}",
+    }
 
 
 def agent_node(state: AgentState) -> AgentState:
@@ -66,6 +92,8 @@ def agent_node(state: AgentState) -> AgentState:
     
     # Build system prompt with fresh company context
     system_prompt = build_cfo_system_prompt(state["company_context"])
+    if state.get("analysis_summary"):
+        system_prompt = system_prompt + f"\n\n--- TOOL SYNTHESIS ---\n{state['analysis_summary']}"
     system_message = SystemMessage(content=system_prompt)
     
     # Get all messages and prepend system prompt
@@ -106,10 +134,29 @@ def tools_node(state: AgentState) -> AgentState:
             error_count += 1
     
     new_error_count = state.get("tool_error_count", 0) + error_count
+
+    tool_calls = []
+    last_message = state["messages"][-1] if state.get("messages") else None
+    if hasattr(last_message, "tool_calls") and last_message.tool_calls:
+        tool_calls = last_message.tool_calls
+
+    for idx, msg in enumerate(msgs):
+        if idx < len(tool_calls):
+            call = tool_calls[idx]
+            persist_tool_audit(
+                state.get("session_id", ""),
+                getattr(msg, "name", call.get("name", "unknown")),
+                call.get("args", {}) if isinstance(call, dict) else {},
+                getattr(msg, "content", None),
+                company_id=state.get("company_id"),
+                chain_id=state.get("chain_id"),
+                status="error" if "error" in str(getattr(msg, "content", "")).lower() else "ok",
+            )
     
     return {
         "messages": msgs,
-        "tool_error_count": new_error_count
+        "tool_error_count": new_error_count,
+        "chain_id": state.get("chain_id", ""),
     }
 
 
@@ -122,10 +169,20 @@ def analyze_node(state: AgentState) -> AgentState:
         return state
         
     print(f"[AGENT] Analyzing tool output for reasoning...")
-    
-    # We can inject a hidden reasoning prompt if needed, 
-    # but for now we'll let the next agent_node handle it
-    return state
+
+    recent_tool_messages = [
+        msg for msg in state["messages"][-6:]
+        if isinstance(msg, ToolMessage)
+    ]
+    summary_bits = []
+    for msg in recent_tool_messages:
+        snippet = str(msg.content or "")[:180].replace("\n", " ")
+        summary_bits.append(f"{getattr(msg, 'name', 'tool')}: {snippet}")
+
+    return {
+        "analysis_summary": " | ".join(summary_bits),
+        "chain_id": state.get("chain_id", "")
+    }
 
 def prune_memory(messages: list[BaseMessage], max_messages: int = 15) -> list[BaseMessage]:
     """Prune old messages while keeping the system prompt and latest context."""
@@ -134,6 +191,80 @@ def prune_memory(messages: list[BaseMessage], max_messages: int = 15) -> list[Ba
     
     # Keep the first message (usually system/initial) and the last N-1
     return [messages[0]] + messages[-(max_messages-1):]
+
+
+def _extract_concept_name(user_message: str) -> Optional[str]:
+    message = user_message.lower()
+    concept_map = {
+        "current ratio": "current_ratio",
+        "quick ratio": "quick_ratio",
+        "gross margin": "gross_margin",
+        "operating margin": "operating_margin",
+        "net margin": "net_margin",
+        "debt to equity": "debt_to_equity",
+        "debt/equity": "debt_to_equity",
+        "interest coverage": "interest_coverage",
+        "cash conversion cycle": "cash_conversion_cycle",
+        "working capital": "working_capital",
+        "free cash flow": "free_cash_flow",
+        "runway": "cash_runway",
+    }
+    for phrase, concept in concept_map.items():
+        if phrase in message:
+            return concept
+    return None
+
+
+def _build_financial_analysis_snapshot(user_message: str) -> tuple[str, dict]:
+    """Create an explicit financial analysis snapshot for the LLM to cite."""
+    query = user_message.lower()
+    sections: list[str] = []
+    analysis_payload: dict = {}
+
+    def add_section(title: str, payload: dict) -> None:
+        analysis_payload[title] = payload
+        parts = []
+        for key, value in payload.items():
+            if isinstance(value, (str, int, float, bool)):
+                parts.append(f"{key}={value}")
+        sections.append(f"{title}: " + "; ".join(parts[:8]))
+
+    if any(term in query for term in ["overview", "health", "full", "summary", "score"]):
+        result = get_comprehensive_analysis.invoke({})
+        add_section("comprehensive_analysis", result)
+    else:
+        if any(term in query for term in ["cash", "runway", "burn", "flow"]):
+            add_section("cash_flow_statement", get_cash_flow_statement.invoke({}))
+            add_section("runway_analysis", get_cash_runway_analysis.invoke({}))
+
+        if any(term in query for term in ["ratio", "working capital", "liquidity"]):
+            add_section("working_capital_metrics", get_working_capital_metrics.invoke({}))
+
+        if any(term in query for term in ["margin", "profit", "revenue", "margin"]):
+            add_section("profitability_metrics", get_profitability_metrics.invoke({}))
+
+        if any(term in query for term in ["debt", "leverage", "interest", "solvency"]):
+            add_section("leverage_metrics", get_leverage_metrics.invoke({}))
+
+        if any(term in query for term in ["efficiency", "turnover", "asset", "inventory", "receivable"]):
+            add_section("efficiency_metrics", get_efficiency_metrics.invoke({}))
+
+        if any(term in query for term in ["recommend", "what should", "next step", "action"]):
+            add_section("recommendations", get_recommendations.invoke({}))
+
+        concept_name = _extract_concept_name(user_message)
+        if concept_name:
+            add_section("concept_explanation", explain_financial_concept.invoke({"concept_name": concept_name}))
+
+        # Keep a compact health score available for most finance queries.
+        if sections:
+            add_section("financial_health", get_financial_health_score.invoke({}))
+
+    if not sections:
+        return "", {}
+
+    snapshot = "\n".join(f"- {section}" for section in sections)
+    return snapshot, analysis_payload
 
 def safety_node(state: AgentState) -> AgentState:
     """
@@ -236,7 +367,9 @@ def build_graph():
 def run_cfo_query(
     user_message: str,
     session_id: str = None,
-    company_context: dict = None
+    company_context: dict = None,
+    company_id: Optional[str] = None,
+    conversation_context: Optional[str] = None,
 ) -> str:
     """
     Main entry point to run a CFO query.
@@ -253,15 +386,34 @@ def run_cfo_query(
         session_id = new_session_id()
     if company_context is None:
         company_context = get_company_context()
+
+    if company_id is None and isinstance(company_context, dict):
+        company_id = company_context.get("company_id")
+
+    set_active_company_context(company_id=company_id)
     
     graph = build_graph()
     config = build_config(session_id)
+
+    persisted_messages = load_session_messages(session_id)
     
+    if conversation_context:
+        company_context = dict(company_context or {})
+        company_context["conversation_context"] = conversation_context
+
+    financial_snapshot, financial_payload = _build_financial_analysis_snapshot(user_message)
+    if financial_snapshot:
+        company_context = dict(company_context or {})
+        company_context["direct_financial_analysis"] = financial_payload
+
     initial_state = {
-        "messages": [HumanMessage(content=user_message)],
+        "messages": persisted_messages + [HumanMessage(content=user_message)],
         "query_type": "simple",
         "company_context": company_context,
         "session_id": session_id,
+        "company_id": company_id,
+        "chain_id": f"{session_id}-{datetime.utcnow().strftime('%Y%m%d%H%M%S%f')}",
+        "analysis_summary": financial_snapshot,
         "tool_error_count": 0,
     }
     
@@ -274,6 +426,15 @@ def run_cfo_query(
         
         for msg in reversed(msgs):
             if isinstance(msg, AIMessage) and msg.content:
+                persist_session_turn(
+                    session_id,
+                    user_message,
+                    msg.content,
+                    company_id=company_id,
+                    summary=msg.content[:500],
+                    chain_id=initial_state["chain_id"],
+                    query_type=initial_state["query_type"],
+                )
                 return msg.content
         
         return "I was unable to process that query. Please try again."
@@ -281,6 +442,8 @@ def run_cfo_query(
     except Exception as e:
         print(f"[AGENT] Error: {e}")
         return f"I encountered an error processing your request: {str(e)}"
+    finally:
+        clear_active_company_context()
 
 
 # CLI test runner

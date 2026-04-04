@@ -22,7 +22,8 @@ import {
   Landmark,
   Grid3X3,
   Cpu,
-  Workflow
+  Workflow,
+  Users
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -35,11 +36,17 @@ const navItems = [
   { name: "Operations", path: "/operations", icon: Workflow },
   { name: "CTO Planner", path: "/dashboard/cto", icon: Cpu },
   { name: "Runway", path: "/runway", icon: Wallet },
+  { name: "Cash Flow", path: "/cash-flow", icon: Wallet },
+  { name: "Collections", path: "/collections", icon: CreditCard },
+  { name: "Budget", path: "/budget", icon: BarChart3 },
+  { name: "Payroll", path: "/payroll", icon: Users },
+  { name: "Assets", path: "/assets", icon: Landmark },
   { name: "Expenses", path: "/expenses", icon: Receipt },
   { name: "Revenue", path: "/revenue", icon: BarChart3 },
   { name: "Tax", path: "/tax", icon: Landmark },
   { name: "Scenarios", path: "/scenarios", icon: LineChart },
   { name: "Benchmarking", path: "/benchmarking", icon: TrendingUp },
+  { name: "Investor", path: "/investor", icon: ShieldCheck },
   { name: "AI Agent", path: "/agent", icon: Bot },
   { name: "Anomalies", path: "/anomalies", icon: AlertTriangle },
   { name: "Settings", path: "/settings", icon: Settings },

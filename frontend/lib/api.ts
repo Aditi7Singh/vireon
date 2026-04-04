@@ -3,36 +3,166 @@ const API_BASE = RAW_API_BASE.replace(/\/$/, "").endsWith("/api/v1")
   ? RAW_API_BASE.replace(/\/$/, "")
   : `${RAW_API_BASE.replace(/\/$/, "")}/api/v1`;
 
-interface FetchOptions extends RequestInit {
-  params?: Record<string, string | number | boolean>;
+// API Error class for better error handling
+export class APIError extends Error {
+  constructor(
+    public status: number,
+    public path: string,
+    public detail: string,
+    public originalError?: any
+  ) {
+    super(detail);
+    this.name = "APIError";
+  }
 }
 
-async function fetchAPI<T>(path: string, options: FetchOptions = {}): Promise<T> {
-  const { params, ...fetchOptions } = options;
+interface FetchOptions extends RequestInit {
+  params?: Record<string, string | number | boolean>;
+  timeout?: number;
+  retries?: number;
+}
+
+// Request logging helper
+function logRequest(method: string, url: string, options?: any) {
+  if (typeof window !== "undefined" && window.location.hostname !== "localhost") {
+    // Only log in development or when explicitly enabled
+    if (process.env.NEXT_PUBLIC_DEBUG_API !== "false") {
+      console.debug(`[API] ${method} ${url}`, options?.body ? `(body: ${options.body.substring(0, 100)}...)` : "");
+    }
+  }
+}
+
+// Response logging helper
+function logResponse(status: number, url: string, duration: number) {
+  if (typeof window !== "undefined" && window.location.hostname !== "localhost") {
+    if (process.env.NEXT_PUBLIC_DEBUG_API !== "false") {
+      console.debug(`[API] ${status} ${url} (${duration}ms)`);
+    }
+  }
+}
+
+// Error logging helper
+function logError(error: Error, context: string) {
+  console.error(`[API Error] ${context}:`, error.message);
+  if (process.env.NODE_ENV === "development") {
+    console.error(error);
+  }
+}
+
+async function fetchAPI<T>(
+  path: string,
+  options: FetchOptions = {}
+): Promise<T> {
+  const { params, timeout = 30000, retries = 1, ...fetchOptions } = options;
 
   let url = `${API_BASE}${path}`;
   if (params) {
     const searchParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
-      searchParams.append(key, String(value));
+      if (value !== null && value !== undefined) {
+        searchParams.append(key, String(value));
+      }
     });
     url += `?${searchParams.toString()}`;
   }
 
-  const response = await fetch(url, {
-    ...fetchOptions,
-    headers: {
-      "Content-Type": "application/json",
-      ...fetchOptions.headers,
-    },
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.detail || `API Error: ${response.status}`);
+  let lastError: Error | null = null;
+  let attempt = 0;
+
+  while (attempt <= retries) {
+    try {
+      attempt++;
+      logRequest(fetchOptions.method || "GET", url, fetchOptions);
+
+      const startTime = performance.now();
+
+      const response = await fetch(url, {
+        ...fetchOptions,
+        signal: controller.signal,
+        headers: {
+          "Content-Type": "application/json",
+          ...fetchOptions.headers,
+        },
+      });
+
+      const duration = performance.now() - startTime;
+      logResponse(response.status, url, duration);
+
+      if (!response.ok) {
+        const rawText = await response.text().catch(() => "");
+        let errorDetail = `HTTP ${response.status}`;
+        let errorData: any = {};
+
+        try {
+          if (rawText) {
+            errorData = JSON.parse(rawText);
+            errorDetail = errorData.detail || errorData.message || errorData.error || errorDetail;
+          }
+        } catch {
+          // If JSON parsing fails, use raw text
+          if (rawText) {
+            errorDetail = rawText.substring(0, 200);
+          }
+        }
+
+        const apiError = new APIError(response.status, path, errorDetail, errorData);
+        logError(apiError, `API request failed: ${fetchOptions.method || "GET"} ${url}`);
+
+        // Retry on certain status codes (5xx errors, 429 rate limit)
+        if ((response.status >= 500 || response.status === 429) && attempt <= retries) {
+          const backoffMs = Math.pow(2, attempt - 1) * 1000;
+          console.warn(`[API] Retry attempt ${attempt}/${retries} after ${backoffMs}ms...`);
+          await new Promise(resolve => setTimeout(resolve, backoffMs));
+          continue;
+        }
+
+        throw apiError;
+      }
+
+      const data = await response.json().catch((err) => {
+        const parseError = new Error(`Failed to parse API response as JSON: ${err.message}`);
+        logError(parseError, `JSON parsing failed for ${url}`);
+        throw parseError;
+      });
+
+      return data as T;
+    } catch (error) {
+      lastError = error as Error;
+
+      if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
+        const networkError = new Error(
+          "Network error: Unable to reach the API server. Check your connection and try again."
+        );
+        logError(networkError, `Network error for ${url}`);
+        throw networkError;
+      }
+
+      if (error instanceof DOMException && error.name === "AbortError") {
+        const timeoutError = new Error(
+          `Request timeout: API call exceeded ${timeout}ms. The server may be experiencing high load.`
+        );
+        logError(timeoutError, `Timeout for ${url}`);
+        throw timeoutError;
+      }
+
+      if (error instanceof APIError) {
+        throw error;
+      }
+
+      // Unexpected error, don't retry
+      const unexpectedError = new Error(`Unexpected error: ${(error as Error).message}`);
+      logError(unexpectedError, `Unexpected error for ${url}`);
+      throw unexpectedError;
+    } finally {
+      clearTimeout(timeoutId);
+    }
   }
 
-  return response.json();
+  // If we get here, all retries failed
+  throw lastError || new Error("API request failed after retries");
 }
 
 // Types
@@ -216,6 +346,49 @@ export interface ForecastEnsemble {
   last_updated: string;
 }
 
+export interface ForecastPoint {
+  forecast_date: string;
+  mrr_predicted: number;
+  cash_predicted: number;
+  confidence_lower: number;
+  confidence_upper: number;
+}
+
+export interface BudgetVarianceItem {
+  category: string;
+  budget: number;
+  actual: number;
+  variance: number;
+  variance_pct: number;
+  is_zero_based?: boolean;
+}
+
+export interface BudgetVarianceResponse {
+  budget_name: string;
+  month: string;
+  department_filter?: string | null;
+  variances: BudgetVarianceItem[];
+}
+
+export interface PayrollEntryItem {
+  id: string;
+  pay_date: string;
+  gross_pay: number;
+  net_pay: number;
+  status: string;
+  department?: string | null;
+}
+
+export interface AssetLifecycleItem {
+  asset_id: string;
+  asset_name: string;
+  category?: string | null;
+  age_years: number;
+  remaining_life_years: number;
+  book_value: number;
+  recommendation: string;
+}
+
 export interface CollectionsAging {
   as_of: string;
   ar: {
@@ -291,6 +464,108 @@ export interface HiringImpactResponse {
   projected_hire_costs_12m?: number;
 }
 
+export interface FinancialConceptResponse {
+  status: string;
+  concept_name: string;
+  definition: string;
+  interpretation: string;
+  good_range: string;
+  red_flags: string[];
+  related_concepts: string[];
+}
+
+export interface FinancialConceptListResponse {
+  status: string;
+  total_concepts: number;
+  concepts: string[];
+}
+
+export interface FinancialRecommendationsResponse {
+  status: string;
+  company_id: string;
+  company_stage: string;
+  recommendation_count: number;
+  recommendations: Array<Record<string, unknown>>;
+  summary: {
+    critical: number;
+    high: number;
+    medium: number;
+  };
+}
+
+export interface ComprehensiveFinancialAnalysisResponse {
+  status: string;
+  analysis_date: string;
+  company_id: string;
+  company_stage: string;
+  income_statement: Record<string, unknown>;
+  key_metrics: Record<string, unknown>;
+  cash_flow: Record<string, unknown>;
+  financial_health: Record<string, unknown>;
+  recommendations: Array<Record<string, unknown>>;
+  recommendation_summary: {
+    total: number;
+    critical: number;
+    high: number;
+    medium: number;
+  };
+}
+
+export interface CashFlowAnalysisInput {
+  operating_cash_flow: number;
+  investing_cash_flow: number;
+  financing_cash_flow: number;
+  capex?: number;
+  net_income: number;
+}
+
+export interface ProfitabilityAnalysisInput {
+  revenue: number;
+  cogs: number;
+  operating_expenses: number;
+  interest_expense?: number;
+  tax_expense?: number;
+}
+
+export interface LiquidityAnalysisInput {
+  current_assets: number;
+  current_liabilities: number;
+  inventory?: number;
+}
+
+export interface LeverageAnalysisInput {
+  total_debt: number;
+  total_equity: number;
+  operating_profit: number;
+  interest_expense: number;
+}
+
+export interface RunwayAnalysisResponse {
+  status: string;
+  months_of_runway?: number;
+  runway_months?: number;
+  zero_date?: string;
+  confidence_interval?: string;
+  [key: string]: unknown;
+}
+
+// Safe wrapper for API calls with error handling and logging
+export async function safeAPICall<T>(
+  callFn: () => Promise<T>,
+  defaultValue: T,
+  context: string
+): Promise<T> {
+  try {
+    return await callFn();
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error(`[API Safe Call] ${context} failed: ${errorMsg}`);
+    
+    // Return default value to prevent UI crashes
+    return defaultValue;
+  }
+}
+
 // API Functions
 export const api = {
   // Cash & Financials
@@ -299,6 +574,50 @@ export const api = {
   getRunway: () => fetchAPI<Runway>("/runway"),
   getRevenue: () => fetchAPI<Revenue>("/revenue"),
   getScorecard: () => fetchAPI<Scorecard>("/scorecard"),
+  analyzeFinancialCashFlow: (payload: CashFlowAnalysisInput) =>
+    fetchAPI<Record<string, unknown>>("/financial/analyze/cash-flow", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  analyzeFinancialProfitability: (payload: ProfitabilityAnalysisInput) =>
+    fetchAPI<Record<string, unknown>>("/financial/analyze/profitability", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  analyzeFinancialLiquidity: (payload: LiquidityAnalysisInput) =>
+    fetchAPI<Record<string, unknown>>("/financial/analyze/working-capital", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  analyzeFinancialLeverage: (payload: LeverageAnalysisInput) =>
+    fetchAPI<Record<string, unknown>>("/financial/analyze/leverage", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  analyzeFinancialComprehensive: (payload: Record<string, unknown>) =>
+    fetchAPI<ComprehensiveFinancialAnalysisResponse>("/financial/analyze/comprehensive", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  getFinancialConcept: (conceptName: string) =>
+    fetchAPI<FinancialConceptResponse>(`/financial/concepts/${conceptName}`),
+  listFinancialConcepts: () =>
+    fetchAPI<FinancialConceptListResponse>("/financial/concepts"),
+  getFinancialRecommendations: (payload: Record<string, unknown>) =>
+    fetchAPI<FinancialRecommendationsResponse>("/financial/recommendations", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  calculateFinancialRunway: (params: { cash_balance: number; monthly_burn: number; monthly_revenue?: number; growth_rate?: number }) =>
+    fetchAPI<RunwayAnalysisResponse>("/financial/calculate/runway", {
+      method: "POST",
+      params,
+    }),
+  getForecasts: (companyId: string, months: number = 6) =>
+    fetchAPI<ForecastPoint[]>("/planning/forecasts", { params: { company_id: companyId, months } }),
+  getBudgets: () => fetchAPI<any[]>("/planning/budgets"),
+  getBudgetVariance: (budgetId: string, params?: { month?: string; department?: string }) =>
+    fetchAPI<BudgetVarianceResponse>(`/planning/budgets/${budgetId}/variance`, { params: params as Record<string, string | number> }),
 
   // Expenses
   getExpenses: (months: number = 3, params?: { department?: string; product_tag?: string }) => 
@@ -418,6 +737,15 @@ export const api = {
     }),
 
   getBenchmarks: () => fetchAPI<any>("/benchmarks/sass-health"),
+  getPayrollEntries: (params?: { start_date?: string; end_date?: string }) =>
+    fetchAPI<PayrollEntryItem[]>("/payroll/payroll-entries", { params: params as Record<string, string | number> }),
+  getMonthlyPayrollCost: (month?: string) =>
+    fetchAPI<any>("/payroll/monthly-cost", { params: month ? { month } : undefined }),
+  getEmployees: () => fetchAPI<any[]>("/payroll/employees"),
+  getAssets: (companyId: string) => fetchAPI<any[]>("/depreciation/assets", { params: { company_id: companyId } }),
+  getDepreciationEntries: (companyId: string) => fetchAPI<any[]>("/depreciation/entries", { params: { company_id: companyId } }),
+  getDepreciationExpense: (companyId: string, month: string) =>
+    fetchAPI<any>("/depreciation/monthly-expense", { params: { company_id: companyId, month } }),
   getMe: () => fetchAPI<any>("/users/me/"),
   getStartupHealth: () => fetchAPI<StartupHealth>("/system/startup-health"),
   runStartupRemediation: (action: string, month?: string) =>

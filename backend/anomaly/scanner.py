@@ -43,11 +43,12 @@ def load_gl_transactions(days_back: int = 90) -> pd.DataFrame:
         )
         if response.status_code == 200:
             data = response.json()
-            # Transform to DataFrame
-            expenses = data.get("breakdown", [])
-            df = pd.DataFrame(expenses)
-            if not df.empty:
-                return df
+            breakdown = data.get("breakdown", {})
+            if isinstance(breakdown, dict) and breakdown:
+                rows = [{"date": datetime.utcnow().date().isoformat(), "category": category, "vendor": category, "amount": amount, "gl_account": category} for category, amount in breakdown.items()]
+                df = pd.DataFrame(rows)
+                if not df.empty:
+                    return df
     except Exception as e:
         print(f"Could not fetch from ERPNext: {e}")
     
@@ -230,6 +231,227 @@ def detect_duplicate_payments(df: pd.DataFrame, window_days: int = 30) -> List[D
     return alerts
 
 
+def detect_duplicate_expenses(db) -> List[Dict]:
+    """Detect duplicate expenses using company, vendor, amount, and transaction date."""
+    alerts: List[Dict] = []
+    try:
+        rows = (
+            db.query(models.Expense.company_id, models.Expense.contact_id, models.Expense.total_amount, models.Expense.transaction_date, models.Expense.category)
+            .all()
+        )
+        seen = {}
+        for company_id, contact_id, amount, transaction_date, category in rows:
+            key = (str(company_id), str(contact_id), float(amount or 0), transaction_date)
+            seen[key] = seen.get(key, 0) + 1
+        for (company_id, contact_id, amount, transaction_date, category), count in seen.items():
+            if count > 1 and amount > 0:
+                alerts.append({
+                    "severity": "critical",
+                    "alert_type": "duplicate",
+                    "category": category or "general",
+                    "amount": amount,
+                    "baseline": amount,
+                    "delta_pct": 100.0,
+                    "description": f"Duplicate expense detected for {category or 'general'} on {transaction_date}",
+                    "runway_impact": 0.0,
+                    "suggested_owner": "Finance",
+                })
+    except Exception as exc:
+        print(f"[SCANNER] duplicate expense detector failed: {exc}")
+    return alerts
+
+
+def detect_unusual_payment_patterns(db) -> List[Dict]:
+    """Detect unusually large or clustered vendor payments."""
+    alerts: List[Dict] = []
+    try:
+        rows = db.query(models.Expense.contact_id, models.Expense.total_amount, models.Expense.transaction_date, models.Expense.category).all()
+        grouped: Dict[str, List[float]] = {}
+        for contact_id, amount, *_ in rows:
+            key = str(contact_id)
+            grouped.setdefault(key, []).append(float(amount or 0))
+        for contact_id, amounts in grouped.items():
+            if len(amounts) < 3:
+                continue
+            avg = float(np.mean(amounts))
+            latest = amounts[-1]
+            if avg > 0 and latest > avg * 1.75:
+                alerts.append({
+                    "severity": "warning",
+                    "alert_type": "timing",
+                    "category": "vendor",
+                    "amount": latest,
+                    "baseline": avg,
+                    "delta_pct": round(((latest - avg) / avg) * 100, 1),
+                    "description": f"Latest vendor payment is materially above history for contact {contact_id}",
+                    "runway_impact": 0.0,
+                    "suggested_owner": "Finance",
+                })
+    except Exception as exc:
+        print(f"[SCANNER] payment pattern detector failed: {exc}")
+    return alerts
+
+
+def detect_vendor_pricing_anomalies(db) -> List[Dict]:
+    """Detect vendor pricing drift using contact-level expense history."""
+    alerts: List[Dict] = []
+    try:
+        rows = db.query(models.Expense.contact_id, models.Expense.total_amount, models.Expense.category).all()
+        grouped: Dict[str, List[float]] = {}
+        for contact_id, amount, _ in rows:
+            grouped.setdefault(str(contact_id), []).append(float(amount or 0))
+        for contact_id, amounts in grouped.items():
+            if len(amounts) < 4:
+                continue
+            baseline = float(np.mean(amounts[:-1]))
+            latest = amounts[-1]
+            if baseline > 0:
+                delta_pct = ((latest - baseline) / baseline) * 100
+                if delta_pct >= 40:
+                    alerts.append({
+                        "severity": "warning" if delta_pct < 80 else "critical",
+                        "alert_type": "vendor",
+                        "category": "vendor_pricing",
+                        "amount": latest,
+                        "baseline": baseline,
+                        "delta_pct": round(delta_pct, 1),
+                        "description": f"Vendor pricing increased {delta_pct:.1f}% for contact {contact_id}",
+                        "runway_impact": 0.0,
+                        "suggested_owner": "Finance",
+                    })
+    except Exception as exc:
+        print(f"[SCANNER] vendor pricing detector failed: {exc}")
+    return alerts
+
+
+def detect_payroll_anomalies(db) -> List[Dict]:
+    """Detect overtime or payroll spikes from monthly payroll entries."""
+    alerts: List[Dict] = []
+    try:
+        rows = db.query(models.PayrollEntry.pay_date, models.PayrollEntry.gross_pay, models.PayrollEntry.department).all()
+        if not rows:
+            return alerts
+        monthly = {}
+        for pay_date, gross_pay, department in rows:
+            month_key = pay_date.strftime("%Y-%m") if pay_date else "unknown"
+            monthly.setdefault(month_key, []).append(float(gross_pay or 0))
+        series = [sum(values) for _, values in sorted(monthly.items())]
+        if len(series) >= 3:
+            baseline = float(np.mean(series[:-1]))
+            latest = series[-1]
+            if baseline > 0 and latest > baseline * 1.25:
+                alerts.append({
+                    "severity": "warning" if latest < baseline * 1.5 else "critical",
+                    "alert_type": "spike",
+                    "category": "payroll",
+                    "amount": latest,
+                    "baseline": baseline,
+                    "delta_pct": round(((latest - baseline) / baseline) * 100, 1),
+                    "description": "Payroll spike detected versus trailing average",
+                    "runway_impact": 0.0,
+                    "suggested_owner": "People",
+                })
+    except Exception as exc:
+        print(f"[SCANNER] payroll detector failed: {exc}")
+    return alerts
+
+
+def detect_subscription_churn_alerts(db) -> List[Dict]:
+    """Flag revenue drops that imply churn acceleration."""
+    alerts: List[Dict] = []
+    try:
+        metrics = (
+            db.query(models.MonthlyMetric)
+            .order_by(models.MonthlyMetric.metric_month.asc())
+            .all()
+        )
+        if len(metrics) < 3:
+            return alerts
+        revenues = [float(metric.total_revenue or 0) for metric in metrics]
+        baseline = float(np.mean(revenues[:-1]))
+        latest = revenues[-1]
+        if baseline > 0 and latest < baseline * 0.9:
+            alerts.append({
+                "severity": "warning",
+                "alert_type": "revenue_drop",
+                "category": "subscription",
+                "amount": latest,
+                "baseline": baseline,
+                "delta_pct": round(((latest - baseline) / baseline) * 100, 1),
+                "description": "Subscription revenue is below trend, indicating potential churn acceleration",
+                "runway_impact": 0.0,
+                "suggested_owner": "Revenue",
+            })
+    except Exception as exc:
+        print(f"[SCANNER] churn detector failed: {exc}")
+    return alerts
+
+
+def detect_customer_concentration_risk(db) -> List[Dict]:
+    """Flag concentration when one customer dominates open receivables."""
+    alerts: List[Dict] = []
+    try:
+        rows = db.query(models.Invoice.contact_id, models.Invoice.amount_due).filter(
+            models.Invoice.type == "ACCOUNTS_RECEIVABLE",
+            models.Invoice.amount_due > 0,
+        ).all()
+        if not rows:
+            return alerts
+        by_customer: Dict[str, float] = {}
+        for contact_id, amount in rows:
+            by_customer[str(contact_id)] = by_customer.get(str(contact_id), 0.0) + float(amount or 0)
+        total = sum(by_customer.values())
+        if total <= 0:
+            return alerts
+        top_customer, top_amount = max(by_customer.items(), key=lambda item: item[1])
+        share = (top_amount / total) * 100
+        if share >= 25:
+            alerts.append({
+                "severity": "warning" if share < 40 else "critical",
+                "alert_type": "timing",
+                "category": "customer_concentration",
+                "amount": top_amount,
+                "baseline": total,
+                "delta_pct": round(share, 1),
+                "description": f"Top customer {top_customer} represents {share:.1f}% of AR",
+                "runway_impact": 0.0,
+                "suggested_owner": "CEO",
+            })
+    except Exception as exc:
+        print(f"[SCANNER] customer concentration detector failed: {exc}")
+    return alerts
+
+
+def detect_supply_chain_cost_anomalies(db) -> List[Dict]:
+    """Detect cloud and supply-chain style spend spikes by category."""
+    alerts: List[Dict] = []
+    try:
+        rows = db.query(models.Expense.category, models.Expense.total_amount).all()
+        grouped: Dict[str, List[float]] = {}
+        for category, amount in rows:
+            grouped.setdefault((category or "misc").lower(), []).append(float(amount or 0))
+        for category, amounts in grouped.items():
+            if len(amounts) < 4:
+                continue
+            baseline = float(np.mean(amounts[:-1]))
+            latest = amounts[-1]
+            if baseline > 0 and latest > baseline * 1.4:
+                alerts.append({
+                    "severity": "warning" if latest < baseline * 2 else "critical",
+                    "alert_type": "spike",
+                    "category": category,
+                    "amount": latest,
+                    "baseline": baseline,
+                    "delta_pct": round(((latest - baseline) / baseline) * 100, 1),
+                    "description": f"Supply-chain style cost anomaly in {category}",
+                    "runway_impact": 0.0,
+                    "suggested_owner": "Operations",
+                })
+    except Exception as exc:
+        print(f"[SCANNER] supply chain detector failed: {exc}")
+    return alerts
+
+
 def detect_new_vendor_anomalies(df: pd.DataFrame, threshold: float = 1000) -> List[Dict]:
     """
     Flag new vendors with significant charges.
@@ -353,6 +575,22 @@ def run_full_scan() -> Dict:
         # These functions add to the DB directly (anomaly table)
         anomaly_detection.detect_revenue_anomalies(db)
         anomaly_detection.detect_duplicate_invoices(db)
+
+        duplicate_expense_alerts = detect_duplicate_expenses(db)
+        vendor_pricing_alerts = detect_vendor_pricing_anomalies(db)
+        payroll_alerts = detect_payroll_anomalies(db)
+        churn_alerts = detect_subscription_churn_alerts(db)
+        concentration_alerts = detect_customer_concentration_risk(db)
+        supply_chain_alerts = detect_supply_chain_cost_anomalies(db)
+
+        all_alerts.extend(
+            duplicate_expense_alerts
+            + vendor_pricing_alerts
+            + payroll_alerts
+            + churn_alerts
+            + concentration_alerts
+            + supply_chain_alerts
+        )
         
         db.close()
         print("[SCANNER] Ran supplemental detectors (Revenue, Duplicates)")

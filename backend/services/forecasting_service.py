@@ -367,7 +367,13 @@ def _moving_average_forecast(df: pd.DataFrame, periods: int = 12) -> pd.DataFram
 
 def calculate_ensemble_runway(company_id: UUID, db: Session) -> dict:
     """Blend SARIMA-family forecast with moving-average baseline for robustness."""
+    import math
+    
     current_cash = _current_cash_inr(company_id, db)
+    # Sanitize current_cash to avoid NaN/Inf propagation
+    if current_cash is None or math.isnan(current_cash) or math.isinf(current_cash):
+        current_cash = 0.0
+    
     burn_df = prepare_monthly_timeseries(company_id, db, entry_type="debit")
     revenue_df = prepare_monthly_timeseries(company_id, db, entry_type="credit")
 
@@ -382,11 +388,29 @@ def calculate_ensemble_runway(company_id: UUID, db: Session) -> dict:
     rev_fc["yhat"] = (rev_fc["yhat"] * 0.7) + (rev_ma["yhat"] * 0.3)
 
     runway_data = _runway_from_projection(current_cash, burn_fc, rev_fc)
+    
+    # Sanitize runway data to remove NaN/Inf values
+    def sanitize_float(val):
+        if val is None or (isinstance(val, float) and (math.isnan(val) or math.isinf(val))):
+            return 0.0
+        return float(val)
+    
+    # Sanitize monthly projections
+    sanitized_projections = []
+    for month_data in runway_data.get("monthly_projections", []):
+        sanitized_projections.append({
+            "month": month_data.get("month"),
+            "projected_burn": sanitize_float(month_data.get("projected_burn")),
+            "projected_revenue": sanitize_float(month_data.get("projected_revenue")),
+            "net_burn": sanitize_float(month_data.get("net_burn")),
+            "cumulative_cash": sanitize_float(month_data.get("cumulative_cash")),
+        })
+    
     return {
-        "current_cash_inr": current_cash,
-        "runway_months": runway_data["runway_months"],
+        "current_cash_inr": sanitize_float(current_cash),
+        "runway_months": sanitize_float(runway_data["runway_months"]),
         "runway_date": runway_data["runway_date"],
-        "monthly_projections": runway_data["monthly_projections"],
+        "monthly_projections": sanitized_projections,
         "model_used": f"ensemble({burn_model['model_type']}+moving_average, {rev_model['model_type']}+moving_average)",
         "weights": {"primary": 0.7, "moving_average": 0.3},
         "last_updated": datetime.utcnow().isoformat(),

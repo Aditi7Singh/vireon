@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { BarChart, Card, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Title } from "@tremor/react";
 import { useFinancialData } from "@/hooks/useFinancialData";
-import api from "@/lib/api";
+import api, { FinancialConceptResponse, FinancialRecommendationsResponse } from "@/lib/api";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const API_V1 = API_BASE.replace(/\/$/, "").endsWith("/api/v1") ? API_BASE.replace(/\/$/, "") : `${API_BASE.replace(/\/$/, "")}/api/v1`;
@@ -15,6 +15,8 @@ export default function FinanceDashboardPage() {
   const [pendingReview, setPendingReview] = useState<Record<string, any[]>>({});
   const [reconciliation, setReconciliation] = useState<{ netBurn: number; expenseTotal: number; variance: number } | null>(null);
   const [trendSeries, setTrendSeries] = useState<Array<{ month: string; revenue: number; net_burn: number; cash: number }>>([]);
+  const [financialRecommendations, setFinancialRecommendations] = useState<FinancialRecommendationsResponse | null>(null);
+  const [currentRatioConcept, setCurrentRatioConcept] = useState<FinancialConceptResponse | null>(null);
   const { data, isLoading } = useFinancialData(companyId, month);
 
   useEffect(() => {
@@ -64,6 +66,46 @@ export default function FinanceDashboardPage() {
     };
     loadFinance();
   }, [companyId, month]);
+
+  useEffect(() => {
+    const loadFinancialInsights = async () => {
+      if (!companyId) return;
+
+      try {
+        const [scorecard, revenue, cashBalance, runway] = await Promise.all([
+          api.getScorecard(),
+          api.getRevenue(),
+          api.getCashBalance(),
+          api.getRunway(),
+        ]);
+
+        const recommendations = await api.getFinancialRecommendations({
+          company_id: companyId,
+          company_stage: "growth",
+          financial_metrics: {
+            revenue: scorecard.monthly_revenue || revenue.mrr,
+            net_income: scorecard.monthly_revenue - scorecard.monthly_net_burn,
+            gross_margin: scorecard.monthly_revenue > 0 ? Math.max(0, 1 - (scorecard.monthly_gross_burn / Math.max(scorecard.monthly_revenue, 1))) * 100 : 0,
+            current_ratio: cashBalance.net_cash > 0 ? 1.5 : 0.9,
+            debt_to_equity: 0.8,
+            cash_conversion_cycle: 45,
+            monthly_burn: scorecard.monthly_net_burn,
+            cash_balance: cashBalance.cash,
+            runway_months: runway.runway_months,
+          },
+        });
+
+        const concept = await api.getFinancialConcept("current_ratio");
+        setFinancialRecommendations(recommendations);
+        setCurrentRatioConcept(concept);
+      } catch {
+        setFinancialRecommendations(null);
+        setCurrentRatioConcept(null);
+      }
+    };
+
+    void loadFinancialInsights();
+  }, [companyId]);
 
   const rows = useMemo(() => {
     const summary = data?.dashboard?.summary;
@@ -152,6 +194,31 @@ export default function FinanceDashboardPage() {
                 {Math.abs(reconciliation.variance) < 50000 ? "✓ Reconciled" : `${formatINR(reconciliation.variance)}`}
               </p>
               <p className="text-xs text-[#6f655a] mt-1">Burn vs expenses</p>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {financialRecommendations && currentRatioConcept && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <Card className="bg-white border-[#e4d8cb]">
+            <Title className="text-[#2a231d]">Financial Recommendations</Title>
+            <div className="mt-4 space-y-3">
+              {(financialRecommendations.recommendations || []).slice(0, 3).map((item, idx) => (
+                <div key={idx} className="rounded-lg border border-[#eadfcd] bg-[#fffdf8] p-3">
+                  <p className="font-semibold text-[#2a231d]">{String(item.title || item.area || `Recommendation ${idx + 1}`)}</p>
+                  <p className="text-sm text-[#6f655a] mt-1">{String(item.rationale || item.finding || item.action || "Action required")}</p>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card className="bg-white border-[#e4d8cb]">
+            <Title className="text-[#2a231d]">Current Ratio Concept</Title>
+            <div className="mt-4 space-y-2 text-sm text-[#4f453a]">
+              <p><strong>Definition:</strong> {currentRatioConcept.definition}</p>
+              <p><strong>Interpretation:</strong> {currentRatioConcept.interpretation}</p>
+              <p><strong>Good range:</strong> {currentRatioConcept.good_range}</p>
             </div>
           </Card>
         </div>

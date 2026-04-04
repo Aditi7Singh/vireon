@@ -309,7 +309,7 @@ export default function AnomaliesPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-xs font-bold text-[#5f5344] min-w-fit\">Other:</span>
+                  <span className="text-xs font-bold text-[#5f5344] min-w-fit">Other:</span>
                   <div className="flex flex-wrap gap-1">
                     {genericEmails.length > 0 ? (
                       genericEmails.map((e, i) => <span key={i} className="inline-block px-2 py-1 bg-green-100 text-green-700 rounded text-xs">{e}</span>)
