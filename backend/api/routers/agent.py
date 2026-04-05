@@ -8,6 +8,8 @@ import schemas
 import database
 import auth
 from agent.cfo_agent import run_cfo_query
+from agent.finance_agent import run_finance_query
+from agent.finance_manager_agent import run_finance_manager_query
 from agent.memory import build_enhanced_context, load_session_messages
 from agent.routing import classify_query
 from langchain_core.messages import HumanMessage, AIMessage
@@ -138,3 +140,51 @@ async def get_history(
     except Exception as e:
         print(f"Error fetching history: {e}")
         return {"session_id": session_id, "messages": []}
+
+
+@router.post("/finance/chat", response_model=dict)
+async def chat_with_finance_agent(
+    request: schemas.ChatRequest,
+    db: Session = Depends(database.get_db),
+    current_user: Optional[models.User] = Depends(auth.get_current_user),
+):
+    session_id = request.session_id or f"finance_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    company = db.query(models.Company).filter(models.Company.id == request.company_id).first() if request.company_id else db.query(models.Company).first()
+    context = build_enhanced_context({"name": company.name if company else "SeedlingLabs"}, company_id=str(company.id) if company else None)
+    answer = run_finance_query(
+        user_message=request.message,
+        session_id=session_id,
+        company_context=context,
+        company_id=str(company.id) if company else None,
+    )
+    return {
+        "response": answer,
+        "session_id": session_id,
+        "query_type": classify_query(request.message),
+        "agent_mode": "finance_operations",
+        "timestamp": datetime.now().isoformat(),
+    }
+
+
+@router.post("/finance-manager/chat", response_model=dict)
+async def chat_with_finance_manager_agent(
+    request: schemas.ChatRequest,
+    db: Session = Depends(database.get_db),
+    current_user: Optional[models.User] = Depends(auth.get_current_user),
+):
+    session_id = request.session_id or f"finmgr_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    company = db.query(models.Company).filter(models.Company.id == request.company_id).first() if request.company_id else db.query(models.Company).first()
+    context = build_enhanced_context({"name": company.name if company else "SeedlingLabs"}, company_id=str(company.id) if company else None)
+    answer = run_finance_manager_query(
+        user_message=request.message,
+        session_id=session_id,
+        company_context=context,
+        company_id=str(company.id) if company else None,
+    )
+    return {
+        "response": answer,
+        "session_id": session_id,
+        "query_type": classify_query(request.message),
+        "agent_mode": "finance_manager",
+        "timestamp": datetime.now().isoformat(),
+    }

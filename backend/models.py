@@ -739,6 +739,154 @@ class ScenarioSnapshot(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
 
+class ClosePeriod(Base):
+    __tablename__ = "close_periods"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    period = Column(String(7), nullable=False, index=True)  # YYYY-MM
+    status = Column(String(30), nullable=False, default="draft")  # draft, in_progress, validated, locked
+    readiness_score = Column(Float, nullable=False, default=0.0)
+    locked_at = Column(DateTime, nullable=True)
+    locked_by = Column(String(255), nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+
+class CloseChecklist(Base):
+    __tablename__ = "close_checklists"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    close_period_id = Column(UUID(as_uuid=True), ForeignKey("close_periods.id", ondelete="CASCADE"), nullable=False, index=True)
+    item_key = Column(String(100), nullable=False)
+    item_name = Column(String(255), nullable=False)
+    status = Column(String(30), nullable=False, default="pending")  # pending, complete, blocked
+    details = Column(JSON, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+
+class CloseAudit(Base):
+    __tablename__ = "close_audit"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    close_period_id = Column(UUID(as_uuid=True), ForeignKey("close_periods.id", ondelete="CASCADE"), nullable=False, index=True)
+    action = Column(String(100), nullable=False, index=True)
+    actor_id = Column(String(255), nullable=True)
+    audit_data = Column(JSON, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow, index=True)
+
+
+class ApprovalWorkflow(Base):
+    __tablename__ = "approval_workflows"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    name = Column(String(255), nullable=False)
+    entity_type = Column(String(100), nullable=False, default="finance_operation")
+    is_active = Column(Boolean, nullable=False, default=True)
+    config = Column(JSON, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+
+class ApprovalStep(Base):
+    __tablename__ = "approval_steps"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    workflow_id = Column(UUID(as_uuid=True), ForeignKey("approval_workflows.id", ondelete="CASCADE"), nullable=False, index=True)
+    step_order = Column(Integer, nullable=False, default=1)
+    approver_role = Column(String(100), nullable=False)
+    min_amount = Column(Numeric(15, 2), nullable=False, default=0)
+    max_amount = Column(Numeric(15, 2), nullable=True)
+    parallel_group = Column(String(100), nullable=True)
+    escalation_hours = Column(Integer, nullable=True)
+    allow_delegation = Column(Boolean, nullable=False, default=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class ApprovalRequest(Base):
+    __tablename__ = "approval_requests"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    workflow_id = Column(UUID(as_uuid=True), ForeignKey("approval_workflows.id", ondelete="CASCADE"), nullable=False, index=True)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    reference_type = Column(String(100), nullable=False, default="finance_operation")
+    reference_id = Column(String(255), nullable=True)
+    amount = Column(Numeric(15, 2), nullable=False, default=0)
+    status = Column(String(30), nullable=False, default="pending")  # pending, approved, rejected, delegated
+    current_step_order = Column(Integer, nullable=False, default=1)
+    requested_by = Column(String(255), nullable=True)
+    due_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+
+class ApprovalAction(Base):
+    __tablename__ = "approval_actions"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    request_id = Column(UUID(as_uuid=True), ForeignKey("approval_requests.id", ondelete="CASCADE"), nullable=False, index=True)
+    action = Column(String(30), nullable=False)  # approve, reject, delegate
+    actor_id = Column(String(255), nullable=False)
+    actor_role = Column(String(100), nullable=True)
+    comments = Column(Text, nullable=True)
+    delegated_to = Column(String(255), nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow, index=True)
+
+
+class AuditEvent(Base):
+    __tablename__ = "audit_events"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=True, index=True)
+    event_type = Column(String(100), nullable=False, index=True)
+    entity_type = Column(String(100), nullable=False, index=True)
+    entity_id = Column(String(255), nullable=False, index=True)
+    old_value = Column(JSON, nullable=True)
+    new_value = Column(JSON, nullable=True)
+    user_id = Column(String(255), nullable=True, index=True)
+    timestamp = Column(DateTime, nullable=False, default=datetime.datetime.utcnow, index=True)
+    immutable_hash = Column(String(128), nullable=False, index=True)
+
+
+class EntityHierarchy(Base):
+    __tablename__ = "entity_hierarchy"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    parent_company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    subsidiary_company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    ownership_pct = Column(Numeric(5, 2), nullable=False, default=100)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class IntercompanyTransaction(Base):
+    __tablename__ = "intercompany_transactions"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    from_company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    to_company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    period = Column(String(7), nullable=False, index=True)
+    amount = Column(Numeric(15, 2), nullable=False)
+    currency = Column(String(3), nullable=False, default="INR")
+    status = Column(String(30), nullable=False, default="open")  # open, matched, eliminated
+    reference = Column(String(255), nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class ConsolidationSnapshot(Base):
+    __tablename__ = "consolidation_snapshots"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    period = Column(String(7), nullable=False, index=True)
+    company_ids = Column(JSON, nullable=False)
+    target_currency = Column(String(3), nullable=False, default="INR")
+    balance_sheet = Column(JSON, nullable=False)
+    pnl = Column(JSON, nullable=False)
+    minority_interest = Column(Numeric(15, 2), nullable=False, default=0)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
 class AgentConversation(Base):
     __tablename__ = "agent_conversations"
 

@@ -184,11 +184,18 @@ def _seed_transactions_if_empty(db: Session, company_id) -> None:
 def run_bootstrap() -> None:
     """Deterministic local bootstrap used on app startup."""
     ensure_sqlite_compatibility()
-    db = database.SessionLocal()
+    try:
+        db = database.SessionLocal()
+    except Exception as e:
+        print(f"⚠️  Bootstrap: Could not connect to database ({e}). Skipping bootstrap.")
+        return
+    
     try:
         company = _seed_default_company(db)
         _seed_monthly_metrics_if_empty(db, company.id)
         _seed_exchange_rates_if_empty(db)
         _seed_transactions_if_empty(db, company.id)
+    except Exception as e:
+        print(f"⚠️  Bootstrap error (non-fatal): {e}")
     finally:
         db.close()

@@ -13,14 +13,18 @@ from agent.prompts import build_query_classifier_prompt
 # Keyword sets for fast pre-filtering
 SIMPLE_KEYWORDS = {"balance", "cash", "burn rate", "mrr", "arr", "runway", "how much", "what is", 
                   "depreciation", "assets", "book value", "loans", "debt", "payroll", "taxes", 
-                  "tax liability", "fixed assets", "asset utilization"}
+                                    "tax liability", "fixed assets", "asset utilization", "invoice status", "approval status",
+                                    "close status", "budget utilization", "bank reconciliation"}
 COMPLEX_KEYWORDS = {"why", "what if", "hire", "scenario", "forecast", "should we", "impact", 
                    "reduce", "increase", "explain", "what happens", "simulate", "cut",
                    "depreciation schedule", "loan impact", "tax planning", "payroll optimization",
-                   "asset management", "debt reduction", "capital efficiency"}
+                                     "asset management", "debt reduction", "capital efficiency", "month-end close",
+                                     "consolidation", "multi-entity", "period lock", "reallocation", "approval workflow",
+                                     "collections strategy", "vendor optimization", "payment run"}
 ALERT_KEYWORDS = {"spike", "anomaly", "alert", "unusual", "surprised", "unexpected", 
                  "double", "duplicate", "weird", "odd", "suspicious", "overdue", "breach",
-                 "tax deadline", "loan covenant", "asset impairment"}
+                                 "tax deadline", "loan covenant", "asset impairment", "close blocked", "reconciliation failed",
+                                 "approval stuck", "budget overrun"}
 
 
 def classify_query(user_message: str) -> Literal["simple", "complex", "alert"]:

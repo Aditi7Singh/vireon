@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 from datetime import date, timedelta
+from uuid import UUID
 import models
 import numpy as np
 from sqlalchemy import func, extract
@@ -331,4 +332,155 @@ def check_budget_alerts(db: Session, budget_id: Any, threshold_pct: float = 10.0
             })
 
     return alerts
+
+
+def create_budget(db: Session, company_id: UUID, period: str, budgets: dict) -> models.Budget:
+    """
+    Create a budget and lines from category/department payload.
+
+    Expected payload patterns:
+    - {"marketing": 12000, "payroll": 50000}
+    - {"engineering": {"payroll": 30000, "tools": 5000}}
+    """
+    fiscal_year = int(period.split("-")[0]) if "-" in period else date.today().year
+    budget_name = f"Budget {period}"
+    budget = models.Budget(
+        company_id=company_id,
+        name=budget_name,
+        fiscal_year=fiscal_year,
+        status="draft",
+    )
+    db.add(budget)
+    db.flush()
+
+    for key, value in budgets.items():
+        if isinstance(value, dict):
+            department = str(key)
+            for category, amount in value.items():
+                db.add(
+                    models.BudgetLine(
+                        budget_id=budget.id,
+                        category=f"{department}:{category}",
+                        monthly_amount=float(amount or 0),
+                    )
+                )
+        else:
+            db.add(
+                models.BudgetLine(
+                    budget_id=budget.id,
+                    category=str(key),
+                    monthly_amount=float(value or 0),
+                )
+            )
+
+    db.commit()
+    db.refresh(budget)
+    return budget
+
+
+def submit_for_approval(db: Session, budget_id: UUID) -> dict:
+    budget = db.query(models.Budget).filter(models.Budget.id == budget_id).first()
+    if not budget:
+        return {"success": False, "message": "Budget not found"}
+
+    budget.status = "pending_approval"
+    db.commit()
+    return {"success": True, "budget_id": str(budget.id), "status": budget.status}
+
+
+def approve_budget(db: Session, budget_id: UUID, approver_id: UUID) -> dict:
+    budget = db.query(models.Budget).filter(models.Budget.id == budget_id).first()
+    if not budget:
+        return {"success": False, "message": "Budget not found"}
+
+    old_status = budget.status
+    budget.status = "approved"
+    db.commit()
+
+    return {
+        "success": True,
+        "budget_id": str(budget.id),
+        "old_status": old_status,
+        "new_status": budget.status,
+        "approved_by": str(approver_id),
+    }
+
+
+def track_budget_utilization(db: Session, company_id: UUID, period: str) -> dict:
+    budget = (
+        db.query(models.Budget)
+        .filter(models.Budget.company_id == company_id)
+        .order_by(models.Budget.created_at.desc())
+        .first()
+    )
+    if not budget:
+        return {"success": False, "message": "Budget not found"}
+
+    target_month = date.fromisoformat(f"{period}-01") if len(period) == 7 else date.fromisoformat(period)
+    variance = get_budget_variance(db, budget.id, target_month=target_month)
+    if not variance:
+        return {"success": False, "message": "No variance data"}
+
+    total_budget = sum(float(v.get("budget", 0)) for v in variance.get("variances", []))
+    total_actual = sum(float(v.get("actual", 0)) for v in variance.get("variances", []))
+    utilization_pct = (total_actual / total_budget) * 100 if total_budget > 0 else 0
+
+    return {
+        "success": True,
+        "company_id": str(company_id),
+        "period": period,
+        "budget_id": str(budget.id),
+        "budget_total": round(total_budget, 2),
+        "actual_total": round(total_actual, 2),
+        "utilization_pct": round(utilization_pct, 2),
+        "category_breakdown": variance.get("variances", []),
+    }
+
+
+def reallocate_budget(
+    db: Session,
+    budget_id: UUID,
+    from_category: str,
+    to_category: str,
+    amount: float,
+) -> dict:
+    budget = db.query(models.Budget).filter(models.Budget.id == budget_id).first()
+    if not budget:
+        return {"success": False, "message": "Budget not found"}
+
+    from_line = (
+        db.query(models.BudgetLine)
+        .filter(models.BudgetLine.budget_id == budget_id, models.BudgetLine.category == from_category)
+        .first()
+    )
+    to_line = (
+        db.query(models.BudgetLine)
+        .filter(models.BudgetLine.budget_id == budget_id, models.BudgetLine.category == to_category)
+        .first()
+    )
+    if not from_line:
+        return {"success": False, "message": "Source category not found"}
+    if float(from_line.monthly_amount or 0) < amount:
+        return {"success": False, "message": "Insufficient budget in source category"}
+    if not to_line:
+        to_line = models.BudgetLine(budget_id=budget_id, category=to_category, monthly_amount=0)
+        db.add(to_line)
+
+    from_before = float(from_line.monthly_amount or 0)
+    to_before = float(to_line.monthly_amount or 0)
+    from_line.monthly_amount = from_before - amount
+    to_line.monthly_amount = to_before + amount
+    db.commit()
+
+    return {
+        "success": True,
+        "budget_id": str(budget.id),
+        "from_category": from_category,
+        "to_category": to_category,
+        "reallocated_amount": float(amount),
+        "from_before": round(from_before, 2),
+        "from_after": round(float(from_line.monthly_amount or 0), 2),
+        "to_before": round(to_before, 2),
+        "to_after": round(float(to_line.monthly_amount or 0), 2),
+    }
 

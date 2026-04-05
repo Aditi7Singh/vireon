@@ -19,9 +19,146 @@ class ScenarioSaveRequest(BaseModel):
     input_data: Dict
     result_data: Dict
 
+
+class BudgetCreateRequest(BaseModel):
+    company_id: UUID
+    period: str
+    budgets: Dict
+
+
+class BudgetApprovalRequest(BaseModel):
+    approver_id: UUID
+
+
+class BudgetReallocateRequest(BaseModel):
+    from_category: str
+    to_category: str
+    amount: float
+
 @router.get("/budgets", response_model=List[schemas.Budget])
 def get_budgets(db: Session = Depends(database.get_db), current_user: models.User = Depends(auth.get_current_user)):
     return db.query(models.Budget).all()
+
+
+@router.post("/budgets")
+def create_budget(
+    payload: BudgetCreateRequest,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    budget = planning_service.create_budget(db, payload.company_id, payload.period, payload.budgets)
+    return {
+        "id": str(budget.id),
+        "company_id": str(budget.company_id),
+        "name": budget.name,
+        "status": budget.status,
+    }
+
+
+@router.get("/budgets/{budget_id}")
+def get_budget(
+    budget_id: UUID,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    budget = db.query(models.Budget).filter(models.Budget.id == budget_id).first()
+    if not budget:
+        raise HTTPException(status_code=404, detail="Budget not found")
+    return budget
+
+
+@router.put("/budgets/{budget_id}")
+def update_budget(
+    budget_id: UUID,
+    payload: BudgetCreateRequest,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    budget = db.query(models.Budget).filter(models.Budget.id == budget_id).first()
+    if not budget:
+        raise HTTPException(status_code=404, detail="Budget not found")
+
+    existing_lines = db.query(models.BudgetLine).filter(models.BudgetLine.budget_id == budget.id).all()
+    for line in existing_lines:
+        db.delete(line)
+    db.flush()
+    for category, amount in payload.budgets.items():
+        db.add(models.BudgetLine(budget_id=budget.id, category=str(category), monthly_amount=float(amount)))
+    budget.name = f"Budget {payload.period}"
+    budget.fiscal_year = int(payload.period.split("-")[0]) if "-" in payload.period else budget.fiscal_year
+    db.commit()
+    return {"success": True, "budget_id": str(budget.id)}
+
+
+@router.delete("/budgets/{budget_id}")
+def delete_budget(
+    budget_id: UUID,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    budget = db.query(models.Budget).filter(models.Budget.id == budget_id).first()
+    if not budget:
+        raise HTTPException(status_code=404, detail="Budget not found")
+    db.delete(budget)
+    db.commit()
+    return {"success": True, "budget_id": str(budget_id)}
+
+
+@router.post("/budgets/{budget_id}/submit")
+def submit_budget_for_approval(
+    budget_id: UUID,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    result = planning_service.submit_for_approval(db, budget_id)
+    if not result.get("success"):
+        raise HTTPException(status_code=404, detail=result.get("message", "Failed to submit budget"))
+    return result
+
+
+@router.post("/budgets/{budget_id}/approve")
+def approve_budget(
+    budget_id: UUID,
+    payload: BudgetApprovalRequest,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    result = planning_service.approve_budget(db, budget_id, payload.approver_id)
+    if not result.get("success"):
+        raise HTTPException(status_code=404, detail=result.get("message", "Failed to approve budget"))
+    return result
+
+
+@router.get("/budgets/utilization/{company_id}")
+def track_budget_utilization(
+    company_id: UUID,
+    period: str,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    result = planning_service.track_budget_utilization(db, company_id, period)
+    if not result.get("success"):
+        raise HTTPException(status_code=404, detail=result.get("message", "No budget utilization data"))
+    return result
+
+
+@router.post("/budgets/{budget_id}/reallocate")
+def reallocate_budget(
+    budget_id: UUID,
+    payload: BudgetReallocateRequest,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    result = planning_service.reallocate_budget(
+        db,
+        budget_id,
+        payload.from_category,
+        payload.to_category,
+        payload.amount,
+    )
+    if not result.get("success"):
+        raise HTTPException(status_code=400, detail=result.get("message", "Budget reallocation failed"))
+    return result
 
 @router.get("/budgets/{budget_id}/variance")
 def get_budget_variance(

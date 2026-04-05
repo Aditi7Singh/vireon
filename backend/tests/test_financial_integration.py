@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Dict, Any
 
 # Import test dependencies
-from backend.services.financial_functions import (
+from services.financial_functions import (
     # Cash Flow Functions
     operating_cash_flow,
     investing_cash_flow,
@@ -47,21 +47,21 @@ from backend.services.financial_functions import (
     financial_health_score,
 )
 
-from backend.services.reasoning_engine import (
+from services.reasoning_engine import (
     FinancialKnowledgeBase,
     ProfitVarianceAnalyzer,
     CashFlowAnalyzer,
     RecommendationGenerator,
 )
 
-from backend.services.memory_service import (
+from services.memory_service import (
     ConversationMemory,
     MemoryService,
     ConversationMessage,
     MessageRole,
 )
 
-from backend.agent.financial_tools import get_all_financial_tools
+from agent.financial_tools import get_all_financial_tools
 
 
 # ============================================================================

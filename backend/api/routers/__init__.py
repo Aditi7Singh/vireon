@@ -25,4 +25,8 @@ from . import (
 	fx,
 	tax,
 	financial_alerts,
+	close,
+	approvals,
+	audit,
+	consolidation,
 )

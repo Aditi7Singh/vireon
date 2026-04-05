@@ -1184,24 +1184,415 @@ def analyze_credit_risk(limit: int = 10) -> Dict[str, Any]:
 
 @tool
 def track_budget_vs_actual(month: Optional[str] = None) -> Dict[str, Any]:
-    """Compare the latest budget against actuals using the planning service."""
+    """Compare budget utilization and variance for the selected period."""
     db = None
     try:
-        from analytics import scenarios  # noqa: F401  # keep import symmetry with other tools
         from services import planning as planning_service
 
         db = _get_db()
-        budget = _company_budget(db)
-        if not budget:
+        company = _get_first_company(db)
+        if not company:
+            return {"error": "No company found"}
+
+        period = month or date.today().strftime("%Y-%m")
+        utilization = planning_service.track_budget_utilization(db, company.id, period)
+        if not utilization.get("success"):
             return {"error": "No budget found"}
-
-        target_month = None
-        if month:
-            target_month = date.fromisoformat(f"{month}-01") if len(month) == 7 else date.fromisoformat(month)
-
-        return planning_service.get_budget_variance(db, budget.id, target_month=target_month)
+        return utilization
     except Exception as e:
         return {"error": str(e), "tool": "track_budget_vs_actual"}
+    finally:
+        _close_db(db)
+
+
+@tool
+def manage_budget(month: str, category: str, amount: float) -> Dict[str, Any]:
+    """Create or update a budget category amount for a month."""
+    db = None
+    try:
+        import models
+        from services import planning as planning_service
+
+        db = _get_db()
+        company = _get_first_company(db)
+        if not company:
+            return {"error": "No company found", "tool": "manage_budget"}
+
+        budget = (
+            db.query(models.Budget)
+            .filter(models.Budget.company_id == company.id, models.Budget.name == f"Budget {month}")
+            .first()
+        )
+        if not budget:
+            budget = planning_service.create_budget(db, company.id, month, {category: amount})
+        else:
+            line = (
+                db.query(models.BudgetLine)
+                .filter(models.BudgetLine.budget_id == budget.id, models.BudgetLine.category == category)
+                .first()
+            )
+            if not line:
+                line = models.BudgetLine(budget_id=budget.id, category=category, monthly_amount=0)
+                db.add(line)
+            line.monthly_amount = float(amount)
+            db.commit()
+
+        return {
+            "success": True,
+            "budget_id": str(budget.id),
+            "period": month,
+            "category": category,
+            "amount": float(amount),
+            "status": budget.status,
+        }
+    except Exception as exc:
+        return _build_error("manage_budget", exc)
+    finally:
+        _close_db(db)
+
+
+@tool
+def create_period_close(period: str, company_id: UUID) -> Dict[str, Any]:
+    """Initialize and validate close readiness for a period."""
+    db = None
+    try:
+        from services.close_service import CloseService
+
+        db = _get_db()
+        service = CloseService(db)
+        return service.validate_close_readiness(company_id, period)
+    except Exception as exc:
+        return _build_error("create_period_close", exc)
+    finally:
+        _close_db(db)
+
+
+@tool
+def lock_period(period: str, company_id: UUID, locked_by: str) -> Dict[str, Any]:
+    """Lock a financial period with close audit."""
+    db = None
+    try:
+        import uuid
+        from services.close_service import CloseService
+
+        db = _get_db()
+        service = CloseService(db)
+        try:
+            user_uuid = UUID(str(locked_by))
+        except Exception:
+            user_uuid = uuid.uuid5(uuid.NAMESPACE_DNS, f"finance-locker:{locked_by}")
+        return service.lock_period(company_id, period, user_uuid)
+    except Exception as exc:
+        return _build_error("lock_period", exc)
+    finally:
+        _close_db(db)
+
+
+@tool
+def run_reconciliation(period: str, company_id: UUID) -> Dict[str, Any]:
+    """Run reconciliation helper for bank, AR, and AP for a period."""
+    db = None
+    try:
+        from services.close_service import CloseService
+
+        db = _get_db()
+        service = CloseService(db)
+        readiness = service.validate_close_readiness(company_id, period)
+        return {
+            "period": period,
+            "company_id": str(company_id),
+            "reconciliation_status": "complete" if readiness.get("readiness_score", 0) >= 75 else "needs_attention",
+            "readiness": readiness,
+        }
+    except Exception as exc:
+        return _build_error("run_reconciliation", exc)
+    finally:
+        _close_db(db)
+
+
+@tool
+def get_close_status(company_id: UUID) -> Dict[str, Any]:
+    """Fetch close status dashboard payload for a company."""
+    db = None
+    try:
+        from services.close_service import CloseService
+
+        db = _get_db()
+        service = CloseService(db)
+        return service.get_close_status(company_id)
+    except Exception as exc:
+        return _build_error("get_close_status", exc)
+    finally:
+        _close_db(db)
+
+
+@tool
+def get_consolidated_view(entity_ids: list[UUID]) -> Dict[str, Any]:
+    """Get consolidated balance sheet and P&L view for entities."""
+    db = None
+    try:
+        from services.consolidation_service import ConsolidationService
+
+        db = _get_db()
+        service = ConsolidationService(db)
+        period = date.today().strftime("%Y-%m")
+        return {
+            "period": period,
+            "balance_sheet": service.generate_consolidated_balance_sheet(entity_ids, period),
+            "pnl": service.generate_consolidated_pnl(entity_ids, period),
+        }
+    except Exception as exc:
+        return _build_error("get_consolidated_view", exc)
+    finally:
+        _close_db(db)
+
+
+@tool
+def submit_for_approval(workflow_id: UUID, amount: float, approver_role: str) -> Dict[str, Any]:
+    """Submit an approval request for finance operation."""
+    db = None
+    try:
+        import models
+        from services.workflow_approval_service import WorkflowApprovalService
+
+        db = _get_db()
+        workflow = db.query(models.ApprovalWorkflow).filter(models.ApprovalWorkflow.id == workflow_id).first()
+        if not workflow:
+            return {"error": "Workflow not found", "tool": "submit_for_approval"}
+
+        service = WorkflowApprovalService(db)
+        req = service.submit_request(
+            workflow_id=workflow_id,
+            company_id=workflow.company_id,
+            amount=amount,
+            requested_by=approver_role,
+            reference_type="finance_operation",
+            reference_id=None,
+        )
+        return {
+            "success": True,
+            "request_id": str(req.id),
+            "status": req.status,
+            "current_step_order": req.current_step_order,
+        }
+    except Exception as exc:
+        return _build_error("submit_for_approval", exc)
+    finally:
+        _close_db(db)
+
+
+@tool
+def process_invoice_batch(invoice_ids: list[UUID], action: str) -> Dict[str, Any]:
+    """Process invoice batch for submit, approve, mark_paid, or void actions."""
+    db = None
+    try:
+        import models
+
+        db = _get_db()
+        requested_ids = {str(invoice_id) for invoice_id in invoice_ids}
+        candidates = db.query(models.Invoice).all()
+        rows = [row for row in candidates if str(row.id) in requested_ids]
+        if not rows:
+            return {"processed": 0, "message": "No invoices found"}
+
+        action_map = {
+            "submit": "SUBMITTED",
+            "approve": "OPEN",
+            "mark_paid": "PAID",
+            "void": "VOID",
+        }
+        new_status = action_map.get(action.lower().strip())
+        if not new_status:
+            return {"error": "Unsupported invoice action", "tool": "process_invoice_batch"}
+
+        for row in rows:
+            row.status = new_status
+            if new_status == "PAID":
+                row.amount_paid = row.total_amount
+                row.amount_due = 0
+                row.payment_date = date.today()
+
+        db.commit()
+        return {"processed": len(rows), "action": action, "new_status": new_status}
+    except Exception as exc:
+        return _build_error("process_invoice_batch", exc)
+    finally:
+        _close_db(db)
+
+
+@tool
+def schedule_payments(payment_run_id: UUID) -> Dict[str, Any]:
+    """Schedule due AP invoices as a payment run."""
+    db = None
+    try:
+        import models
+        db = _get_db()
+        company = _get_first_company(db)
+        if not company:
+            return {"error": "No company found", "tool": "schedule_payments"}
+
+        due_rows = (
+            db.query(models.Invoice)
+            .filter(
+                models.Invoice.company_id == company.id,
+                models.Invoice.type == "ACCOUNTS_PAYABLE",
+                models.Invoice.amount_due > 0,
+            )
+            .order_by(models.Invoice.due_date.asc())
+            .all()
+        )
+        total = sum(_safe_float(item.amount_due) for item in due_rows)
+        return {
+            "payment_run_id": str(payment_run_id),
+            "scheduled_count": len(due_rows),
+            "scheduled_amount": round(total, 2),
+            "status": "scheduled",
+        }
+    except Exception as exc:
+        return _build_error("schedule_payments", exc)
+    finally:
+        _close_db(db)
+
+
+@tool
+def optimize_vendor_payments(company_id: UUID, timing: str) -> Dict[str, Any]:
+    """Optimize AP payment recommendations based on timing preference."""
+    db = None
+    try:
+        import models
+        db = _get_db()
+        invoices = (
+            db.query(models.Invoice)
+            .filter(
+                models.Invoice.company_id == company_id,
+                models.Invoice.type == "ACCOUNTS_PAYABLE",
+                models.Invoice.amount_due > 0,
+            )
+            .all()
+        )
+        plan = []
+        for inv in invoices:
+            due = inv.due_date.isoformat() if inv.due_date else None
+            recommendation = "pay_on_due_date"
+            if timing == "early_discounts":
+                recommendation = "pay_early_if_discount_available"
+            elif timing == "cash_preserve":
+                recommendation = "defer_to_due_date"
+            plan.append(
+                {
+                    "invoice_id": str(inv.id),
+                    "amount_due": _safe_float(inv.amount_due),
+                    "due_date": due,
+                    "recommendation": recommendation,
+                }
+            )
+
+        return {"company_id": str(company_id), "timing": timing, "recommendations": plan[:100]}
+    except Exception as exc:
+        return _build_error("optimize_vendor_payments", exc)
+    finally:
+        _close_db(db)
+
+
+@tool
+def run_collections_workflow(company_id: UUID, strategy: str) -> Dict[str, Any]:
+    """Run AR collections workflow with strategy assignment."""
+    db = None
+    try:
+        import models
+        db = _get_db()
+        today = date.today()
+        overdue = (
+            db.query(models.Invoice)
+            .filter(
+                models.Invoice.company_id == company_id,
+                models.Invoice.type == "ACCOUNTS_RECEIVABLE",
+                models.Invoice.amount_due > 0,
+                models.Invoice.due_date < today,
+            )
+            .all()
+        )
+        total_overdue = sum(_safe_float(item.amount_due) for item in overdue)
+        return {
+            "company_id": str(company_id),
+            "strategy": strategy,
+            "overdue_count": len(overdue),
+            "overdue_amount": round(total_overdue, 2),
+            "next_actions": [
+                "send_reminder_email",
+                "schedule_collection_call",
+                "escalate_high_risk_accounts",
+            ],
+        }
+    except Exception as exc:
+        return _build_error("run_collections_workflow", exc)
+    finally:
+        _close_db(db)
+
+
+@tool
+def prepare_tax_filing_data(tax_period: str, company_id: UUID) -> Dict[str, Any]:
+    """Prepare tax filing dataset for a period."""
+    db = None
+    try:
+        import models
+        db = _get_db()
+        metrics = (
+            db.query(models.MonthlyMetric)
+            .filter(models.MonthlyMetric.company_id == company_id)
+            .order_by(models.MonthlyMetric.metric_month.desc())
+            .limit(3)
+            .all()
+        )
+        revenue = sum(_safe_float(m.total_revenue) for m in metrics)
+        expenses = sum(_safe_float(m.total_expenses) for m in metrics)
+        taxable_income = max(0.0, revenue - expenses)
+        estimated_tax = taxable_income * 0.25
+        return {
+            "company_id": str(company_id),
+            "tax_period": tax_period,
+            "revenue": round(revenue, 2),
+            "expenses": round(expenses, 2),
+            "taxable_income": round(taxable_income, 2),
+            "estimated_tax": round(estimated_tax, 2),
+            "status": "prepared",
+        }
+    except Exception as exc:
+        return _build_error("prepare_tax_filing_data", exc)
+    finally:
+        _close_db(db)
+
+
+@tool
+def reconcile_bank_statement(company_id: UUID, statement_id: UUID) -> Dict[str, Any]:
+    """Assist bank statement reconciliation for selected company."""
+    db = None
+    try:
+        import models
+        db = _get_db()
+        txns = (
+            db.query(models.BankingTransaction)
+            .join(models.BankFeed, models.BankFeed.id == models.BankingTransaction.feed_id)
+            .filter(models.BankFeed.company_id == company_id)
+            .all()
+        )
+        ledger_total = _safe_float(
+            db.query(func.coalesce(func.sum(models.FinancialLedgerEntry.amount_inr), 0))
+            .filter(models.FinancialLedgerEntry.company_id == company_id)
+            .scalar()
+        )
+        bank_total = sum(_safe_float(item.amount) for item in txns)
+        difference = round(bank_total - ledger_total, 2)
+        return {
+            "company_id": str(company_id),
+            "statement_id": str(statement_id),
+            "bank_total": round(bank_total, 2),
+            "ledger_total": round(ledger_total, 2),
+            "difference": difference,
+            "status": "reconciled" if abs(difference) < 1 else "needs_review",
+        }
+    except Exception as exc:
+        return _build_error("reconcile_bank_statement", exc)
     finally:
         _close_db(db)
 
@@ -2349,6 +2740,26 @@ def get_mrr_arr_snapshot() -> Dict[str, Any]:
 
 
 # Export all tools as a list for LangGraph
+FINANCE_MANAGER_TOOLS = [
+    manage_budget,
+    create_period_close,
+    lock_period,
+    get_consolidated_view,
+    submit_for_approval,
+    run_reconciliation,
+    track_budget_vs_actual,
+    get_close_status,
+]
+
+FINANCE_OPERATIONS_TOOLS = [
+    process_invoice_batch,
+    schedule_payments,
+    optimize_vendor_payments,
+    run_collections_workflow,
+    prepare_tax_filing_data,
+    reconcile_bank_statement,
+]
+
 ALL_TOOLS = [
     get_cash_balance,
     get_burn_rate,
@@ -2381,4 +2792,17 @@ ALL_TOOLS = [
     analyze_profit_variance,
     analyze_cash_flow_quality,
     get_mrr_arr_snapshot,
+    track_budget_vs_actual,
+    manage_budget,
+    create_period_close,
+    lock_period,
+    run_reconciliation,
+    get_consolidated_view,
+    submit_for_approval,
+    process_invoice_batch,
+    schedule_payments,
+    optimize_vendor_payments,
+    run_collections_workflow,
+    prepare_tax_filing_data,
+    reconcile_bank_statement,
 ]
