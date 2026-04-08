@@ -16,7 +16,17 @@ from fastapi.middleware.cors import CORSMiddleware
 import models
 import database
 import bootstrap
-from api.routers import auth, analytics, agent, ingest, erpnext, alerts, benchmarks, planning, loans, payroll, depreciation, documents, reports, banking, cloud_costs, ledger, inputs, forecasting, burn, recommendations, notifications, system, fx, tax, merge, financial_alerts, invoice_lifecycle, financial, close, approvals, audit, consolidation
+from api.routers import (
+    auth, analytics, agent, ingest, erpnext, alerts, benchmarks, planning, 
+    loans, payroll, depreciation, documents, reports, banking, cloud_costs, 
+    ledger, inputs, forecasting, burn, recommendations, notifications, system, 
+    fx, tax, merge, financial_alerts, invoice_lifecycle, financial, close, 
+    approvals, audit, consolidation,
+    # New enhanced features
+    contracts, reconciliation, nlg_reports, recurring_templates, board_reports,
+    scenario_comparison, customer_health, forecast_monitoring, finance_tasks,
+    transaction_comments, inventory, revenue_recognition_asc606, purchase_orders
+)
 
 # Basic generic logging config
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
@@ -213,6 +223,21 @@ app.include_router(close.router, prefix="/api/v1")
 app.include_router(approvals.router, prefix="/api/v1")
 app.include_router(audit.router, prefix="/api/v1")
 app.include_router(consolidation.router, prefix="/api/v1")
+
+# New enhanced features routers
+app.include_router(contracts.router, prefix="/api/v1")
+app.include_router(reconciliation.router, prefix="/api/v1")
+app.include_router(nlg_reports.router, prefix="/api/v1")
+app.include_router(recurring_templates.router, prefix="/api/v1")
+app.include_router(board_reports.router, prefix="/api/v1")
+app.include_router(scenario_comparison.router, prefix="/api/v1")
+app.include_router(customer_health.router, prefix="/api/v1")
+app.include_router(forecast_monitoring.router, prefix="/api/v1")
+app.include_router(finance_tasks.router, prefix="/api/v1")
+app.include_router(transaction_comments.router, prefix="/api/v1")
+app.include_router(inventory.router, prefix="/api/v1")
+app.include_router(revenue_recognition_asc606.router, prefix="/api/v1")
+app.include_router(purchase_orders.router, prefix="/api/v1")
 
 # API routes are intentionally versioned under /api/v1
 

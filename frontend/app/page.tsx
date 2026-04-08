@@ -97,7 +97,7 @@ export default function Home() {
               Open Vireon Dashboard
             </Link>
             <Link
-              href="/dashboard/runway"
+              href="/runway"
               className="inline-flex items-center justify-center border-2 border-[#2f2820] bg-[#f8f0e2] px-8 py-3 text-sm font-bold uppercase tracking-[0.14em] text-[#201a14] transition-colors hover:bg-[#efe1c8]"
             >
               View Runway Forecast
@@ -189,7 +189,7 @@ export default function Home() {
             <p className="mt-1 text-sm uppercase tracking-[0.08em] text-[#5d4f40]">Months</p>
 
             <Link
-              href="/dashboard/runway"
+              href="/runway"
               className="mt-6 inline-flex border border-[#2f2820] bg-[#fff9ef] px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-[#1f1913] transition-colors hover:bg-[#f0e4cf]"
             >
               Go to Runway

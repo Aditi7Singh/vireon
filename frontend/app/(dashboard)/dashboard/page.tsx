@@ -195,7 +195,7 @@ export default function DashboardHomePage() {
               <p className="text-xs text-[#7e715f]">Last 6 months, normalized from unified ledger.</p>
             </div>
             <Link
-              href="/dashboard/runway"
+              href="/runway"
               className="inline-flex items-center gap-1 text-sm font-medium text-[#7d4f13] hover:text-[#603a08]"
             >
               Explore runway

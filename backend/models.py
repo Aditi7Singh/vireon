@@ -945,3 +945,393 @@ class AgentPreference(Base):
     preference_value = Column(JSON, nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+
+# ─── NEW MODELS FOR ENHANCED FEATURES ──────────────────────────────────────
+
+class ContractStatus(str, enum.Enum):
+    ACTIVE = "active"
+    EXPIRED = "expired"
+    CANCELLED = "cancelled"
+    PENDING = "pending"
+
+
+class Contract(Base):
+    """Contract and Vendor Management"""
+    __tablename__ = "contracts"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    vendor_name = Column(String(255), nullable=False, index=True)
+    contract_number = Column(String(100), unique=True)
+    amount = Column(Numeric(15, 2), nullable=False)
+    currency = Column(String(3), default="USD")
+    start_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False, index=True)
+    auto_renewal = Column(Boolean, default=False)
+    renewal_notice_days = Column(Integer, default=30)
+    category = Column(String(100), index=True)  # SaaS, Services, License, etc.
+    status = Column(Enum(ContractStatus), default=ContractStatus.ACTIVE, index=True)
+    contact_person = Column(String(255))
+    contact_email = Column(String(255))
+    description = Column(Text)
+    payment_terms = Column(String(100))
+    seats_licensed = Column(Integer, nullable=True)  # For SaaS seat optimization
+    seats_used = Column(Integer, nullable=True)
+    notes = Column(Text)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+
+class ContractAlert(Base):
+    """Renewal alerts for contracts"""
+    __tablename__ = "contract_alerts"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    contract_id = Column(UUID(as_uuid=True), ForeignKey("contracts.id", ondelete="CASCADE"), nullable=False, index=True)
+    alert_date = Column(Date, nullable=False, index=True)
+    days_until_expiry = Column(Integer, nullable=False)
+    alert_sent = Column(Boolean, default=False)
+    sent_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class ReconciliationStatus(str, enum.Enum):
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    MATCHED = "matched"
+    UNMATCHED = "unmatched"
+    APPROVED = "approved"
+    LOCKED = "locked"
+
+
+class BankReconciliation(Base):
+    """Bank reconciliation tracking"""
+    __tablename__ = "bank_reconciliations"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    account_id = Column(UUID(as_uuid=True), ForeignKey("accounts.id"), nullable=False)
+    period_start = Column(Date, nullable=False)
+    period_end = Column(Date, nullable=False, index=True)
+    statement_balance = Column(Numeric(15, 2), nullable=False)
+    book_balance = Column(Numeric(15, 2), nullable=False)
+    variance = Column(Numeric(15, 2), nullable=False)
+    status = Column(Enum(ReconciliationStatus), default=ReconciliationStatus.PENDING, index=True)
+    matched_count = Column(Integer, default=0)
+    unmatched_count = Column(Integer, default=0)
+    approved_by = Column(String(255), nullable=True)
+    approved_at = Column(DateTime, nullable=True)
+    notes = Column(Text)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+
+class BankTransactionMatch(Base):
+    """Matching bank transactions with GL entries"""
+    __tablename__ = "bank_transaction_matches"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    reconciliation_id = Column(UUID(as_uuid=True), ForeignKey("bank_reconciliations.id", ondelete="CASCADE"), nullable=False)
+    bank_transaction_id = Column(String(255), nullable=False, index=True)
+    ledger_entry_id = Column(UUID(as_uuid=True), ForeignKey("financial_ledger_entries.id"), nullable=True)
+    match_confidence = Column(Numeric(5, 2), nullable=True)  # 0-100
+    match_type = Column(String(50))  # exact, fuzzy, manual
+    matched_by = Column(String(255))
+    matched_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class TransactionTemplate(Base):
+    """Recurring transaction templates"""
+    __tablename__ = "transaction_templates"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    name = Column(String(255), nullable=False)
+    description = Column(Text)
+    entry_type = Column(Enum(LedgerEntryType), nullable=False)
+    category = Column(Enum(LedgerCategory), nullable=False)
+    amount = Column(Numeric(15, 2), nullable=False)
+    currency = Column(String(3), default="USD")
+    frequency = Column(String(50), nullable=False)  # monthly, quarterly, annually
+    start_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=True)
+    auto_generate = Column(Boolean, default=True)
+    escalation_rate = Column(Numeric(5, 2), default=0)  # Annual increase %
+    next_generation_date = Column(Date, nullable=True, index=True)
+    last_generated_at = Column(DateTime, nullable=True)
+    is_active = Column(Boolean, default=True)
+    product_tag = Column(Enum(LedgerProductTag), default=LedgerProductTag.UNALLOCATED)
+    office_tag = Column(Enum(LedgerOfficeTag), default=LedgerOfficeTag.NA)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+
+class POStatus(str, enum.Enum):
+    DRAFT = "draft"
+    SUBMITTED = "submitted"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    PARTIALLY_RECEIVED = "partially_received"
+    RECEIVED = "received"
+    CLOSED = "closed"
+    CANCELLED = "cancelled"
+
+
+class PurchaseOrder(Base):
+    """Purchase Order management"""
+    __tablename__ = "purchase_orders"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    po_number = Column(String(100), unique=True, nullable=False, index=True)
+    vendor_id = Column(UUID(as_uuid=True), ForeignKey("contacts.id"), nullable=False)
+    po_date = Column(Date, nullable=False)
+    expected_delivery_date = Column(Date, nullable=True)
+    total_amount = Column(Numeric(15, 2), nullable=False)
+    currency = Column(String(3), default="USD")
+    status = Column(Enum(POStatus), default=POStatus.DRAFT, index=True)
+    requested_by = Column(String(255), nullable=False)
+    approved_by = Column(String(255), nullable=True)
+    approved_at = Column(DateTime, nullable=True)
+    rejection_reason = Column(Text, nullable=True)
+    department = Column(String(100))
+    budget_id = Column(UUID(as_uuid=True), ForeignKey("budgets.id"), nullable=True)
+    notes = Column(Text)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+
+class POLineItem(Base):
+    """Purchase Order line items"""
+    __tablename__ = "po_line_items"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    po_id = Column(UUID(as_uuid=True), ForeignKey("purchase_orders.id", ondelete="CASCADE"), nullable=False)
+    description = Column(String(255), nullable=False)
+    quantity = Column(Numeric(10, 2), nullable=False)
+    unit_price = Column(Numeric(15, 2), nullable=False)
+    total_price = Column(Numeric(15, 2), nullable=False)
+    quantity_received = Column(Numeric(10, 2), default=0)
+    account_code = Column(String(100))
+
+
+class CustomerHealthStatus(str, enum.Enum):
+    HEALTHY = "healthy"
+    AT_RISK = "at_risk"
+    CHURNED = "churned"
+
+
+class CustomerHealthScore(Base):
+    """Customer health scoring for churn prediction"""
+    __tablename__ = "customer_health_scores"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    customer_id = Column(UUID(as_uuid=True), ForeignKey("contacts.id"), nullable=False, index=True)
+    score = Column(Numeric(5, 2), nullable=False)  # 0-100
+    status = Column(Enum(CustomerHealthStatus), nullable=False, index=True)
+    payment_behavior_score = Column(Numeric(5, 2))
+    revenue_trend_score = Column(Numeric(5, 2))
+    churn_probability = Column(Numeric(5, 2))
+    arr_at_risk = Column(Numeric(15, 2))
+    late_payment_count = Column(Integer, default=0)
+    dispute_count = Column(Integer, default=0)
+    revenue_growth_rate = Column(Numeric(5, 2))
+    last_payment_date = Column(Date)
+    calculated_at = Column(DateTime, default=datetime.datetime.utcnow, index=True)
+
+
+class ForecastModel(Base):
+    """Forecast model tracking and monitoring"""
+    __tablename__ = "forecast_models"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    model_type = Column(String(50), nullable=False)  # SARIMA, Prophet, LSTM
+    metric_name = Column(String(100), nullable=False, index=True)  # runway, burn_rate, revenue
+    model_params = Column(JSON)
+    training_data_start = Column(Date)
+    training_data_end = Column(Date)
+    mape_score = Column(Numeric(5, 2))  # Mean Absolute Percentage Error
+    rmse_score = Column(Numeric(15, 2))  # Root Mean Squared Error
+    mae_score = Column(Numeric(15, 2))  # Mean Absolute Error
+    last_trained_at = Column(DateTime, default=datetime.datetime.utcnow)
+    prediction_count = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class ForecastAccuracy(Base):
+    """Track forecast vs actual for model monitoring"""
+    __tablename__ = "forecast_accuracy"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    model_id = Column(UUID(as_uuid=True), ForeignKey("forecast_models.id", ondelete="CASCADE"), nullable=False)
+    forecast_date = Column(Date, nullable=False, index=True)
+    forecast_value = Column(Numeric(15, 2), nullable=False)
+    actual_value = Column(Numeric(15, 2), nullable=True)
+    absolute_error = Column(Numeric(15, 2))
+    percentage_error = Column(Numeric(5, 2))
+    recorded_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class NarrativeReport(Base):
+    """NLG-generated narrative reports"""
+    __tablename__ = "narrative_reports"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    report_type = Column(String(50), nullable=False, index=True)  # monthly, quarterly, board, mda
+    report_period = Column(String(20), nullable=False)  # YYYY-MM or YYYY-QN
+    narrative_content = Column(Text, nullable=False)
+    key_insights = Column(JSON)
+    variance_explanations = Column(JSON)
+    financial_data = Column(JSON)
+    generated_by_model = Column(String(100))  # gpt-4, gpt-4o, etc
+    generated_at = Column(DateTime, default=datetime.datetime.utcnow, index=True)
+    reviewed_by = Column(String(255), nullable=True)
+    reviewed_at = Column(DateTime, nullable=True)
+
+
+class BoardReport(Base):
+    """Board report tracking"""
+    __tablename__ = "board_reports"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    report_date = Column(Date, nullable=False)
+    reporting_period = Column(String(20), nullable=False)
+    cash_position = Column(Numeric(15, 2))
+    runway_months = Column(Numeric(5, 2))
+    burn_rate = Column(Numeric(15, 2))
+    arr = Column(Numeric(15, 2))
+    mrr = Column(Numeric(15, 2))
+    cac_payback_months = Column(Numeric(5, 2))
+    ltv_cac_ratio = Column(Numeric(5, 2))
+    revenue_growth_rate = Column(Numeric(5, 2))
+    risk_indicators = Column(JSON)
+    mitigation_plans = Column(JSON)
+    pdf_url = Column(String(500))
+    generated_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class ScenarioComparison(Base):
+    """Scenario comparison tracking"""
+    __tablename__ = "scenario_comparisons"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    comparison_name = Column(String(255), nullable=False)
+    scenarios = Column(JSON, nullable=False)  # Array of scenario configurations
+    results = Column(JSON, nullable=False)  # Comparison results
+    sensitivity_analysis = Column(JSON)
+    monte_carlo_results = Column(JSON)
+    created_by = Column(String(255))
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class FinanceTask(Base):
+    """Task management for finance team"""
+    __tablename__ = "finance_tasks"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    title = Column(String(255), nullable=False)
+    description = Column(Text)
+    task_type = Column(String(50), index=True)  # close_checklist, review, compliance
+    assigned_to = Column(String(255), index=True)
+    due_date = Column(Date, nullable=True, index=True)
+    status = Column(String(50), default="pending", index=True)  # pending, in_progress, blocked, completed
+    priority = Column(String(20), default="medium")
+    depends_on = Column(JSON)  # Array of task IDs this depends on
+    checklist_items = Column(JSON)
+    completed_at = Column(DateTime, nullable=True)
+    completed_by = Column(String(255), nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+
+class TransactionComment(Base):
+    """Comment threading on transactions"""
+    __tablename__ = "transaction_comments"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False)
+    entity_type = Column(String(50), nullable=False)  # ledger_entry, invoice, expense, etc
+    entity_id = Column(UUID(as_uuid=True), nullable=False, index=True)
+    comment_text = Column(Text, nullable=False)
+    created_by = Column(String(255), nullable=False)
+    mentioned_users = Column(JSON)  # Array of @mentioned usernames
+    is_resolved = Column(Boolean, default=False)
+    resolved_at = Column(DateTime, nullable=True)
+    resolved_by = Column(String(255), nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow, index=True)
+
+
+class InventoryItem(Base):
+    """Inventory item master for product companies"""
+    __tablename__ = "inventory_items"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    sku = Column(String(100), unique=True, nullable=False, index=True)
+    name = Column(String(255), nullable=False)
+    description = Column(Text)
+    category = Column(String(100))
+    unit_cost = Column(Numeric(15, 2), nullable=False)
+    quantity_on_hand = Column(Numeric(10, 2), default=0)
+    reorder_point = Column(Numeric(10, 2))
+    costing_method = Column(String(20), default="FIFO")  # FIFO, LIFO, WeightedAverage
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+
+class InventoryTransaction(Base):
+    """Inventory movements"""
+    __tablename__ = "inventory_transactions"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    item_id = Column(UUID(as_uuid=True), ForeignKey("inventory_items.id", ondelete="CASCADE"), nullable=False)
+    transaction_date = Column(Date, nullable=False, index=True)
+    transaction_type = Column(String(50), nullable=False)  # purchase, sale, adjustment, write_off
+    quantity = Column(Numeric(10, 2), nullable=False)
+    unit_cost = Column(Numeric(15, 2), nullable=False)
+    total_cost = Column(Numeric(15, 2), nullable=False)
+    reference_type = Column(String(50))  # invoice, po, adjustment
+    reference_id = Column(UUID(as_uuid=True))
+    notes = Column(Text)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class RevenueRecognition(Base):
+    """Revenue recognition schedules for ASC 606"""
+    __tablename__ = "revenue_recognition"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
+    contract_id = Column(UUID(as_uuid=True), ForeignKey("contracts.id"), nullable=True)
+    invoice_id = Column(UUID(as_uuid=True), ForeignKey("invoices.id"), nullable=True)
+    total_contract_value = Column(Numeric(15, 2), nullable=False)
+    recognized_to_date = Column(Numeric(15, 2), default=0)
+    deferred_revenue = Column(Numeric(15, 2), nullable=False)
+    recognition_start = Column(Date, nullable=False)
+    recognition_end = Column(Date, nullable=False)
+    recognition_method = Column(String(50))  # straight_line, performance_obligation
+    performance_obligations = Column(JSON)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+
+class RevenueSchedule(Base):
+    """Monthly revenue recognition schedule"""
+    __tablename__ = "revenue_schedules"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    recognition_id = Column(UUID(as_uuid=True), ForeignKey("revenue_recognition.id", ondelete="CASCADE"), nullable=False)
+    schedule_date = Column(Date, nullable=False, index=True)
+    amount = Column(Numeric(15, 2), nullable=False)
+    is_recognized = Column(Boolean, default=False)
+    recognized_at = Column(DateTime, nullable=True)
+    gl_entry_id = Column(UUID(as_uuid=True), ForeignKey("financial_ledger_entries.id"), nullable=True)

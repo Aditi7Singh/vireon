@@ -152,13 +152,14 @@ While Vireon provides robust financial intelligence, here are some areas that ar
 4. **Access the application**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:8000
-   - API Docs: http://localhost:8000/docs
+   - API Docs: http://localhost:8000/api/v1/docs
    - Mailhog (Email Testing): http://localhost:1025
 
 ### Production Deployment (AWS + Ollama)
 
-For production deployment guidance with AWS networking, security, and Ollama setup options, see:
-- `docs/deployment/aws-ollama-deployment-guide.md`
+For the consolidated deployment guide, see [DEPLOYMENT.md](DEPLOYMENT.md).
+
+For the current project status and remaining work, see [PROJECT_STATUS.md](PROJECT_STATUS.md).
 
 ### Configuration
 

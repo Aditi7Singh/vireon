@@ -691,3 +691,219 @@ class CohortHealthMetrics(BaseModel):
     ltv_cac_ratio: float  # LTV / CAC, >3 is good
     payback_months: float
     retention_health: str  # percentage of monthly cohort retained
+
+
+# ─── NEW SCHEMAS FOR ENHANCED FEATURES ──────────────────────────────────────
+
+class ContractCreate(BaseModel):
+    company_id: UUID
+    vendor_name: str
+    contract_number: Optional[str] = None
+    amount: float
+    currency: str = "USD"
+    start_date: date
+    end_date: date
+    auto_renewal: bool = False
+    renewal_notice_days: int = 30
+    category: Optional[str] = None
+    contact_person: Optional[str] = None
+    contact_email: Optional[str] = None
+    description: Optional[str] = None
+    payment_terms: Optional[str] = None
+    seats_licensed: Optional[int] = None
+    seats_used: Optional[int] = None
+    notes: Optional[str] = None
+
+
+class ContractUpdate(BaseModel):
+    vendor_name: Optional[str] = None
+    amount: Optional[float] = None
+    end_date: Optional[date] = None
+    auto_renewal: Optional[bool] = None
+    renewal_notice_days: Optional[int] = None
+    category: Optional[str] = None
+    seats_used: Optional[int] = None
+    status: Optional[str] = None
+
+
+class Contract(ContractCreate):
+    id: UUID
+    status: str
+    created_at: datetime
+    updated_at: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ReconciliationCreate(BaseModel):
+    company_id: UUID
+    account_id: UUID
+    period_start: date
+    period_end: date
+    statement_balance: float
+
+
+class TransactionTemplateCreate(BaseModel):
+    company_id: UUID
+    name: str
+    description: Optional[str] = None
+    entry_type: LedgerEntryType
+    category: LedgerCategory
+    amount: float
+    currency: str = "USD"
+    frequency: str  # monthly, quarterly, annually
+    start_date: date
+    end_date: Optional[date] = None
+    auto_generate: bool = True
+    escalation_rate: float = 0
+    product_tag: Optional[LedgerProductTag] = None
+    office_tag: Optional[LedgerOfficeTag] = None
+
+
+class TransactionTemplate(TransactionTemplateCreate):
+    id: UUID
+    next_generation_date: Optional[date] = None
+    last_generated_at: Optional[datetime] = None
+    is_active: bool
+    created_at: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+
+class BoardReportGenerate(BaseModel):
+    company_id: UUID
+    report_date: date
+    reporting_period: str
+
+
+class ScenarioComparisonCreate(BaseModel):
+    company_id: UUID
+    comparison_name: str
+    scenarios: dict
+
+
+class CustomerHealthScoreResponse(BaseModel):
+    customer_id: UUID
+    customer_name: str
+    score: float
+    status: str
+    churn_probability: float
+    arr_at_risk: float
+    late_payment_count: int
+    revenue_growth_rate: float
+
+
+class ForecastAccuracyResponse(BaseModel):
+    model_id: UUID
+    model_type: str
+    metric_name: str
+    mape_score: float
+    rmse_score: float
+    recent_accuracy: float
+
+
+class FinanceTaskCreate(BaseModel):
+    company_id: UUID
+    title: str
+    description: Optional[str] = None
+    task_type: str
+    assigned_to: str
+    due_date: Optional[date] = None
+    priority: str = "medium"
+    depends_on: Optional[list] = None
+    checklist_items: Optional[dict] = None
+
+
+class FinanceTask(FinanceTaskCreate):
+    id: UUID
+    status: str
+    completed_at: Optional[datetime] = None
+    completed_by: Optional[str] = None
+    created_at: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+
+class TransactionCommentCreate(BaseModel):
+    company_id: UUID
+    entity_type: str
+    entity_id: UUID
+    comment_text: str
+    mentioned_users: Optional[list] = None
+
+
+class TransactionComment(TransactionCommentCreate):
+    id: UUID
+    created_by: str
+    is_resolved: bool
+    created_at: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+
+class InventoryItemCreate(BaseModel):
+    company_id: UUID
+    sku: str
+    name: str
+    description: Optional[str] = None
+    category: Optional[str] = None
+    unit_cost: float
+    quantity_on_hand: float = 0
+    reorder_point: Optional[float] = None
+    costing_method: str = "FIFO"
+
+
+class InventoryItem(InventoryItemCreate):
+    id: UUID
+    is_active: bool
+    created_at: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+
+class RevenueRecognitionCreate(BaseModel):
+    company_id: UUID
+    contract_id: Optional[UUID] = None
+    invoice_id: Optional[UUID] = None
+    total_contract_value: float
+    deferred_revenue: float
+    recognition_start: date
+    recognition_end: date
+    recognition_method: str = "straight_line"
+    performance_obligations: Optional[dict] = None
+
+
+class PurchaseOrderCreate(BaseModel):
+    company_id: UUID
+    po_number: str
+    vendor_id: UUID
+    po_date: date
+    expected_delivery_date: Optional[date] = None
+    total_amount: float
+    currency: str = "USD"
+    requested_by: str
+    department: Optional[str] = None
+    budget_id: Optional[UUID] = None
+    notes: Optional[str] = None
+
+
+class PurchaseOrder(PurchaseOrderCreate):
+    id: UUID
+    status: str
+    approved_by: Optional[str] = None
+    approved_at: Optional[datetime] = None
+    created_at: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+
+class POLineItemCreate(BaseModel):
+    po_id: UUID
+    description: str
+    quantity: float
+    unit_price: float
+    total_price: float
+    account_code: Optional[str] = None
+
+
+class NarrativeReportResponse(BaseModel):
+    report_id: UUID
+    report_type: str
+    report_period: str
+    narrative: str
+    key_insights: list
+    generated_at: datetime

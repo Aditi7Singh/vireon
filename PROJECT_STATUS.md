@@ -1,5 +1,12 @@
 # Vireon Project Status & Roadmap
 
+**Current snapshot:** April 8, 2026  
+**Canonical project status file:** yes
+
+## Current Summary
+
+The project is implemented across the frontend, backend, and deployment stack. The main remaining work is product hardening rather than basic feature completion: multi-currency UX polish, document/OCR workflow finishing, and stronger close/compliance controls.
+
 **Version**: 1.1.0  
 **Last Updated**: March 27, 2026  
 **Status**: ✅ **STABLE - Pilot Production Ready (Commercialization In Progress)**
