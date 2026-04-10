@@ -23,3 +23,6 @@ pandas
 numpy
 statsmodels
 prophet
+scikit-learn
+langchain-core
+langgraph

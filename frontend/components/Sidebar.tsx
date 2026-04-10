@@ -23,7 +23,14 @@ import {
   Grid3X3,
   Cpu,
   Workflow,
-  Users
+  Users,
+  FlameKindling,
+  BookOpen,
+  Calculator,
+  Activity,
+  ShieldAlert,
+  Building2,
+  ClipboardList,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -37,6 +44,7 @@ const navItems = [
   { name: "CTO Planner", path: "/dashboard/cto", icon: Cpu },
   { name: "Runway", path: "/runway", icon: Wallet },
   { name: "Cash Flow", path: "/cash-flow", icon: Wallet },
+  { name: "Burn Analysis", path: "/burn-analysis", icon: FlameKindling },
   { name: "Collections", path: "/collections", icon: CreditCard },
   { name: "Budget", path: "/budget", icon: BarChart3 },
   { name: "Payroll", path: "/payroll", icon: Users },
@@ -49,6 +57,13 @@ const navItems = [
   { name: "Investor", path: "/investor", icon: ShieldCheck },
   { name: "AI Agent", path: "/agent", icon: Bot },
   { name: "Anomalies", path: "/anomalies", icon: AlertTriangle },
+  // Phase 3 — Enterprise AI CFO
+  { name: "Accruals", path: "/accruals", icon: BookOpen },
+  { name: "Tax Provisioning", path: "/tax-provisioning", icon: Calculator },
+  { name: "Cash Flow at Risk", path: "/cfar", icon: Activity },
+  { name: "Vendor Risk", path: "/vendor-risk", icon: ShieldAlert },
+  { name: "Month-End Close", path: "/month-end-close", icon: ClipboardList },
+  { name: "Consolidation", path: "/consolidation", icon: Building2 },
   { name: "Settings", path: "/settings", icon: Settings },
 ];
 

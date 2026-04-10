@@ -17,15 +17,19 @@ import models
 import database
 import bootstrap
 from api.routers import (
-    auth, analytics, agent, ingest, erpnext, alerts, benchmarks, planning, 
-    loans, payroll, depreciation, documents, reports, banking, cloud_costs, 
-    ledger, inputs, forecasting, burn, recommendations, notifications, system, 
-    fx, tax, merge, financial_alerts, invoice_lifecycle, financial, close, 
+    auth, analytics, agent, ingest, erpnext, alerts, benchmarks, planning,
+    loans, payroll, depreciation, documents, reports, banking, cloud_costs,
+    ledger, inputs, forecasting, burn, recommendations, notifications, system,
+    fx, tax, merge, financial_alerts, invoice_lifecycle, financial, close,
     approvals, audit, consolidation,
     # New enhanced features
     contracts, reconciliation, nlg_reports, recurring_templates, board_reports,
     scenario_comparison, customer_health, forecast_monitoring, finance_tasks,
-    transaction_comments, inventory, revenue_recognition_asc606, purchase_orders
+    transaction_comments, inventory, revenue_recognition_asc606, purchase_orders,
+    # Autonomous AI CFO upgrades
+    advanced_analytics,
+    # Phase 3 & 4 — Enterprise + Research-Backed
+    phase3, stripe_webhooks,
 )
 
 # Basic generic logging config
@@ -238,6 +242,13 @@ app.include_router(transaction_comments.router, prefix="/api/v1")
 app.include_router(inventory.router, prefix="/api/v1")
 app.include_router(revenue_recognition_asc606.router, prefix="/api/v1")
 app.include_router(purchase_orders.router, prefix="/api/v1")
+
+# Autonomous AI CFO upgrades
+app.include_router(advanced_analytics.router, prefix="/api/v1")
+
+# Phase 3 & 4 — Enterprise + Research-Backed
+app.include_router(phase3.router, prefix="/api/v1")
+app.include_router(stripe_webhooks.router, prefix="/api/v1")
 
 # API routes are intentionally versioned under /api/v1
 

@@ -245,6 +245,135 @@ def compare_board_reports(
     return comparison
 
 
+@router.post("/{report_id}/generate-narrative", response_model=dict)
+def generate_board_narrative(
+    report_id: uuid.UUID,
+    tone: str = "professional",
+    audience: str = "board",
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    """
+    Generate an LLM-powered investor narrative for a board report.
+
+    Falls back to a deterministic template when no LLM is available.
+    Uses real metrics from the stored board report — never fabricates numbers.
+    """
+    report = db.query(models.BoardReport).filter(
+        models.BoardReport.id == report_id
+    ).first()
+    if not report:
+        raise HTTPException(status_code=404, detail="Board report not found")
+
+    cash = float(report.cash_position or 0)
+    runway = float(report.runway_months or 0)
+    burn = float(report.burn_rate or 0)
+    arr = float(report.arr or 0)
+    mrr = float(report.mrr or 0)
+    growth = float(report.revenue_growth_rate or 0)
+    risk_count = len(report.risk_indicators) if report.risk_indicators else 0
+    period = report.reporting_period
+
+    # Build structured metrics context (passed to LLM or template)
+    metrics_ctx = {
+        "period": period,
+        "cash_position_m": round(cash / 1_000_000, 2),
+        "runway_months": round(runway, 1),
+        "monthly_burn_k": round(burn / 1_000, 1),
+        "arr_m": round(arr / 1_000_000, 2),
+        "mrr_k": round(mrr / 1_000, 1),
+        "revenue_growth_pct": round(growth, 1),
+        "risk_count": risk_count,
+    }
+
+    # Try LLM narrative
+    narrative = _generate_narrative_llm(metrics_ctx, tone, audience)
+    if narrative is None:
+        narrative = _generate_narrative_template(metrics_ctx, tone, audience)
+
+    return {
+        "report_id": str(report_id),
+        "period": period,
+        "audience": audience,
+        "tone": tone,
+        "narrative": narrative,
+        "metrics_used": metrics_ctx,
+    }
+
+
+def _generate_narrative_llm(metrics: dict, tone: str, audience: str):
+    """Generate narrative using LLM. Returns None if LLM unavailable."""
+    import os
+    api_key = os.getenv("OPENAI_API_KEY", "")
+    if not api_key:
+        return None
+
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=api_key)
+
+        system_prompt = (
+            f"You are a CFO writing a {tone} {audience} update. "
+            "Use ONLY the metrics provided — never invent numbers. "
+            "Write in 3 sections: Executive Summary (2-3 sentences), "
+            "Financial Highlights (bullet points), Outlook & Risks (1 paragraph). "
+            "Keep it under 300 words."
+        )
+        user_msg = (
+            f"Period: {metrics['period']}\n"
+            f"Cash: ${metrics['cash_position_m']}M | Runway: {metrics['runway_months']} months\n"
+            f"Monthly Burn: ${metrics['monthly_burn_k']}K | ARR: ${metrics['arr_m']}M\n"
+            f"Revenue Growth: {metrics['revenue_growth_pct']}% | Active Risks: {metrics['risk_count']}\n\n"
+            "Write the board update narrative."
+        )
+
+        resp = client.chat.completions.create(
+            model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_msg},
+            ],
+            max_tokens=400,
+            temperature=0.4,
+        )
+        return resp.choices[0].message.content.strip()
+    except Exception:
+        return None
+
+
+def _generate_narrative_template(metrics: dict, tone: str, audience: str) -> dict:
+    """Deterministic template narrative when LLM is unavailable."""
+    cash_m = metrics["cash_position_m"]
+    runway = metrics["runway_months"]
+    burn_k = metrics["monthly_burn_k"]
+    arr_m = metrics["arr_m"]
+    growth = metrics["revenue_growth_pct"]
+    risk_count = metrics["risk_count"]
+    period = metrics["period"]
+
+    runway_signal = "above our 18-month target" if runway >= 18 else "within operating range" if runway >= 12 else "below our minimum threshold"
+    growth_signal = "strong double-digit growth" if growth >= 20 else "steady growth" if growth >= 5 else "flat quarter"
+
+    return {
+        "executive_summary": (
+            f"For {period}, the company maintained ${cash_m}M in cash with {runway:.1f} months of runway — "
+            f"{runway_signal}. Monthly burn rate of ${burn_k}K reflects disciplined spend management "
+            f"as we scale ARR to ${arr_m}M."
+        ),
+        "financial_highlights": [
+            f"Cash Position: ${cash_m}M (Runway: {runway:.1f} months)",
+            f"ARR: ${arr_m}M ({growth:+.1f}% growth — {growth_signal})",
+            f"Monthly Burn: ${burn_k}K",
+            f"Active Risks: {risk_count} identified, mitigation plans in place",
+        ],
+        "outlook": (
+            f"The company is on track for continued ARR expansion. "
+            f"{'Immediate focus on extending runway via revenue acceleration and cost optimization.' if runway < 12 else 'Capital position is sufficient for planned initiatives through the next 2 quarters.'} "
+            f"{'No critical risks requiring board escalation.' if risk_count == 0 else f'{risk_count} risk(s) are being actively managed with documented mitigation plans.'}"
+        ),
+    }
+
+
 # Helper functions
 
 def calculate_board_metrics(db: Session, company_id: uuid.UUID, period: str) -> dict:

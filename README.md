@@ -1,466 +1,377 @@
---# Vireon — Your AI Financial Copilot for ERP Systems
+# Vireon — Autonomous AI CFO for ERP Systems
+
+> Bridging the gap between "simple data visualization" and "autonomous financial intelligence."  
+> Vireon rivals QuickBooks' complexity while acting as a proactive Finance Manager.
+
+---
 
 ## Overview
 
-**Vireon** is an AI-powered financial intelligence system designed to work alongside enterprise ERP platforms. The system acts as a fractional AI CFO, capable of analyzing financial data, detecting anomalies, forecasting cash runway, and answering complex financial questions in natural language.
+**Vireon** is a sophisticated, industry-ready Autonomous AI CFO built on top of enterprise ERP platforms. It combines deterministic financial math with multi-agent AI reasoning to deliver actionable intelligence — not just charts.
 
-Instead of building a simulated financial database from scratch, this system integrates directly with **ERPNext**, an open-source enterprise resource planning system used by real companies for accounting, financial management, and operations.
+### What sets Vireon apart from dashboards
 
-### ERPNext Data Coverage & Positioning
-Vireon acts as an AI Copilot that **works with ERPNext + has its own modules for what's missing**. Core metrics (cash, burn, runway, revenue, expenses, and GL anomalies) are derived directly from ERPNext data. However, specific gaps in standard ERPNext are handled natively by Vireon's own tables, including:
-- **Payroll/HR data** (`Employee` and `PayrollEntry` tables)
-- **Loans and custom depreciation** (`Loan` and `FixedAsset` tables)
+| Feature | Simple Dashboard | Vireon |
+|---------|-----------------|--------|
+| Charts | Static visuals | **Actionable** — click to drill into real GL entries |
+| Anomaly Detection | Static thresholds | **Isolation Forest ML** — detects split invoices, seasonal patterns |
+| Forecasting | Simple averages | **Prophet + SARIMA ensemble** with DSO-trend inputs |
+| AI Chat | Generic LLM | **LangGraph multi-agent** — Auditor + Strategist + CFO agents |
+| Calculations | LLM arithmetic | **Deterministic Math Engine** — zero hallucinations |
+| Cash Flow | Line chart | **Sankey diagram** (Revenue → OpEx → Net Profit) |
+| Burn Analysis | Monthly bar | **Waterfall chart** with month-over-month drill-down |
 
-The AI agent operates as a financial analyst and decision-support tool. It retrieves financial data from ERPNext, processes it using a deterministic analytics engine, and communicates insights through a conversational interface and interactive dashboards.
+---
 
-This architecture ensures that financial calculations remain deterministic and auditable while still enabling natural language interaction through a large language model.
-
-## System Architecture
-
-The project moves from a demo financial simulator to a real enterprise workflow system, where ERPNext serves as the **financial system of record**.
+## Architecture
 
 ```mermaid
 graph TD
-    User([User]) --> Frontend[Next.js Frontend]
-    Frontend --> Agent[AI Agent Layer - LLM + Tool Calling]
-    Agent --> Backend[FastAPI Backend - Tool APIs]
-    Backend --> MathEngine[Analytics / Math Engine]
-    MathEngine --> ERPAPI[ERPNext REST API]
-    ERPAPI --> ERPDB[(ERPNext Database)]
+    subgraph "Data Sources"
+        ERP[ERPNext REST API]
+        PLAID[Plaid Bank API]
+        STRIPE[Stripe Webhooks]
+        AWS[AWS Billing API]
+    end
+
+    subgraph "FastAPI Backend /api/v1"
+        INGEST[Ingest · GL Sync]
+        ANALYTICS[Analytics · Runway · Burn]
+        ADVANCED[Advanced Analytics<br/>GL Drill-Down · Sankey · Waterfall]
+        AGENT_RT[Agent Router]
+    end
+
+    subgraph "LangGraph Multi-Agent Layer"
+        CFO[CFO Agent<br/>classify → tools → analyze]
+        AUDITOR[Auditor Agent<br/>fetch_gl → reconcile → report]
+        STRATEGIST[Strategist Agent<br/>baseline → payroll_tax → math_engine]
+    end
+
+    subgraph "Deterministic Engines"
+        MATH[Math Engine<br/>Fully-loaded cost · Runway simulation]
+        IF_SVC[Isolation Forest<br/>Split Invoice · Seasonal Anomalies]
+        FORECAST[SARIMA + Prophet<br/>DSO-aware forecasting]
+    end
+
+    subgraph "Next.js Frontend"
+        SANKEY[Sankey Cash Flow Map]
+        WATERFALL[Waterfall Burn Analysis]
+        DRAWER[GL Drill-Down Drawer]
+    end
+
+    ERP --> INGEST --> ANALYTICS
+    PLAID --> AGENT_RT
+    AGENT_RT --> CFO & AUDITOR & STRATEGIST
+    STRATEGIST --> MATH
+    ADVANCED --> IF_SVC
+    SANKEY & WATERFALL & DRAWER --> ADVANCED
 ```
 
-### Core System Components
+---
 
-1.  **Frontend (Next.js + Tremor)**: Interactive dashboards, cash runway visualization, AI chat interface, and scenario simulation.
-2.  **AI Agent Layer (GPT-4o)**: Interprets user questions and orchestrates tool usage. The agent **never** performs calculations; it calls backend tools.
-3.  **Backend API Layer (FastAPI)**: Acts as the tool layer, querying ERPNext and providing structured financial outputs.
-4.  **Math Engine (Python)**: Deterministic functions for calculating startup metrics (Burn Rate, Runway, ARR, MRR, Gross Margin).
-5.  **ERPNext Integration**: ERPNext stores all data (Sales Invoices, Purchase Invoices, Payment Entries, GL Entries) as the source of truth.
+## Tech Stack
 
-## Tech Stack Summary
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | Next.js 14, TypeScript, Tailwind CSS, Tremor, Recharts |
+| **AI Agents** | LangGraph, LangChain, OpenAI GPT-4o (Groq / Ollama fallback) |
+| **Backend** | Python 3.11, FastAPI, SQLAlchemy, Alembic |
+| **ML / Analytics** | Scikit-learn (Isolation Forest), Prophet, SARIMA, NumPy, Pandas |
+| **Math Engine** | Pure Python — deterministic, no LLM arithmetic |
+| **Database** | PostgreSQL 15, Redis 8 |
+| **Job Queue** | Celery + Redis Beat |
+| **ERP** | ERPNext REST API |
+| **Bank Integration** | Plaid API |
+| **Containers** | Docker Compose (7-service orchestration) |
 
-| Layer           | Technology                    |
-| :-------------- | :---------------------------- |
-| **Frontend**    | Next.js, Tailwind CSS, Tremor |
-| **AI Agent**    | OpenAI GPT-4o / LangGraph     |
-| **Backend**     | Python, FastAPI               |
-| **Math Engine** | Python (Deterministic Logic)  |
-| **ERP System**  | ERPNext                       |
-| **Database**    | MariaDB (ERPNext default)     |
+---
 
 ## Key Features
 
-### Dashboard & Analytics
-- **Executive Dashboard (CEO)**: Real-time cash position, monthly burn rate, runway forecast, and key financial metrics
-- **Chief Technology Officer Dashboard**: AWS infrastructure costs tracking, tech spend trends, software licensing costs with quick entry forms
-- **Finance Dashboard**: General ledger review, financial transactions, and detailed expense analysis
-- **Revenue Dashboard**: Sales pipeline, invoice status, ARR/MRR metrics, and revenue forecasts
-- **Expense Management**: Detailed expense categorization, cost allocation, and spending analysis
-- **Tax Planning**: Tax liability tracking, deduction optimization, and compliance monitoring
-- **Anomaly Detection**: Automated alerts for spending anomalies, revenue dips, and operational outliers
+### Interactive Dashboards (QuickBooks-Level)
+- **Drill-Down Everything**: Click any chart segment → side drawer with real GL entries
+- **Sankey Cash Flow Map**: Revenue → COGS → Gross Profit → OpEx → Net P&L
+- **Waterfall Burn Analysis**: Month-over-month cash changes with bar-level drill-down
+- **Executive Dashboards**: CEO (cash/runway), CTO (tech costs), Finance (GL/close)
 
-### AI & Intelligence
-- **Autonomous Financial Alerts**: SMTP-integrated email notifications for spending spikes, customer churn, and runway thresholds
-- **Natural Language Financial Queries**: Chat interface to ask complex financial questions (e.g., "Why did expenses increase?" or "What's our current runway?")
-- **AI Agent Layer**: GPT-4o powered agent with tool calling for orchestrated financial analysis
-- **Scenario Simulation**: Interactive runway scenario planner with adjustable burn rate, hiring costs, and revenue growth
-- **Benchmarking**: Compare financial metrics against industry standards
+### LangGraph Multi-Agent System
+- **CFO Agent**: Full LangGraph `StateGraph` with classify → agent → tools → analyze loop
+- **Auditor Agent**: Autonomous bank reconciliation — fetches GL, fetches bank statement, runs deterministic matching, flags discrepancies
+- **Strategist Agent**: Complex scenario planning — "What happens if we hire 5 engineers in Dubai and lose our biggest SaaS client?"
 
-### Financial Forecasting & Planning
-- **Runway Forecasting**: Real-time cash runway calculation with sensitivity analysis
-- **Scenario Planning**: Model impact of hiring, cost reduction, or revenue changes on runway
-- **Hiring Impact Calculator**: Estimate payroll costs and net impact on runway for new headcount
-- **Tech Cost Tracking**: Monitor AWS, software licenses, and infrastructure spending with trend analysis
-- **Financial Metrics**: ARR, MRR, Gross Margin, burn rate, and cash position calculations
+### Deterministic Math Engine (No LLM Hallucinations)
+- Fully-loaded headcount cost by location (US, Dubai, India, UK, EU, Singapore…)
+- Month-by-month cash runway simulation with hire/revenue/cost events
+- Burn multiple, break-even month, zero-cash-month detection
 
-### Multi-Channel Alerts
-- **Email Notifications**: Configurable alerts sent via SMTP (Gmail, corporate email, etc.)
-- **Alert Recipients**: Multiple recipient support (CEO, Finance team, custom email addresses)
-- **Alert Types**: Spending anomalies, runway threshold warnings, revenue alerts, compliance notifications
+### ML Anomaly Detection 2.0
+- **Isolation Forest** (Scikit-learn): detects seasonal anomalies, unusual GL patterns
+- **Split Invoice Detector**: flags same-vendor similar-amounts within a time window
+- **7 additional detectors**: payroll spikes, churn, vendor pricing drift, concentration risk, duplicate expenses
 
-### ERPNext Integration
-- **Direct ERP Sync**: Reads accounting data from ERPNext (sales, purchases, GL entries)
-- **Real-time Data Binding**: Dashboard metrics update automatically with ERP data
-- **Custom Modules**: Payroll, loans, and fixed assets tracking beyond standard ERPNext
+### Predictive Forecasting
+- **SARIMA + Prophet ensemble** with automated model retraining
+- **Forecast monitoring**: accuracy tracking and drift detection
+- **DSO-aware cash flow**: Days Sales Outstanding trends feed into cash projections
 
-## Current Limitations
+### Phase 3 — Enterprise Intelligence (Complete)
+- **Automatic Accrual Detection**: scans vendor history + service dates to surface unbooked entries before close
+- **Predictive Tax Provisioning**: multi-jurisdiction (US/UK/Dubai/India/Singapore/EU), R&D credits, deduction optimizer
+- **Prophet DSO Forecasting**: Days Sales Outstanding trend → expected cash collection per month
+- **Automated Month-End Close**: 10-item checklist with readiness score (0–100) and blocking issue triage
+- **Cash Flow at Risk (CFaR)**: 10,000 Monte Carlo paths → fan chart, CFaR@95%, probability of going negative
+- **Vendor Risk Intelligence**: concentration risk, payment drift, fraud signals, W-9 compliance
+- **Real-Time Stripe Webhooks**: HMAC-SHA256 verified events — live MRR, churn, payment failures
+- **SOC 2 Audit Trail**: immutable SHA-256 hashed event log with tamper detection endpoint
 
-While Vireon provides robust financial intelligence, here are some areas that are still in development:
+### Phase 4 — Research-Backed Additions (Complete)
+- **Agentic Close Workflow**: LangGraph CloseAgent with graceful direct-orchestration fallback
+- **Zero-Shot Tax Code Classifier**: auto-classify GL descriptions to IRS account codes (6400 SaaS, 6200 R&D, etc.)
+- **NLP Contract Risk Extraction**: 8 risk clause detectors — auto-renewal, termination penalties, IP rights, price escalation
+- **Board Deck Auto-Generator**: LLM narrative + deterministic template fallback from real board metrics
+- **Multi-Entity Consolidation**: FX translation + intercompany elimination across all subsidiaries
 
-- **Multi-currency support** (partially implemented: currency capture and INR normalization exist; live FX sync, revaluation workflows, and full UI controls are still in progress)
-- **Advanced ML forecasting** (implemented with SARIMA and Prophet fallbacks; next step is model monitoring and automated retraining)
-- **OCR/document ingestion** (backend upload/status pipeline exists; production-grade OCR extraction and workflow automation are still in progress)
+---
 
-## Implementation Phases
+## API Endpoints (Complete Reference)
 
-### Phase 1: ERPNext Setup
+### Phase 2 — AI Upgrade
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/v1/advanced/anomalies/isolation-forest` | Run ML anomaly scan |
+| `GET`  | `/api/v1/advanced/gl/drilldown` | GL entries for a category |
+| `POST` | `/api/v1/advanced/agents/reconcile` | Trigger Auditor Agent |
+| `POST` | `/api/v1/advanced/agents/scenario` | Trigger Strategist Agent |
+| `GET`  | `/api/v1/advanced/cash-flow/sankey` | Sankey diagram data |
+| `GET`  | `/api/v1/advanced/burn-analysis/waterfall` | Waterfall chart data |
 
-- Install ERPNext and configure accounting modules.
-- Enable REST API access and generate keys.
+### Phase 3 & 4 — Enterprise + Research
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/v1/phase3/accruals/detect` | Auto accrual detection |
+| `POST` | `/api/v1/phase3/tax/provision` | Predictive tax provisioning |
+| `POST` | `/api/v1/phase3/dso/forecast` | DSO-based cash flow forecast |
+| `POST` | `/api/v1/phase3/close/run` | Automated month-end close |
+| `GET`  | `/api/v1/phase3/close/checklist` | Close checklist template |
+| `POST` | `/api/v1/phase3/cfar/simulate` | CFaR Monte Carlo (10K paths) |
+| `POST` | `/api/v1/phase3/vendor-risk/analyze` | Vendor risk intelligence |
+| `POST` | `/api/v1/phase3/tax/classify` | Zero-shot tax code classifier |
+| `POST` | `/api/v1/phase3/tax/classify/batch` | Batch GL auto-classification |
+| `POST` | `/api/v1/phase3/contracts/risk-extract` | NLP contract risk extraction |
+| `POST` | `/api/v1/webhooks/stripe/events` | Real-time Stripe webhooks |
+| `GET`  | `/api/v1/webhooks/stripe/mrr` | Live MRR dashboard |
+| `POST` | `/api/v1/board-reports/{id}/generate-narrative` | LLM board deck narrative |
+| `GET`  | `/api/v1/audit/tamper-check/{company_id}` | SOC 2 tamper detection |
 
-### Phase 2: Math Engine (Current Focus)
+Full API reference at `/api/v1/docs` (Swagger) or `/api/v1/redoc`.
 
-- Implement strict Python functions for core metrics:
-  - `Calculate Runway (Cash ÷ Burn Rate)`
-  - `Calculate Monthly Burn`
-  - `Scenario Modifiers (e.g., Hiring Simulation)`
-
-### Phase 3: Backend API Wrapper
-
-- Implement FastAPI endpoints that wrap ERPNext API calls.
-- Examples: `get_cash_balance`, `get_expenses`, `get_revenue`.
-
-### Phase 4: AI Agent Integration
-
-- Implement LLM with tool calling to orchestrate backend tools.
-
-### Phase 5: Dashboard
-
-- Build Next.js UI for visualization and real-time interaction.
+---
 
 ## Getting Started
 
 ### Prerequisites
 - Docker & Docker Compose
-- Node.js 20+ (for local frontend development)
-- Python 3.11+ (for local backend development)
+- Node.js 20+
+- Python 3.11+
 - PostgreSQL 15
-- Redis 8.6+
+- Redis 8+
 - ERPNext instance with API credentials
+- OpenAI API key (or Groq / Ollama for local LLM)
 
 ### Quick Start with Docker Compose
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/vireon/vireon.git
-   cd vireon
-   ```
-
-2. **Configure environment variables**
-   ```bash
-   cp backend/.env.example backend/.env
-   # Edit backend/.env with your configuration
-   # Required: ERPNEXT_URL, ERPNEXT_API_KEY, ERPNEXT_API_SECRET
-   # Required: OPENAI_API_KEY, SMTP_* settings for email alerts
-   ```
-
-3. **Start all services**
-   ```bash
-   docker compose up -d
-   ```
-
-4. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8000
-   - API Docs: http://localhost:8000/api/v1/docs
-   - Mailhog (Email Testing): http://localhost:1025
-
-### Production Deployment (AWS + Ollama)
-
-For the consolidated deployment guide, see [DEPLOYMENT.md](DEPLOYMENT.md).
-
-For the current project status and remaining work, see [PROJECT_STATUS.md](PROJECT_STATUS.md).
-
-### Configuration
-
-#### Email Alerts (SMTP)
-Configure in `backend/.env`:
-```
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASS=your-app-password
-SMTP_FROM=alerts@yourcompany.com
-ALERT_FALLBACK_EMAIL=finance@yourcompany.com
-```
-
-#### ERPNext Integration
-```
-ERPNEXT_URL=https://your-erpnext-instance.com
-ERPNEXT_API_KEY=your-api-key
-ERPNEXT_API_SECRET=your-api-secret
-COMPANY_ID=your-company-id
-```
-
-#### AI Agent
-```
-OPENAI_API_KEY=your-openai-api-key
-OPENAI_MODEL=gpt-4o
-```
-
-### Database Setup
-
-1. **Initialize PostgreSQL schema**
-   ```bash
-   docker compose exec backend alembic upgrade head
-   ```
-
-2. **Seed demo data (optional)**
-   ```bash
-   docker compose exec backend python backend/scripts/seed_demo_data.py
-   ```
-
-### Development
-
-#### Frontend Development
 ```bash
+# 1. Clone
+git clone https://github.com/vireon/vireon.git
+cd vireon
+
+# 2. Configure
+cp backend/.env.example backend/.env
+# Edit backend/.env:
+#   ERPNEXT_URL, ERPNEXT_API_KEY, ERPNEXT_API_SECRET
+#   OPENAI_API_KEY
+#   SMTP_* settings
+
+# 3. Start
+docker compose up -d
+
+# 4. Migrate DB
+docker compose exec backend alembic upgrade head
+
+# 5. Seed demo data (optional)
+docker compose exec backend python scripts/seed_demo_data.py
+```
+
+**Access:**
+- Frontend:   http://localhost:3000
+- API:        http://localhost:8000
+- API Docs:   http://localhost:8000/api/v1/docs
+- Mailhog:    http://localhost:8025
+
+### Local Development
+
+```bash
+# Backend
+cd backend
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
+
+# Frontend
 cd frontend
 npm install
 npm run dev
 ```
 
-#### Backend Development
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-python main.py
-```
+---
 
 ## Project Structure
 
-```text
+```
 vireon/
-├── frontend/                    # Next.js React Application
-│   ├── app/
-│   │   ├── (dashboard)/        # Dashboard Pages
-│   │   │   ├── dashboard/      # Executive, CTO, Finance dashboards
-│   │   │   ├── runway/         # Scenario planning
-│   │   │   ├── revenue/        # Revenue analytics
-│   │   │   ├── expenses/       # Expense tracking
-│   │   │   ├── tax/            # Tax planning
-│   │   │   ├── anomalies/      # Anomaly detection
-│   │   │   ├── benchmarking/   # Industry benchmarks
-│   │   │   ├── agent/          # AI chat interface
-│   │   │   └── settings/       # Configuration
-│   ├── components/              # Reusable React components
-│   ├── hooks/                   # Custom React hooks
-│   ├── lib/                     # Utilities and store
-│   └── public/                  # Static assets
+├── frontend/
+│   ├── app/(dashboard)/
+│   │   ├── dashboard/            # CEO · CTO · Finance views
+│   │   ├── cash-flow/            # Sankey + forecast + GL drill-down
+│   │   ├── burn-analysis/        # Waterfall chart + KPIs
+│   │   ├── anomalies/            # Isolation Forest ML scanner
+│   │   ├── runway/               # Scenario planner
+│   │   ├── scenarios/            # Scenario comparison
+│   │   ├── agent/                # AI chat (CFO · Auditor · Strategist)
+│   │   ├── accruals/             # ★ Phase 3: Accrual detection dashboard
+│   │   ├── tax-provisioning/     # ★ Phase 3: Multi-jurisdiction tax estimates
+│   │   ├── cfar/                 # ★ Phase 4: Cash Flow at Risk fan chart
+│   │   ├── vendor-risk/          # ★ Phase 4: Vendor risk + tax classifier
+│   │   ├── month-end-close/      # ★ Phase 3/4: Close checklist + readiness score
+│   │   └── consolidation/        # ★ Phase 3: Multi-entity P&L with FX
+│   └── components/
+│       ├── SankeyChart.tsx       # Cash Flow Sankey diagram
+│       ├── WaterfallChart.tsx    # Burn Analysis waterfall
+│       ├── GLDrilldownDrawer.tsx # GL entries side drawer
+│       ├── ChatDrawer.tsx        # AI agent chat
+│       └── ...
 │
-├── backend/                     # FastAPI Python Application
-│   ├── agent/                   # AI Agent implementation
-│   │   ├── agent_runner.py     # Main agent orchestration
-│   │   ├── tools.py            # Tool definitions for LLM
-│   │   ├── prompts.py          # System prompts and templates
-│   │   └── routing.py          # Tool routing logic
+├── backend/
+│   ├── agent/
+│   │   ├── cfo_agent.py          # LangGraph CFO Agent
+│   │   ├── auditor_agent.py      # LangGraph Auditor (bank reconciliation)
+│   │   ├── strategist_agent.py   # LangGraph Strategist (scenario planning)
+│   │   ├── close_agent.py        # ★ Phase 3/4: Agentic month-end close
+│   │   └── tools.py              # 100+ financial tools
 │   │
-│   ├── api/                     # API Route Handlers
-│   │   ├── routers/
-│   │   │   ├── analytics.py        # Financial metrics endpoints
-│   │   │   ├── notifications.py    # Alert configuration
-│   │   │   ├── financial_alerts.py # Alert management
-│   │   │   ├── benchmarks.py       # Industry benchmarks
-│   │   │   └── ...
-│   │
-│   ├── analytics/               # Math Engine & Calculations
-│   │   ├── metrics.py          # Core financial metrics
-│   │   └── scenarios.py        # Scenario simulation
-│   │
-│   ├── anomaly/                # Anomaly Detection
-│   │   ├── scanner.py          # Detection algorithms
-│   │   └── tasks.py            # Celery background tasks
-│   │
-│   ├── services/               # Business Logic
-│   │   ├── tax_service.py      # Tax calculations
-│   │   ├── vendor_services.py  # Vendor analytics
-│   │   └── stripe_sync.py      # Payment sync
-│   │
-│   ├── tasks/                  # Celery Background Tasks
-│   │   ├── alert_tasks.py      # Email notification tasks
-│   │   └── sync_tasks.py       # Data synchronization
-│   │
-│   ├── erpnext_client/         # ERPNext API Client
-│   │   └── client.py           # REST API wrapper
-│   │
-│   ├── scripts/                # Database & Data Scripts
-│   │   ├── seed_demo_data.py
-│   │   ├── seed_financial_data.py
+│   ├── services/
+│   │   ├── isolation_forest_service.py  # ML anomaly detection
+│   │   ├── math_engine.py               # Deterministic scenario math
+│   │   ├── forecasting_service.py       # SARIMA + Prophet
+│   │   ├── accrual_detection_service.py # ★ Phase 3: Auto accrual detection
+│   │   ├── predictive_tax_service.py    # ★ Phase 3: Multi-jurisdiction tax
+│   │   ├── dso_forecast_service.py      # ★ Phase 3: Prophet DSO forecasting
+│   │   ├── cfar_service.py              # ★ Phase 4: CFaR Monte Carlo
+│   │   ├── vendor_risk_service.py       # ★ Phase 4: Vendor risk + tax classifier
 │   │   └── ...
 │   │
-│   ├── models.py               # SQLAlchemy ORM models
-│   ├── schemas.py              # Pydantic request/response schemas
-│   ├── database.py             # Database connection & migrations
-│   ├── auth.py                 # Authentication & authorization
-│   ├── main.py                 # FastAPI application startup
-│   └── requirements.txt        # Python dependencies
+│   ├── api/routers/
+│   │   ├── advanced_analytics.py  # GL drill-down · Sankey · Waterfall · IF
+│   │   ├── phase3.py              # ★ Phase 3/4: All new enterprise endpoints
+│   │   ├── stripe_webhooks.py     # ★ Phase 3: Real-time Stripe events
+│   │   ├── agent.py               # CFO · Auditor · Strategist endpoints
+│   │   └── 45+ more routers
+│   │
+│   ├── models.py               # 80+ SQLAlchemy models
+│   ├── main.py                 # FastAPI app + all routers
+│   └── requirements.txt
 │
-├── docker-compose.yml          # Container orchestration
-├── README.md                   # This file
-└── PROJECT_STATUS.md           # Development status & roadmap
+├── ARCHITECTURE.md             # Mermaid diagrams + complete feature roadmap
+├── docker-compose.yml
+└── DEPLOYMENT.md
 ```
 
 ---
 
-## API Reference
+## Configuration
 
-All API endpoints are prefixed with `/api/v1/`. Below is a summary of available endpoints:
+### Required Environment Variables
 
-### Authentication
-| Endpoint | Method | Description |
-| :-------- | :----- | :---------- |
-| `/api/v1/auth/login` | POST | User login |
-| `/api/v1/auth/logout` | POST | User logout |
-| `/api/v1/auth/register` | POST | Register new user |
+```bash
+# Database
+DATABASE_URL=postgresql://user:pass@localhost:5433/vireon
 
-### Data Ingestion
-| Endpoint | Method | Description |
-| :-------- | :----- | :---------- |
-| `/api/v1/ingest/accounts` | GET/POST | Fetch and sync accounts |
-| `/api/v1/ingest/contacts` | GET/POST | Fetch and sync contacts |
-| `/api/v1/ingest/invoices` | GET/POST | Fetch and sync invoices |
-| `/api/v1/ingest/expenses` | GET/POST | Fetch and sync expenses |
-| `/api/v1/ingest/employees` | GET/POST | Fetch and sync employees |
+# AI
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-4o
 
-### Analytics
-| Endpoint | Method | Description |
-| :-------- | :----- | :---------- |
-| `/api/v1/analytics/runway` | GET | Calculate cash runway |
-| `/api/v1/analytics/burn-rate` | GET | Calculate burn rate |
-| `/api/v1/analytics/metrics` | GET | Get monthly metrics |
-| `/api/v1/analytics/summary` | GET | Financial summary |
+# ERPNext
+ERPNEXT_URL=https://your-erpnext.com
+ERPNEXT_API_KEY=...
+ERPNEXT_API_SECRET=...
 
-### AI Agent
-| Endpoint | Method | Description |
-| :-------- | :----- | :---------- |
-| `/api/v1/agent/chat` | POST | Chat with AI agent |
-| `/api/v1/agent/tools` | GET | List available tools |
+# Email Alerts
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=alerts@yourcompany.com
+SMTP_PASS=app-password
 
-### ERPNext Integration
-| Endpoint | Method | Description |
-| :-------- | :----- | :---------- |
-| `/api/v1/erpnext/sync` | POST | Sync data from ERPNext |
-| `/api/v1/erpnext/accounts` | GET | Get accounts |
-| `/api/v1/erpnext/invoices` | GET | Get invoices |
-| `/api/v1/erpnext/payments` | GET | Get payments |
+# Optional: local LLM fallback
+USE_LOCAL_LLM=false
+OLLAMA_BASE_URL=http://localhost:11434
+```
 
-### Alerts & Anomalies
-| Endpoint | Method | Description |
-| :-------- | :----- | :---------- |
-| `/api/v1/alerts` | GET | List alerts |
-| `/api/v1/alerts/{id}` | GET/PUT | Get or update alert |
+---
 
-### Benchmarks
-| Endpoint | Method | Description |
-| :-------- | :----- | :---------- |
-| `/api/v1/benchmarks` | GET | Get industry benchmarks |
-| `/api/v1/benchmarks/compare` | POST | Compare against benchmarks |
+## Scenario Planning Examples
 
-### Planning & Forecasting
-| Endpoint | Method | Description |
-| :-------- | :----- | :---------- |
-| `/api/v1/planning/budgets` | GET/POST | Manage budgets |
-| `/api/v1/planning/forecast` | GET/POST | Manage forecasts |
-| `/api/v1/planning/scenarios` | GET/POST | Scenario planning |
+The Strategist Agent handles complex natural language queries using the Deterministic Math Engine:
+
+```
+"What happens to our runway if we hire 5 engineers in Dubai and lose our 
+ biggest SaaS client next quarter?"
+
+→ Fetches baseline: $4.2M cash, $380K revenue, $620K burn
+→ Fetches Dubai payroll tax: 1.15× overhead multiplier
+→ Computes: 5 × $120K × 1.15 / 12 = $57,500/month extra burn
+→ Revenue loss: ~$76K/month (20% MRR estimate)
+→ New net burn: $353,500/month
+→ Runway: 18.1 months → 11.9 months (−6.2 months)
+```
+
+---
 
 ## Troubleshooting
 
-### Frontend Not Compiling
-- Check browser console for errors
-- Verify `frontend/.env` contains required API base URL
-- Clear Next.js cache: `rm -rf frontend/.next`
-- Rebuild frontend: `docker compose up --build frontend`
-
-### Backend API Errors
-- Check backend logs: `docker compose logs backend`
-- Verify `backend/.env` configuration
-- Ensure PostgreSQL is running: `docker compose logs postgres`
-- Test database connection: `docker compose exec backend python -c "from database import engine; print(engine.execute('SELECT 1'))"`
-
-### Email Alerts Not Sending
-1. Verify SMTP credentials in `backend/.env`
-2. Check backend logs: `docker compose logs backend | grep -i smtp`
-3. Check test alert: `curl -X POST http://localhost:8000/api/v1/notifications/test`
-4. For Gmail: Enable "Less secure app access" or use app-specific password
-
-### ERPNext Sync Issues
-1. Verify ERPNext URL is accessible
-2. Check API credentials are correct
-3. Review sync logs: `docker compose exec backend tail -f logs/sync.log`
-4. Test connection: `curl https://your-erpnext.com/api/resource/Company`
-
-### Redis Connection Issues
-- Check Redis is running: `docker compose logs redis`
-- Verify connection: `docker compose exec redis redis-cli ping`
-- Expected response: `PONG`
-
-## Deployment
-
-### Docker Compose (Development)
+### Backend
 ```bash
-docker compose up -d
+docker compose logs backend          # View logs
+docker compose exec backend alembic upgrade head  # Run migrations
 ```
 
-### Production Deployment
-For production deployment, consider:
-1. Use managed PostgreSQL (RDS, Cloud SQL, etc.)
-2. Use managed Redis (ElastiCache, Cloud Memorystore, etc.)
-3. Deploy frontend to CDN (Vercel, Netlify, CloudFront)
-4. Deploy backend to container service (ECS, GKE, Cloud Run)
-5. Configure environment variables securely (secrets manager)
-6. Enable HTTPS and proper security groups
-7. Set up monitoring and alerting (DataDog, New Relic, etc.)
+### Frontend
+```bash
+rm -rf frontend/.next               # Clear cache
+docker compose up --build frontend  # Rebuild
+```
 
-## Contributing
+### Redis / Celery
+```bash
+docker compose exec redis redis-cli ping  # Should return PONG
+docker compose logs worker                # Celery worker logs
+```
 
-Contributions are welcome! Please:
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+---
 
-## Support & Documentation
+## API Documentation
 
-- **Documentation**: See `PROJECT_STATUS.md` for development roadmap and current status
-- **Issue Tracking**: GitHub Issues for bug reports and feature requests
-- **Live Demo**: Available at https://vireon-demo.com (when deployed)
-- **Community**: Join our Slack/Discord for discussions
+- **Swagger UI**: http://localhost:8000/api/v1/docs
+- **ReDoc**: http://localhost:8000/api/v1/redoc
+- **OpenAPI JSON**: http://localhost:8000/api/v1/openapi.json
+
+---
 
 ## License
 
-This project is licensed under the MIT License. See `LICENSE` file for details.
-
-## Acknowledgments
-
-- Built with [Next.js](https://nextjs.org), [FastAPI](https://fastapi.tiangolo.com), and [ERPNext](https://erpnext.com)
-- AI capabilities powered by [OpenAI GPT-4o](https://openai.com)
-- Charts and visualization with [Tremor](https://www.tremor.so) and [Recharts](https://recharts.org)
-- UI components with [Lucide Icons](https://lucide.dev) and [Tailwind CSS](https://tailwindcss.com)
+MIT License. See `LICENSE` for details.
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: March 2026  
-**Status**: Stable - Production Ready
-
-### API Documentation
-
-Interactive API documentation is available at:
-- **Swagger UI**: `/api/v1/docs`
-- **ReDoc**: `/api/v1/redoc`
-- **OpenAPI Schema**: `/api/v1/openapi.json`
-
----
-
-## Environment Variables
-
-| Variable | Default | Description |
-| :-------- | :------- | :---------- |
-| `DATABASE_URL` | - | PostgreSQL connection string |
-| `REDIS_URL` | `redis://localhost:6379/0` | Redis connection string |
-| `SECRET_KEY` | `vireon-secret-key-change-in-production` | JWT secret key |
-| `GROQ_API_KEY` | - | Groq API key for LLM |
-| `USE_LOCAL_LLM` | `false` | Use local Ollama instead of Groq |
-| `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama server URL |
-| `SANDBOX_MODE` | `false` | Enable sandbox mode for testing |
-| `COMPANY_NAME` | `SeedlingLabs` | Company name for display |
-
-### Sandbox Mode
-
-Set `SANDBOX_MODE=true` in your environment to enable sandbox mode for testing:
-
-```bash
-export SANDBOX_MODE=true
-```
+**Version**: 3.0.0 — Autonomous AI CFO + Enterprise Intelligence  
+**Last Updated**: April 2026  
+**Status**: Production Ready · Enterprise Tier · Phase 3/4 Complete

@@ -6,7 +6,7 @@ import TopBar from "@/components/TopBar";
 import { useAppStore } from "@/lib/store";
 import api from "@/lib/api";
 import { cn } from "@/lib/utils";
-import { AlertTriangle, Mail, Search, Zap } from "lucide-react";
+import { AlertTriangle, BrainCircuit, ChevronDown, ChevronUp, Cpu, Mail, Search, Zap } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const API_V1 = API_BASE.replace(/\/$/, "").endsWith("/api/v1")
@@ -45,6 +45,15 @@ export default function AnomaliesPage() {
   const [loading, setLoading] = useState(true);
   const [health, setHealth] = useState<FinancialHealth | null>(null);
   const [anomalies, setAnomalies] = useState<FinancialAnomaly[]>([]);
+
+  // Isolation Forest ML scanner state
+  const [ifLoading, setIfLoading] = useState(false);
+  const [ifResult, setIfResult] = useState<{
+    total: number; critical: number; warnings: number;
+    anomalies: Array<{ severity: string; description: string; alert_type: string; amount: number; vendor: string; category: string; anomaly_score?: number; detection_method?: string }>;
+    split_invoices_found: number; isolation_forest_flags: number;
+  } | null>(null);
+  const [ifExpanded, setIfExpanded] = useState(false);
   const [filter, setFilter] = useState<"all" | "critical" | "warning" | "info">("all");
   const [query, setQuery] = useState("");
   const [showConfig, setShowConfig] = useState(false);
@@ -206,6 +215,33 @@ export default function AnomaliesPage() {
     }
   };
 
+  const handleRunIsolationForest = async () => {
+    if (!companyId) return;
+    setIfLoading(true);
+    setIfResult(null);
+    try {
+      const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+      const res = await fetch(
+        `${API_V1}/advanced/anomalies/isolation-forest?company_id=${companyId}&days_back=90&contamination=0.05`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        }
+      );
+      if (!res.ok) throw new Error(`API error ${res.status}`);
+      const data = await res.json();
+      setIfResult(data);
+      setIfExpanded(true);
+    } catch (e) {
+      console.error("IF scan failed:", e);
+    } finally {
+      setIfLoading(false);
+    }
+  };
+
   if (loading) {
     return <div className="min-h-screen bg-[#f6f3ee]" />;
   }
@@ -260,6 +296,112 @@ export default function AnomaliesPage() {
             {lastAlert}
           </div>
         )}
+
+        {/* ── ML Anomaly Scanner (Isolation Forest) ── */}
+        <section className="rounded-2xl border border-[#ddd2c2] bg-[#fffdf8] shadow-[0_8px_24px_rgba(60,45,24,0.07)]">
+          <div className="flex items-center justify-between px-5 py-4">
+            <div className="flex items-center gap-3">
+              <Cpu className="h-5 w-5 text-[#7c3aed]" />
+              <div>
+                <h2 className="text-sm font-semibold text-[#2a1f14]">
+                  ML Anomaly Scanner · Isolation Forest
+                </h2>
+                <p className="text-xs text-[#7a6252]">
+                  Scikit-learn Isolation Forest detects split invoices, seasonal anomalies, and unusual GL patterns.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {ifResult && (
+                <button
+                  onClick={() => setIfExpanded(!ifExpanded)}
+                  className="flex items-center gap-1 text-xs text-[#7a6252] hover:text-[#2a1f14]"
+                >
+                  {ifExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  {ifExpanded ? "Collapse" : "Expand"}
+                </button>
+              )}
+              <button
+                onClick={handleRunIsolationForest}
+                disabled={ifLoading}
+                className="inline-flex items-center gap-2 rounded-xl bg-[#7c3aed] px-4 py-2 text-sm font-medium text-white hover:bg-[#6d28d9] disabled:opacity-50"
+              >
+                <BrainCircuit className="h-4 w-4" />
+                {ifLoading ? "Scanning…" : "Run ML Scan"}
+              </button>
+            </div>
+          </div>
+
+          {ifResult && ifExpanded && (
+            <div className="border-t border-[#ede8df] px-5 pb-5 pt-4">
+              <div className="mb-4 grid grid-cols-3 gap-3">
+                {[
+                  { label: "Total Flags", value: ifResult.total, color: "text-[#2a1f14]" },
+                  { label: "Critical", value: ifResult.critical, color: "text-[#dc2626]" },
+                  { label: "Warnings", value: ifResult.warnings, color: "text-[#d97706]" },
+                ].map((s) => (
+                  <div key={s.label} className="rounded-xl border border-[#ede8df] bg-[#fffcf5] px-3 py-2.5 text-center">
+                    <p className="text-xs text-[#8c7a68]">{s.label}</p>
+                    <p className={`mt-0.5 text-2xl font-bold ${s.color}`}>{s.value}</p>
+                  </div>
+                ))}
+              </div>
+
+              {ifResult.anomalies.length === 0 ? (
+                <p className="py-4 text-center text-sm text-[#16a34a] font-medium">
+                  ✅ No ML anomalies detected — GL data looks clean.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {ifResult.anomalies.slice(0, 20).map((a, i) => (
+                    <div
+                      key={i}
+                      className={cn(
+                        "rounded-xl border px-4 py-3",
+                        a.severity === "critical"
+                          ? "border-[#fca5a5] bg-[#fef2f2]"
+                          : "border-[#fde68a] bg-[#fffbeb]"
+                      )}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span
+                              className={cn(
+                                "rounded-full px-2 py-0.5 text-[10px] font-bold uppercase",
+                                a.severity === "critical"
+                                  ? "bg-red-100 text-red-700"
+                                  : "bg-amber-100 text-amber-700"
+                              )}
+                            >
+                              {a.severity}
+                            </span>
+                            <span className="text-[10px] text-[#9a8878] uppercase tracking-wide">
+                              {a.alert_type} · {a.detection_method || "ml"}
+                            </span>
+                          </div>
+                          <p className="text-sm text-[#2a1f14]">{a.description}</p>
+                          <p className="mt-0.5 text-xs text-[#7a6252]">
+                            {a.vendor} · {a.category}
+                            {a.anomaly_score !== undefined && ` · score ${a.anomaly_score.toFixed(3)}`}
+                          </p>
+                        </div>
+                        <span className="shrink-0 text-sm font-semibold text-[#2a1f14]">
+                          ${a.amount.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                  {ifResult.anomalies.length > 20 && (
+                    <p className="text-center text-xs text-[#9a8878]">
+                      +{ifResult.anomalies.length - 20} more anomalies not shown
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </section>
 
         {/* Alert Configuration */}
         {showConfig && (

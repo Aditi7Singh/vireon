@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 import models
 import schemas
@@ -186,5 +186,107 @@ async def chat_with_finance_manager_agent(
         "session_id": session_id,
         "query_type": classify_query(request.message),
         "agent_mode": "finance_manager",
+        "timestamp": datetime.now().isoformat(),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Auditor Agent  — autonomous bank reconciliation
+# ---------------------------------------------------------------------------
+
+
+@router.post("/auditor/reconcile", response_model=dict)
+async def run_auditor_reconciliation(
+    payload: dict = Body(...),
+    db: Session = Depends(database.get_db),
+    current_user: Optional[models.User] = Depends(auth.get_current_user),
+):
+    """
+    Trigger the Autonomous Auditor Agent to perform bank reconciliation.
+
+    Body: { company_id, period_start (YYYY-MM-DD), period_end (YYYY-MM-DD) }
+    """
+    from agent.auditor_agent import run_bank_reconciliation
+
+    company_id = str(payload.get("company_id", ""))
+    period_start = payload.get(
+        "period_start", (datetime.now().date() - __import__("datetime").timedelta(days=30)).isoformat()
+    )
+    period_end = payload.get("period_end", datetime.now().date().isoformat())
+
+    if not company_id:
+        raise HTTPException(status_code=400, detail="company_id is required")
+
+    session_id = f"audit-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+
+    report = run_bank_reconciliation(
+        company_id=company_id,
+        period_start=period_start,
+        period_end=period_end,
+        session_id=session_id,
+    )
+
+    return {
+        "agent": "auditor",
+        "company_id": company_id,
+        "period": {"start": period_start, "end": period_end},
+        "session_id": session_id,
+        "report": report,
+        "timestamp": datetime.now().isoformat(),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Strategist Agent  — scenario planning with deterministic math engine
+# ---------------------------------------------------------------------------
+
+
+@router.post("/strategist/scenario", response_model=dict)
+async def run_scenario_planning(
+    payload: dict = Body(...),
+    db: Session = Depends(database.get_db),
+    current_user: Optional[models.User] = Depends(auth.get_current_user),
+):
+    """
+    Trigger the Strategist Agent to answer complex "what-if" financial scenarios.
+
+    Body: { company_id, query }
+    Example: { "company_id": "...", "query": "What happens if we hire 5 engineers
+              in Dubai and lose our biggest SaaS client next quarter?" }
+    """
+    from agent.strategist_agent import run_scenario_query
+
+    company_id = str(payload.get("company_id", ""))
+    query = str(payload.get("query", ""))
+
+    if not company_id or not query:
+        raise HTTPException(status_code=400, detail="company_id and query are required")
+
+    # Try to get real company context
+    company = None
+    if payload.get("company_id"):
+        import uuid as _uuid
+        try:
+            cid = _uuid.UUID(company_id)
+            company = db.query(models.Company).filter(models.Company.id == cid).first()
+        except ValueError:
+            pass
+    if not company:
+        company = db.query(models.Company).first()
+
+    session_id = f"strategist-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+
+    analysis = run_scenario_query(
+        user_query=query,
+        company_id=str(company.id) if company else company_id,
+        session_id=session_id,
+    )
+
+    return {
+        "agent": "strategist",
+        "company_id": company_id,
+        "query": query,
+        "session_id": session_id,
+        "analysis": analysis,
         "timestamp": datetime.now().isoformat(),
     }
