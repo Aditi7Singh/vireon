@@ -16,15 +16,21 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, Legend, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 const burnTrendData = [
-  { month: "Jan", burn: 1620000, revenue: 910000 },
-  { month: "Feb", burn: 1580000, revenue: 960000 },
-  { month: "Mar", burn: 1510000, revenue: 1040000 },
-  { month: "Apr", burn: 1490000, revenue: 1120000 },
-  { month: "May", burn: 1450000, revenue: 1240000 },
-  { month: "Jun", burn: 1410000, revenue: 1300000 },
+  { month: "May 25", burn: 1820000, revenue: 456000, netBurn: 1364000 },
+  { month: "Jun 25", burn: 1780000, revenue: 492000, netBurn: 1288000 },
+  { month: "Jul 25", burn: 1740000, revenue: 546000, netBurn: 1194000 },
+  { month: "Aug 25", burn: 1710000, revenue: 602000, netBurn: 1108000 },
+  { month: "Sep 25", burn: 1680000, revenue: 654000, netBurn: 1026000 },
+  { month: "Oct 25", burn: 1650000, revenue: 720000, netBurn: 930000 },
+  { month: "Nov 25", burn: 1630000, revenue: 810000, netBurn: 820000 },
+  { month: "Dec 25", burn: 1610000, revenue: 900000, netBurn: 710000 },
+  { month: "Jan 26", burn: 1590000, revenue: 984000, netBurn: 606000 },
+  { month: "Feb 26", burn: 1560000, revenue: 1068000, netBurn: 492000 },
+  { month: "Mar 26", burn: 1530000, revenue: 1158000, netBurn: 372000 },
+  { month: "Apr 26", burn: 1490000, revenue: 1298000, netBurn: 192000 },
 ];
 
 const priorityActions = [
@@ -90,36 +96,38 @@ function formatCurrencyShort(value: number): string {
 export default function DashboardHomePage() {
   const metrics = useMemo(() => {
     const latest = burnTrendData[burnTrendData.length - 1];
-    const runwayMonths = (18_900_000 / latest.burn).toFixed(1);
+    const prev = burnTrendData[burnTrendData.length - 2];
+    const runwayMonths = (18_900_000 / latest.netBurn).toFixed(1);
     const burnMultiple = (latest.burn / latest.revenue).toFixed(2);
+    const revGrowth = (((latest.revenue - prev.revenue) / prev.revenue) * 100).toFixed(1);
 
     return [
       {
-        label: "Net Burn",
-        value: formatCurrencyShort(latest.burn),
-        trend: "-4.1% vs last month",
+        label: "Net Burn / Month",
+        value: formatCurrencyShort(latest.netBurn),
+        trend: `-${(((prev.netBurn - latest.netBurn) / prev.netBurn) * 100).toFixed(1)}% vs prior month`,
         positive: true,
         icon: Building2,
       },
       {
         label: "Burn Multiple",
         value: `${burnMultiple}x`,
-        trend: "Target: 1.50x",
-        positive: Number(burnMultiple) <= 1.7,
+        trend: burnMultiple <= "1.50" ? "✓ At target ≤1.5x" : "Target: ≤1.5x",
+        positive: Number(burnMultiple) <= 1.5,
         icon: BrainCircuit,
       },
       {
         label: "Runway",
         value: `${runwayMonths} months`,
-        trend: "Threshold alert at 12 months",
-        positive: Number(runwayMonths) > 12,
+        trend: Number(runwayMonths) > 18 ? "✓ Healthy (>18 mo)" : "Alert at 12 months",
+        positive: Number(runwayMonths) > 18,
         icon: ShieldCheck,
       },
       {
-        label: "Team Cost Ratio",
-        value: "44%",
-        trend: "+1.3% QoQ",
-        positive: false,
+        label: "Revenue Growth",
+        value: `+${revGrowth}% MoM`,
+        trend: `${formatCurrencyShort(latest.revenue)} ARR run-rate`,
+        positive: true,
         icon: Users,
       },
     ];
@@ -191,87 +199,96 @@ export default function DashboardHomePage() {
         <article className="rounded-2xl border border-[#ddd2c1] bg-[#fffdf9] p-5 shadow-[0_14px_35px_rgba(60,45,25,0.06)] lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-[#2a2118]">Burn vs Revenue Momentum</h2>
-              <p className="text-xs text-[#7e715f]">Last 6 months, normalized from unified ledger.</p>
+              <h2 className="text-lg font-semibold text-[#2a2118]">Burn vs Revenue — 12-Month Trend</h2>
+              <p className="text-xs text-[#7e715f]">May 2025 – Apr 2026 · Gross burn, recognized revenue, and net burn overlay.</p>
             </div>
             <Link
               href="/runway"
               className="inline-flex items-center gap-1 text-sm font-medium text-[#7d4f13] hover:text-[#603a08]"
             >
-              Explore runway
+              Full runway model
               <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="h-[280px] w-full">
+          <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={burnTrendData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+              <AreaChart data={burnTrendData} margin={{ top: 8, right: 20, left: 8, bottom: 0 }}>
                 <defs>
                   <linearGradient id="burnFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.35} />
+                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.18} />
                     <stop offset="95%" stopColor="#ef4444" stopOpacity={0.02} />
                   </linearGradient>
                   <linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.28} />
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.22} />
                     <stop offset="95%" stopColor="#10b981" stopOpacity={0.02} />
                   </linearGradient>
-                  <filter id="shadowChart">
-                    <feDropShadow dx="0" dy="2" stdDeviation="2" floodOpacity="0.08" />
-                  </filter>
+                  <linearGradient id="netBurnFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.18} />
+                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.02} />
+                  </linearGradient>
                 </defs>
-                <XAxis 
-                  axisLine={{ stroke: "#e8dccf", strokeWidth: 1 }} 
-                  tickLine={false} 
-                  dataKey="month" 
-                  tick={{ fill: "#7f6f5e", fontSize: 12, fontWeight: 500 }} 
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0ebe3" vertical={false} />
+                <XAxis
+                  axisLine={false}
+                  tickLine={false}
+                  dataKey="month"
+                  tick={{ fill: "#7f6f5e", fontSize: 11, fontWeight: 500 }}
+                  interval={1}
                 />
                 <YAxis
-                  axisLine={{ stroke: "#e8dccf", strokeWidth: 1 }}
+                  axisLine={false}
                   tickLine={false}
                   tickFormatter={(v) => `$${Math.round(v / 1000)}k`}
-                  tick={{ fill: "#7f6f5e", fontSize: 12 }}
+                  tick={{ fill: "#7f6f5e", fontSize: 11 }}
+                  width={52}
                 />
                 <Tooltip
                   contentStyle={{
-                    borderRadius: 12,
+                    borderRadius: 10,
                     border: "1px solid #e0cfc2",
                     background: "#fffbf5",
-                    boxShadow: "0 4px 12px rgba(63, 45, 24, 0.15)",
-                    color: "#2a2118",
+                    boxShadow: "0 4px 16px rgba(63,45,24,0.12)",
+                    fontSize: 12,
                   }}
-                  formatter={(value: number) => [formatCurrencyShort(value)]}
-                  labelFormatter={(label) => `${label} 2024`}
+                  formatter={(value: number, name: string) => {
+                    const labels: Record<string, string> = { burn: "Gross Burn", revenue: "Revenue", netBurn: "Net Burn" };
+                    return [formatCurrencyShort(value), labels[name] ?? name];
+                  }}
                 />
-                <Area 
-                  type="monotone" 
-                  dataKey="burn" 
-                  stroke="#dc2626" 
-                  strokeWidth={2.4} 
-                  fill="url(#burnFill)"
-                  filter="url(#shadowChart)"
+                <Legend
+                  wrapperStyle={{ fontSize: 11, paddingTop: 8 }}
+                  formatter={(value) => {
+                    const m: Record<string, string> = { burn: "Gross Burn", revenue: "Revenue", netBurn: "Net Burn" };
+                    return m[value] ?? value;
+                  }}
                 />
-                <Area 
-                  type="monotone" 
-                  dataKey="revenue" 
-                  stroke="#059669" 
-                  strokeWidth={2.4} 
-                  fill="url(#revenueFill)"
-                  filter="url(#shadowChart)"
+                <ReferenceLine
+                  y={burnTrendData[burnTrendData.length - 1].revenue}
+                  stroke="#059669"
+                  strokeDasharray="5 4"
+                  strokeWidth={1.2}
+                  label={{ value: "Break-even zone", position: "insideTopRight", fontSize: 10, fill: "#059669" }}
                 />
+                <Area type="monotone" dataKey="burn" stroke="#dc2626" strokeWidth={2} fill="url(#burnFill)" dot={false} />
+                <Area type="monotone" dataKey="revenue" stroke="#059669" strokeWidth={2.4} fill="url(#revenueFill)" dot={false} />
+                <Area type="monotone" dataKey="netBurn" stroke="#d97706" strokeWidth={1.8} fill="url(#netBurnFill)" strokeDasharray="4 3" dot={false} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
-          <div className="mt-4 flex items-center justify-between gap-6 pt-4 border-t border-[#ede8df]">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="h-2.5 w-6 rounded-full bg-red-500" />
-                <span className="text-xs font-medium text-[#7a6d5d]">Monthly Burn</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="h-2.5 w-6 rounded-full bg-emerald-500" />
-                <span className="text-xs font-medium text-[#7a6d5d]">Revenue</span>
-              </div>
+          <div className="mt-3 flex items-center justify-between pt-3 border-t border-[#ede8df]">
+            <div className="flex items-center gap-5">
+              {[
+                { color: "bg-red-500", label: "Gross Burn" },
+                { color: "bg-emerald-500", label: "Revenue" },
+                { color: "bg-amber-500", label: "Net Burn" },
+              ].map(({ color, label }) => (
+                <div key={label} className="flex items-center gap-1.5">
+                  <div className={`h-2 w-5 rounded-full ${color}`} />
+                  <span className="text-xs text-[#7a6d5d]">{label}</span>
+                </div>
+              ))}
             </div>
-            <span className="text-xs text-[#6f6251]">Sep forecast: burn declining 3.2%</span>
+            <span className="text-xs text-emerald-700 font-semibold">▲ Revenue crossing burn in Q2 2026</span>
           </div>
         </article>
 

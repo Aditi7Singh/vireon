@@ -30,6 +30,8 @@ from api.routers import (
     advanced_analytics,
     # Phase 3 & 4 — Enterprise + Research-Backed
     phase3, stripe_webhooks,
+    # Market-ready QuickBooks-grade APIs
+    contacts_api, invoices_api, saas_metrics_api, financial_reports_api,
 )
 
 # Basic generic logging config
@@ -249,6 +251,12 @@ app.include_router(advanced_analytics.router, prefix="/api/v1")
 # Phase 3 & 4 — Enterprise + Research-Backed
 app.include_router(phase3.router, prefix="/api/v1")
 app.include_router(stripe_webhooks.router, prefix="/api/v1")
+
+# Market-ready QuickBooks-grade APIs
+app.include_router(contacts_api.router, prefix="/api/v1")
+app.include_router(invoices_api.router, prefix="/api/v1")
+app.include_router(saas_metrics_api.router, prefix="/api/v1")
+app.include_router(financial_reports_api.router, prefix="/api/v1")
 
 # API routes are intentionally versioned under /api/v1
 

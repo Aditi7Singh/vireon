@@ -566,6 +566,139 @@ export async function safeAPICall<T>(
   }
 }
 
+// ─── Market-ready API types ──────────────────────────────────────────────────
+
+export interface ContactRecord {
+  id: string;
+  name: string;
+  type: string;
+  email?: string | null;
+  phone?: string | null;
+  status?: string;
+  payment_terms?: string | null;
+  currency?: string;
+  tax_number?: string | null;
+  billing_address?: Record<string, unknown> | null;
+  created_at?: string | null;
+}
+
+export interface InvoiceRecord {
+  id: string;
+  invoice_number: string;
+  contact_id?: string | null;
+  contact_name?: string | null;
+  issue_date: string;
+  due_date: string;
+  payment_date?: string | null;
+  status: string;
+  type: string;
+  sub_total: number;
+  tax_amount: number;
+  total_amount: number;
+  amount_paid: number;
+  amount_due: number;
+  currency: string;
+  memo?: string | null;
+  created_at?: string | null;
+}
+
+export interface InvoicesListResponse {
+  count: number;
+  invoices: InvoiceRecord[];
+  aging: { current: number; "1_30": number; "31_60": number; "61_90": number; over_90: number };
+  total_outstanding: number;
+}
+
+export interface CreateInvoicePayload {
+  invoice_number?: string;
+  contact_id?: string;
+  issue_date: string;
+  due_date: string;
+  type: string;
+  sub_total: number;
+  tax_amount?: number;
+  currency?: string;
+  memo?: string;
+}
+
+export interface SaasSummary {
+  mrr: number;
+  arr: number;
+  mrr_growth_pct: number;
+  nrr: number;
+  gross_margin_pct: number;
+  ltv: number;
+  cac: number;
+  ltv_cac_ratio: number;
+  cac_payback_months: number;
+  churn_rate_pct: number;
+  rule_of_40: number;
+  burn_rate: number;
+  runway_months: number;
+}
+
+export interface MrrWaterfallMonth {
+  month: string;
+  mrr: number;
+  new: number;
+  expansion: number;
+  contraction: number;
+  churn: number;
+}
+
+export interface CohortData {
+  cohort: string;
+  cohort_value: string;
+  customer_count: number;
+  mrr_total: number;
+  nrr: number;
+  ltv: number;
+  cac: number;
+  churn_rate: number;
+  payback_months: number;
+  retention_curve: number[];
+}
+
+export interface MetricTrendMonth {
+  month: string;
+  mrr: number;
+  expenses: number;
+  burn_rate: number;
+  runway_months: number;
+  ending_cash: number;
+  net_cash_flow: number;
+}
+
+export interface IncomeStatement {
+  period: { start: string; end: string };
+  revenue: { lines: { account: string; code: string; amount: number }[]; total: number };
+  cogs: { lines: { account: string; code: string; amount: number }[]; total: number };
+  gross_profit: number;
+  gross_margin_pct: number;
+  opex: { lines: { account: string; code: string; amount: number }[]; total: number };
+  ebitda: number;
+  ebit: number;
+  net_income: number;
+  net_margin_pct: number;
+}
+
+export interface BalanceSheet {
+  as_of: string;
+  assets: { lines: { account: string; code: string; amount: number }[]; total: number };
+  liabilities: { lines: { account: string; code: string; amount: number }[]; total: number };
+  equity: { lines: { account: string; code: string; amount: number }[]; retained_earnings: number; total: number };
+  liabilities_and_equity: number;
+  balanced: boolean;
+}
+
+export interface CashFlowStatement {
+  period: { start: string; end: string };
+  operating: { net_income: number; add_depreciation: number; change_in_ar: number; change_in_ap: number; net_operating: number };
+  investing: { capex: number; net_investing: number };
+  financing: { net_debt_change: number; net_financing: number };
+  summary: { beginning_cash: number; net_change: number; ending_cash: number };
+}
+
 // API Functions
 export const api = {
   // Cash & Financials
@@ -774,6 +907,68 @@ export const api = {
       body: JSON.stringify(payload),
     }),
   getScenarioHistory: () => fetchAPI<ScenarioSnapshot[]>("/planning/scenarios/history"),
+
+  // Contacts (vendors + customers)
+  getContacts: (companyId: string, params?: { type?: string; status?: string; search?: string }) =>
+    fetchAPI<{ count: number; contacts: ContactRecord[] }>("/contacts", {
+      params: { company_id: companyId, ...params } as Record<string, string | number | boolean>,
+    }),
+  getContact: (contactId: string) => fetchAPI<ContactRecord>(`/contacts/${contactId}`),
+  createContact: (companyId: string, payload: Omit<ContactRecord, "id" | "created_at">) =>
+    fetchAPI<ContactRecord>(`/contacts?company_id=${companyId}`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  updateContact: (contactId: string, payload: Partial<ContactRecord>) =>
+    fetchAPI<ContactRecord>(`/contacts/${contactId}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    }),
+
+  // Invoices list (AR + AP)
+  getInvoicesList: (companyId: string, params?: { type?: string; status?: string; contact_id?: string }) =>
+    fetchAPI<InvoicesListResponse>("/invoices-list", {
+      params: { company_id: companyId, ...params } as Record<string, string | number | boolean>,
+    }),
+  getInvoiceDetail: (invoiceId: string) => fetchAPI<InvoiceRecord>(`/invoices-list/${invoiceId}`),
+  createInvoiceRecord: (companyId: string, payload: CreateInvoicePayload) =>
+    fetchAPI<InvoiceRecord>(`/invoices-list?company_id=${companyId}`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  updateInvoiceStatus: (invoiceId: string, payload: { status: string; payment_amount?: number; payment_date?: string }) =>
+    fetchAPI<InvoiceRecord>(`/invoices-list/${invoiceId}/status`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    }),
+
+  // SaaS metrics
+  getSaasSummary: (companyId: string) =>
+    fetchAPI<SaasSummary>("/saas-metrics/summary", { params: { company_id: companyId } }),
+  getMrrWaterfall: (companyId: string, months = 12) =>
+    fetchAPI<{ months: MrrWaterfallMonth[] }>("/saas-metrics/waterfall", { params: { company_id: companyId, months } }),
+  getCohortRetention: (companyId: string) =>
+    fetchAPI<{ cohorts: CohortData[]; count: number }>("/saas-metrics/cohorts", { params: { company_id: companyId } }),
+  getMetricTrend: (companyId: string, months = 12) =>
+    fetchAPI<{ months: MetricTrendMonth[] }>("/saas-metrics/trend", { params: { company_id: companyId, months } }),
+
+  // Financial reports
+  getIncomeStatement: (companyId: string, periodStart: string, periodEnd: string) =>
+    fetchAPI<IncomeStatement>("/financial-reports/income-statement", {
+      params: { company_id: companyId, period_start: periodStart, period_end: periodEnd },
+    }),
+  getBalanceSheet: (companyId: string, asOf: string) =>
+    fetchAPI<BalanceSheet>("/financial-reports/balance-sheet", {
+      params: { company_id: companyId, as_of: asOf },
+    }),
+  getCashFlowStatement: (companyId: string, periodStart: string, periodEnd: string) =>
+    fetchAPI<CashFlowStatement>("/financial-reports/cash-flow", {
+      params: { company_id: companyId, period_start: periodStart, period_end: periodEnd },
+    }),
+  getDepartmentBreakdown: (companyId: string, periodStart: string, periodEnd: string) =>
+    fetchAPI<any>("/financial-reports/department-breakdown", {
+      params: { company_id: companyId, period_start: periodStart, period_end: periodEnd },
+    }),
 };
 
 export default api;
