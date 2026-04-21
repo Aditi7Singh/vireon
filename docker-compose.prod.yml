@@ -45,7 +45,7 @@ services:
       REDIS_URL: redis://redis:6379/0
       BACKEND_URL: http://backend:8000
       DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-vireon}:${POSTGRES_PASSWORD:-change-me}@postgres:5432/${POSTGRES_DB:-vireon}
-      USE_LOCAL_LLM: ${USE_LOCAL_LLM:-true}
+      USE_LOCAL_LLM: ${USE_LOCAL_LLM:-false}
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
       OLLAMA_MODEL_FAST: ${OLLAMA_MODEL_FAST:-llama3.1:8b}
       OLLAMA_MODEL_THINK: ${OLLAMA_MODEL_THINK:-qwen2.5:14b}

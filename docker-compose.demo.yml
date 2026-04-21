@@ -1,0 +1,71 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: vireon_demo
+      POSTGRES_USER: vireon
+      POSTGRES_PASSWORD: vireon123
+    ports:
+      - "5433:5432"
+    volumes:
+      - demo_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vireon -d vireon_demo"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 8
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://vireon:vireon123@postgres:5432/vireon_demo
+      - REDIS_URL=redis://redis:6379/0
+      - DEMO_MODE=true
+      - COMPANY_NAME=Orchard Analytics Inc.
+      - BACKEND_URL=http://backend:8000
+      - USE_LOCAL_LLM=false
+      - ALLOWED_ORIGINS=http://localhost:3000
+    env_file:
+      - path: ./backend/.env
+        required: false
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+      sh -c "
+        echo '==> Creating DB tables...' &&
+        python -c 'from database import engine; from models import Base; Base.metadata.create_all(engine)' &&
+        echo '==> Seeding demo data...' &&
+        python scripts/demo_full_seed.py &&
+        echo '==> Starting API server...' &&
+        uvicorn main:app --host 0.0.0.0 --port 8000
+      "
+    restart: on-failure
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+
+volumes:
+  demo_postgres_data:

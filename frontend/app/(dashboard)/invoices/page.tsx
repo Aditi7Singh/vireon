@@ -98,12 +98,19 @@ export default function InvoicesPage() {
     return matchSearch && matchStatus;
   });
 
+  const outstandingInvs = invoices.filter((i) => ["sent", "viewed", "partial"].includes(i.status));
+  const overdueInvs     = invoices.filter((i) => i.status === "overdue");
+  const paidInvs        = invoices.filter((i) => i.status === "paid");
+
   const stats = {
-    total: invoices.reduce((s, i) => s + i.amount, 0),
-    outstanding: invoices.filter((i) => ["sent", "viewed", "partial"].includes(i.status)).reduce((s, i) => s + (i.amount - i.paid), 0),
-    overdue: invoices.filter((i) => i.status === "overdue").reduce((s, i) => s + i.amount, 0),
-    paid_mtd: invoices.filter((i) => i.status === "paid").reduce((s, i) => s + i.amount, 0),
-    draft: invoices.filter((i) => i.status === "draft").length,
+    total:       invoices.reduce((s, i) => s + i.amount, 0),
+    totalCount:  invoices.length,
+    outstanding: outstandingInvs.reduce((s, i) => s + (i.amount - i.paid), 0),
+    outstandingCount: outstandingInvs.length,
+    overdue:     overdueInvs.reduce((s, i) => s + i.amount, 0),
+    overdueCount: overdueInvs.length,
+    paid_mtd:    paidInvs.reduce((s, i) => s + i.amount, 0),
+    paidCount:   paidInvs.length,
   };
 
   const newTotal = newInvoice.items.reduce((s, item) => s + item.qty * item.rate, 0);
@@ -138,10 +145,10 @@ export default function InvoicesPage() {
         {/* Stats */}
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { label: "Total Invoiced (Apr)", value: formatCurrency(stats.total), sub: "7 invoices", color: "text-[#2a2017]" },
-            { label: "Outstanding", value: formatCurrency(stats.outstanding), sub: "3 invoices", color: "text-blue-700" },
-            { label: "Overdue", value: formatCurrency(stats.overdue), sub: "1 invoice", color: "text-red-600" },
-            { label: "Collected MTD", value: formatCurrency(stats.paid_mtd), sub: "1 paid", color: "text-emerald-700" },
+            { label: "Total Invoiced (Apr)", value: formatCurrency(stats.total),       sub: `${stats.totalCount} invoice${stats.totalCount !== 1 ? "s" : ""}`,             color: "text-[#2a2017]" },
+            { label: "Outstanding",          value: formatCurrency(stats.outstanding),  sub: `${stats.outstandingCount} invoice${stats.outstandingCount !== 1 ? "s" : ""}`, color: "text-blue-700" },
+            { label: "Overdue",              value: formatCurrency(stats.overdue),       sub: `${stats.overdueCount} invoice${stats.overdueCount !== 1 ? "s" : ""}`,         color: "text-red-600" },
+            { label: "Collected MTD",        value: formatCurrency(stats.paid_mtd),     sub: `${stats.paidCount} paid`,                                                      color: "text-emerald-700" },
           ].map((s) => (
             <article key={s.label} className="rounded-2xl border border-[#ddd2c2] bg-[#fffdf8] p-5">
               <p className="text-xs uppercase tracking-[0.12em] text-[#776b5a]">{s.label}</p>
@@ -193,8 +200,17 @@ export default function InvoicesPage() {
                       <td className="px-5 py-4 text-[#5f5344]">{inv.date}</td>
                       <td className="px-5 py-4 text-[#5f5344]">{inv.due_date}</td>
                       <td className="px-5 py-4 font-semibold text-[#2a2017]">{formatCurrency(inv.amount)}</td>
-                      <td className="px-5 py-4 font-bold" style={{ color: balance > 0 ? "#dc2626" : "#059669" }}>
-                        {balance > 0 ? formatCurrency(balance) : "Paid"}
+                      <td className="px-5 py-4">
+                        <div>
+                          <span className="font-bold" style={{ color: balance > 0 ? "#dc2626" : "#059669" }}>
+                            {balance > 0 ? formatCurrency(balance) : "Paid"}
+                          </span>
+                          {inv.amount > 0 && inv.paid > 0 && balance > 0 && (
+                            <div className="mt-1 h-1 w-20 rounded-full bg-[#ede8e0]">
+                              <div className="h-1 rounded-full bg-emerald-500" style={{ width: `${Math.round((inv.paid / inv.amount) * 100)}%` }} />
+                            </div>
+                          )}
+                        </div>
                       </td>
                       <td className="px-5 py-4">
                         <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold border" style={{ color: meta.color, background: meta.bg, borderColor: meta.border }}>

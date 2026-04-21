@@ -15,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 
 # LLM Configuration
-USE_LOCAL_LLM = os.getenv("USE_LOCAL_LLM", "true").lower() == "true"  # Use Ollama by default
+USE_LOCAL_LLM = os.getenv("USE_LOCAL_LLM", "false").lower() == "true"  # Default: Groq (faster, no local install needed)
 USE_OPENROUTER = os.getenv("USE_OPENROUTER", "false").lower() == "true"
 
 # Groq Configuration (Primary)

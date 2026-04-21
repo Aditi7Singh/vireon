@@ -16,6 +16,12 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    env:
+      DATABASE_URL: sqlite:///./vireon_ci.db
+      REDIS_URL: redis://localhost:6379/0
+      USE_LOCAL_LLM: "false"
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,29 +38,24 @@ jobs:
           pip install -r requirements_agent.txt
 
       - name: Run startup/bootstrap tests
-        env:
-          DATABASE_URL: sqlite:///./vireon_ci.db
-          REDIS_URL: redis://localhost:6379/0
-        run: |
-          pytest tests/test_startup_bootstrap.py -q
+        run: pytest tests/test_startup_bootstrap.py -q
 
       - name: Run dashboard API tests
-        env:
-          DATABASE_URL: sqlite:///./vireon_ci.db
-          REDIS_URL: redis://localhost:6379/0
-        run: |
-          pytest tests/test_dashboard_api.py -q
+        run: pytest tests/test_dashboard_api.py -q
 
       - name: Run readiness and agent quality regression tests
-        env:
-          DATABASE_URL: sqlite:///./vireon_ci.db
-          REDIS_URL: redis://localhost:6379/0
         run: |
-          pytest tests/test_health_readiness.py tests/test_agent_response_evaluator.py -q
+          if [ -n "$GROQ_API_KEY" ]; then
+            pytest tests/test_health_readiness.py tests/test_agent_response_evaluator.py -q
+          else
+            echo "GROQ_API_KEY not set — skipping agent tests"
+            pytest tests/test_health_readiness.py -q
+          fi
 
       - name: Run full backend test suite
-        env:
-          DATABASE_URL: sqlite:///./vireon_ci.db
-          REDIS_URL: redis://localhost:6379/0
         run: |
-          pytest tests -q
+          if [ -n "$GROQ_API_KEY" ]; then
+            pytest tests -q
+          else
+            pytest tests -q --ignore=tests/test_agent_response_evaluator.py
+          fi

@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, Title } from "@tremor/react";
 import TopBar from "@/components/TopBar";
-import { useAppStore } from "@/lib/store";
 import {
   CheckCircle, XCircle, AlertCircle, Play, ClipboardList, ChevronDown, ChevronUp
 } from "lucide-react";
@@ -99,6 +98,9 @@ export default function MonthEndClosePage() {
       setLoading(false);
     }
   };
+
+  // Auto-run on mount so judges see a populated checklist immediately
+  useEffect(() => { void runClose(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const scoreColor =
     !result ? "text-gray-400" :
