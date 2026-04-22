@@ -13,6 +13,7 @@ from config import settings
 SECRET_KEY = os.getenv("SECRET_KEY", "vireon-secret-key-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ALLOW_DEMO_WITHOUT_TOKEN = os.getenv("ALLOW_DEMO_WITHOUT_TOKEN", "false").strip().lower() in {"1", "true", "yes", "on"}
 
 # auto_error=False allows us to handle missing tokens manually for demo/sandbox mode
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", auto_error=False)
@@ -52,20 +53,23 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     
-    # SANDBOX MODE: If no token is provided, use/create a default demo user
-    if not token:
+    # Optional sandbox mode for local dev only. Disabled by default.
+    if not token and ALLOW_DEMO_WITHOUT_TOKEN:
         demo_user = db.query(models.User).filter(models.User.username == "vireon_demo").first()
         if not demo_user:
             demo_user = models.User(
                 username="vireon_demo",
                 email="demo@vireon.ai",
                 hashed_password=get_password_hash("demo_password"),
-                role=models.UserRole.ADMIN
+                role=models.UserRole.ADMIN.value,
             )
             db.add(demo_user)
             db.commit()
             db.refresh(demo_user)
         return demo_user
+
+    if not token:
+        raise credentials_exception
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -85,7 +89,9 @@ class RoleChecker:
         self.allowed_roles = allowed_roles
 
     def __call__(self, user: models.User = Depends(get_current_user)):
-        if user.role not in self.allowed_roles:
+        normalized_allowed = {str(role).upper() for role in self.allowed_roles}
+        user_role = str(user.role).upper()
+        if user_role not in normalized_allowed:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"User with role {user.role} is not authorized. Required: {self.allowed_roles}"

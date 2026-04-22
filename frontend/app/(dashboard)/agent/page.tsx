@@ -7,7 +7,7 @@ import { useAppStore } from "@/lib/store";
 import {
   AlertCircle, Bot, CheckCircle2, MessageSquare, RefreshCw,
   Send, Sparkles, User, FileText, Receipt, BarChart3, Shield,
-  TrendingUp, DollarSign, Users, Calendar,
+  TrendingUp, Users,
   Zap, ChevronDown, ChevronUp, Copy, ThumbsUp, ThumbsDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -48,6 +48,12 @@ const QUICK_ACTIONS = [
     "Model impact of hiring 5 engineers in June",
     "What happens to runway if we lose our top customer?",
     "Simulate raising a Series B at $200M valuation",
+  ]},
+  { category: "Seeding Lab", icon: Users, color: "#16a34a", prompts: [
+    "Compare burn rate across Sprout, Orchard and AI Lab",
+    "Which project has the highest revenue per employee?",
+    "How does AI Lab GPU spend impact overall runway?",
+    "Model adding 3 engineers to Orchard starting next month",
   ]},
 ];
 
@@ -119,7 +125,7 @@ export default function AgentPage() {
         } else {
           setMessages([{
             role: "assistant",
-            content: "**Hello! I'm your Vireon AI CFO.**\n\nI can help you with financial analysis, create invoices and bills, run scenario models, check compliance deadlines, and much more. I have access to your full financial data.\n\nWhat would you like to work on today?",
+            content: "**Hello! I'm Finley, your Vireon AI finance agent.**\n\nI can help you with financial analysis, create invoices and bills, run scenario models, check compliance deadlines, and much more. I have access to your full financial data.\n\nWhat would you like to work on today?",
             timestamp: new Date().toLocaleTimeString(),
           }]);
         }
@@ -190,7 +196,7 @@ export default function AgentPage() {
 
   return (
     <div className="min-h-screen bg-[#ece3d4] pb-10 text-[#1d1b17]">
-      <TopBar title="AI CFO Agent" />
+      <TopBar title="Finley AI Agent" />
 
       <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
@@ -205,7 +211,7 @@ export default function AgentPage() {
                   <Bot className="h-5 w-5 text-[#fff7ef]" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-[#2a2017]">Vireon CFO Agent</p>
+                  <p className="text-sm font-bold text-[#2a2017]">Finley by Vireon</p>
                   <p className="text-xs text-[#8a7b68]">Powered by LangGraph · GPT-4o</p>
                 </div>
               </div>
@@ -320,30 +326,57 @@ export default function AgentPage() {
               )}
             </div>
 
-            {/* Agent Capabilities */}
+            {/* Agent Capabilities — full showcase */}
             <div className="rounded-2xl border border-[#cfbfa9] bg-[#f8efe3] p-4">
-              <p className="text-xs font-black uppercase tracking-widest text-[#776b5a] mb-3">Agent Capabilities</p>
-              <div className="space-y-2">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-black uppercase tracking-widest text-[#776b5a]">Finley's Capabilities</p>
+                <span className="rounded-full bg-[#2c2520] px-2 py-0.5 text-[9px] font-black text-[#f6d9b0]">100+ tools</span>
+              </div>
+              <div className="space-y-3">
                 {[
-                  { icon: FileText, label: "Create & send invoices", color: "#2563eb" },
-                  { icon: Receipt, label: "Enter & approve bills", color: "#d97706" },
-                  { icon: BarChart3, label: "Generate financial reports", color: "#7c3aed" },
-                  { icon: TrendingUp, label: "Scenario planning & modeling", color: "#059669" },
-                  { icon: Shield, label: "Compliance deadline alerts", color: "#dc2626" },
-                  { icon: DollarSign, label: "GL anomaly detection", color: "#8d4f27" },
-                  { icon: Users, label: "Payroll & headcount analysis", color: "#0891b2" },
-                  { icon: Calendar, label: "Tax provisioning & estimates", color: "#6b7280" },
-                ].map(cap => {
-                  const Icon = cap.icon;
-                  return (
-                    <div key={cap.label} className="flex items-center gap-2.5">
-                      <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${cap.color}15` }}>
-                        <Icon className="h-3.5 w-3.5" style={{ color: cap.color }} />
-                      </div>
-                      <p className="text-xs text-[#5f5344]">{cap.label}</p>
+                  {
+                    group: "Transactions",
+                    color: "#2563eb",
+                    items: ["Create & send invoices", "Enter & approve bills", "Expense categorisation", "Procurement & POs"],
+                  },
+                  {
+                    group: "Intelligence",
+                    color: "#7c3aed",
+                    items: ["GL anomaly detection (ML)", "Vendor risk scoring", "Duplicate invoice detection", "Cash Flow at Risk (Monte Carlo)"],
+                  },
+                  {
+                    group: "Planning",
+                    color: "#059669",
+                    items: ["12-month runway forecast", "Scenario modelling", "Hire impact simulation", "FY budget vs actual"],
+                  },
+                  {
+                    group: "Compliance",
+                    color: "#dc2626",
+                    items: ["India tax calendar (TDS, PF, GST)", "Advance tax calculation", "Month-end close checklist", "SOC 2 audit trail"],
+                  },
+                  {
+                    group: "Portfolio",
+                    color: "#16a34a",
+                    items: ["Sprout / Orchard / AI Lab burn", "Per-project headcount cost", "Cross-project runway impact", "ARR attainment tracking"],
+                  },
+                ].map(({ group, color, items }) => (
+                  <div key={group}>
+                    <p className="text-[9px] font-black uppercase tracking-widest mb-1.5" style={{ color }}>{group}</p>
+                    <div className="grid grid-cols-2 gap-1">
+                      {items.map((item) => (
+                        <div key={item} className="flex items-center gap-1.5 rounded-lg px-2 py-1" style={{ background: color + "10" }}>
+                          <div className="w-1 h-1 rounded-full shrink-0" style={{ background: color }} />
+                          <p className="text-[9px] font-semibold text-[#3d3429] leading-tight">{item}</p>
+                        </div>
+                      ))}
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 rounded-xl bg-[#1f1a16]/90 px-3 py-2 text-center">
+                <p className="text-[9px] font-black text-amber-400 uppercase tracking-wider">Powered by</p>
+                <p className="text-[10px] font-bold text-white">LangGraph · GPT-4o · Deterministic Math Engine</p>
+                <p className="text-[9px] text-[#c8b89e]">Zero-hallucination financial arithmetic</p>
               </div>
             </div>
 

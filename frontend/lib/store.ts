@@ -77,8 +77,8 @@ export const useAppStore = create<AppState>()(
 
     // User - default dashboard identity
     user: {
-      name: "VIREON AI",
-      email: "ai@vireon.finance",
+      name: "Finley",
+      email: "finley@vireon.ai",
       role: "CFO",
     },
     setUser: (user) => set({ user }),

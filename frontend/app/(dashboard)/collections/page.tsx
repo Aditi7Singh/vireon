@@ -132,7 +132,7 @@ export default function CollectionsPage() {
                 className="inline-flex items-center gap-2 rounded-xl bg-[#231c15] px-4 py-2.5 text-sm font-medium text-[#fff7eb] hover:bg-[#17120d]"
               >
                 <Sparkles className="h-4 w-4" />
-                Ask AI CFO
+                Ask Finley
               </button>
             </div>
           </div>

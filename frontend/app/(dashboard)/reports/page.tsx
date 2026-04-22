@@ -11,8 +11,73 @@ import {
   Legend, ReferenceLine,
 } from "recharts";
 
-type ReportType = "income" | "balance" | "cashflow";
+type ReportType = "income" | "balance" | "cashflow" | "indas";
 type Period = "mtd" | "q1" | "q2" | "ytd" | "annual";
+
+const INR = (n: number, decimals = 2) =>
+  n >= 10_000_000 ? `₹${(n / 10_000_000).toFixed(decimals)}Cr`
+  : n >= 100_000   ? `₹${(n / 100_000).toFixed(decimals)}L`
+  : `₹${n.toLocaleString("en-IN")}`;
+
+// ─── IndAS / India statutory data ─────────────────────────────────────────────
+const INDAS_BALANCE_SHEET = {
+  non_current_assets: {
+    "Property, Plant & Equipment (Net)"    : { current: 10_230_000, prior: 12_180_000 },
+    "Right-of-Use Assets (IndAS 116)"      : { current:  6_480_000, prior:  7_200_000 },
+    "Intangible Assets"                    : { current:  5_600_000, prior:  6_760_000 },
+    "Deferred Tax Assets (IndAS 12)"       : { current:  1_480_000, prior:  1_152_000 },
+    "Other Non-Current Assets"             : { current:  2_310_000, prior:  2_310_000 },
+  },
+  current_assets: {
+    "Cash & Cash Equivalents"              : { current: 23_380_000, prior: 15_810_000 },
+    "Bank Balances (FDs)"                  : { current: 41_200_000, prior: 20_600_000 },
+    "Trade Receivables"                    : { current:  2_345_000, prior:  1_794_000 },
+    "GST Input Tax Credit Receivable"      : { current:  1_242_000, prior:    824_000 },
+    "Advance Tax & TDS Receivable"         : { current:  2_108_000, prior:  1_342_000 },
+    "Prepaid Expenses & Other CA"          : { current:    345_000, prior:    312_000 },
+  },
+  equity: {
+    "Share Capital"                        : { current: 24_520_000, prior: 16_280_000 },
+    "Securities Premium"                   : { current: 51_840_000, prior: 29_840_000 },
+    "Retained Earnings"                    : { current:  4_721_000, prior:  1_653_000 },
+  },
+  non_current_liabilities: {
+    "Lease Liabilities — Long-term (116)"  : { current:  4_860_000, prior:  5_400_000 },
+    "Deferred Tax Liability (IndAS 12)"    : { current:    148_000, prior:    115_200 },
+  },
+  current_liabilities: {
+    "Trade Payables"                       : { current:    533_000, prior:    427_000 },
+    "GST Payable (Output – ITC)"           : { current:  1_384_000, prior:    984_000 },
+    "TDS Payable"                          : { current:    138_100, prior:    112_000 },
+    "PF / PT Payable"                      : { current:    574_700, prior:    480_000 },
+    "Advance Tax Payable"                  : { current:    920_000, prior:    640_000 },
+    "Deferred Revenue (Contract Liab.)"    : { current:  1_746_000, prior:  1_382_000 },
+    "Lease Liabilities — Current (116)"    : { current:    720_000, prior:    720_000 },
+    "Other Current Liabilities"            : { current:    312_000, prior:    241_000 },
+  },
+};
+
+const SEGMENT_REPORT = [
+  { segment: "Sprout (Gangavathi)",  revenue: 62_000_000, ebitda: 14_880_000, pat: 11_160_000, assets: 21_400_000, headcount: 5 },
+  { segment: "Orchard (Bengaluru)", revenue: 78_000_000, ebitda: 20_280_000, pat: 15_210_000, assets: 28_600_000, headcount: 6 },
+  { segment: "AI Lab (Remote)",     revenue: 16_800_000, ebitda:  2_520_000, pat:  1_890_000, assets: 11_800_000, headcount: 4 },
+  { segment: "Shared / Corporate",  revenue:         0,  ebitda: -9_680_000, pat: -7_260_000, assets: 34_122_000, headcount: 3 },
+];
+
+const RELATED_PARTY = [
+  { party: "Aditi Singh (Director)", relation: "Key Mgmt Personnel", nature: "Director Remuneration", amount: 5_040_000, balance: 0 },
+  { party: "Ravi Kumar (CFO)",       relation: "Key Mgmt Personnel", nature: "Director Remuneration", amount: 3_360_000, balance: 0 },
+  { party: "Seeding Lab Trust",      relation: "Promoter Entity",     nature: "Equity Contribution",   amount: 12_000_000, balance: 0 },
+];
+
+const INDAS_NOTES = [
+  { std: "IndAS 115", title: "Revenue Recognition",      note: "SaaS subscription revenue recognised on a straight-line basis over contract term. Implementation fees recognised at point-of-delivery. No variable consideration components." },
+  { std: "IndAS 116", title: "Leases",                   note: "Bengaluru office lease (5-yr) recognised as ROU asset ₹6.48L and lease liability ₹5.58L. Short-term leases < 12 months expensed as incurred." },
+  { std: "IndAS 12",  title: "Income Taxes",             note: "Current tax at 25% (Sec 115BAA). DTA of ₹14.8L on timing differences. MAT credit not applicable — company is profitable." },
+  { std: "IndAS 38",  title: "Intangible Assets",        note: "Internally developed software capitalised at ₹5.6L (net) amortised over 3 years. AI model weights assessed as internally generated — expensed." },
+  { std: "IndAS 108", title: "Segment Reporting",        note: "Three operating segments reported: Sprout, Orchard, AI Lab. Shared/Corporate costs allocated pro-rata to revenue. CFO is chief operating decision maker." },
+  { std: "IndAS 24",  title: "Related Party Disclosures",note: "Transactions with KMP at arm's-length. No inter-company loans. No guarantees given to related parties." },
+];
 
 const INCOME_STMT = {
   revenue: {
@@ -131,7 +196,7 @@ function PctChange({ current, prior, inverse = false }: { current: number; prior
   );
 }
 
-function SectionTable({ title, rows, isExpense = false, isTotal = false }: { title: string; rows: Record<string, { current: number; prior: number }>; isExpense?: boolean; isTotal?: boolean }) {
+function SectionTable({ title, rows, isExpense = false }: { title: string; rows: Record<string, { current: number; prior: number }>; isExpense?: boolean }) {
   const total = { current: Object.values(rows).reduce((s, r) => s + r.current, 0), prior: Object.values(rows).reduce((s, r) => s + r.prior, 0) };
   return (
     <div className="mb-2">
@@ -364,7 +429,7 @@ export default function ReportsPage() {
         <section className="rounded-2xl border border-[#ddd2c2] bg-[#fffdf8] overflow-hidden">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-5 border-b border-[#ede8e0]">
             <div className="flex gap-1 bg-[#f0ebe3] rounded-xl p-1">
-              {([["income", "Income Statement"], ["balance", "Balance Sheet"], ["cashflow", "Cash Flow"]] as const).map(([key, label]) => (
+              {([["income", "Income Statement"], ["balance", "Balance Sheet"], ["cashflow", "Cash Flow"], ["indas", "IndAS / India"]] as const).map(([key, label]) => (
                 <button key={key} onClick={() => setReport(key)} className={cn("rounded-lg px-4 py-2 text-xs font-bold transition-all", report === key ? "bg-white text-[#2a2017] shadow-sm" : "text-[#776b5a] hover:text-[#2a2017]")}>
                   {label}
                 </button>
@@ -380,7 +445,7 @@ export default function ReportsPage() {
           {/* Column Headers */}
           <div className="flex items-center justify-between px-5 py-3 border-b border-[#ddd2c2] bg-[#faf7f3]">
             <span className="text-sm font-bold text-[#2a2017]">
-              {report === "income" ? "Orchard Analytics Inc. — Income Statement" : report === "balance" ? "Orchard Analytics Inc. — Balance Sheet" : "Orchard Analytics Inc. — Cash Flow Statement"}
+              {report === "income" ? "Vireon Seeding Lab Pvt. Ltd. — Income Statement" : report === "balance" ? "Vireon Seeding Lab Pvt. Ltd. — Balance Sheet" : "Vireon Seeding Lab Pvt. Ltd. — Cash Flow Statement"}
             </span>
             <div className="flex items-center gap-8">
               <span className="text-xs font-bold text-[#776b5a] w-28 text-right">FY 2025</span>
@@ -459,6 +524,153 @@ export default function ReportsPage() {
                   <span className="text-sm font-semibold text-[#b8a898] w-28 text-right">{formatCurrency(Object.values({...CASH_FLOW.operating,...CASH_FLOW.investing,...CASH_FLOW.financing}).reduce((s, r) => s + r.prior, 0))}</span>
                   <span className={cn("text-sm font-black w-28 text-right", (totalOpCF + totalInvCF + totalFinCF) >= 0 ? "text-emerald-400" : "text-red-400")}>{formatCurrency(totalOpCF + totalInvCF + totalFinCF)}</span>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {report === "indas" && (
+            <div>
+              {/* Schedule III Balance Sheet — IndAS format */}
+              <div className="bg-[#f5f0ea] px-5 py-2 border-y border-[#ede8e0] flex items-center justify-between">
+                <span className="text-xs font-black uppercase tracking-widest text-[#5f5344]">Schedule III Balance Sheet (IndAS) — ₹ Figures</span>
+                <span className="text-[10px] font-bold text-[#8a7968]">Companies Act 2013 · As at Mar 31, 2026</span>
+              </div>
+
+              {[
+                { title: "Non-Current Assets", rows: INDAS_BALANCE_SHEET.non_current_assets },
+                { title: "Current Assets", rows: INDAS_BALANCE_SHEET.current_assets },
+              ].map(({ title, rows }) => (
+                <div key={title} className="mb-1">
+                  <div className="bg-[#f9f5ef] px-5 py-1.5 border-b border-[#ede8e0]">
+                    <span className="text-[11px] font-black text-[#7a6a56] uppercase tracking-wider">{title}</span>
+                  </div>
+                  {Object.entries(rows).map(([name, vals]) => (
+                    <div key={name} className="flex items-center justify-between px-5 py-2.5 border-b border-[#f5f0ea] hover:bg-[#faf7f3]">
+                      <span className="text-sm text-[#4a3f35] pl-4">{name}</span>
+                      <div className="flex items-center gap-8">
+                        <span className="text-sm text-[#776b5a] w-32 text-right">{INR(vals.prior)}</span>
+                        <span className="text-sm font-semibold text-[#2a2017] w-32 text-right">{INR(vals.current)}</span>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="flex items-center justify-between px-5 py-2.5 bg-[#f9f6f1] border-b border-[#ddd2c2]">
+                    <span className="text-sm font-bold text-[#2a2017] pl-2">Total {title}</span>
+                    <div className="flex gap-8">
+                      <span className="text-sm font-semibold text-[#776b5a] w-32 text-right">{INR(Object.values(rows).reduce((s, r) => s + r.prior, 0))}</span>
+                      <span className="text-sm font-bold text-[#2a2017] w-32 text-right">{INR(Object.values(rows).reduce((s, r) => s + r.current, 0))}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {[
+                { title: "Equity", rows: INDAS_BALANCE_SHEET.equity },
+                { title: "Non-Current Liabilities", rows: INDAS_BALANCE_SHEET.non_current_liabilities },
+                { title: "Current Liabilities", rows: INDAS_BALANCE_SHEET.current_liabilities },
+              ].map(({ title, rows }) => (
+                <div key={title} className="mb-1">
+                  <div className="bg-[#f9f5ef] px-5 py-1.5 border-b border-[#ede8e0]">
+                    <span className="text-[11px] font-black text-[#7a6a56] uppercase tracking-wider">{title}</span>
+                  </div>
+                  {Object.entries(rows).map(([name, vals]) => (
+                    <div key={name} className="flex items-center justify-between px-5 py-2.5 border-b border-[#f5f0ea] hover:bg-[#faf7f3]">
+                      <span className="text-sm text-[#4a3f35] pl-4">{name}</span>
+                      <div className="flex items-center gap-8">
+                        <span className="text-sm text-[#776b5a] w-32 text-right">{INR(vals.prior)}</span>
+                        <span className="text-sm font-semibold text-[#2a2017] w-32 text-right">{INR(vals.current)}</span>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="flex items-center justify-between px-5 py-2.5 bg-[#f9f6f1] border-b border-[#ddd2c2]">
+                    <span className="text-sm font-bold text-[#2a2017] pl-2">Total {title}</span>
+                    <div className="flex gap-8">
+                      <span className="text-sm font-semibold text-[#776b5a] w-32 text-right">{INR(Object.values(rows).reduce((s, r) => s + r.prior, 0))}</span>
+                      <span className="text-sm font-bold text-[#2a2017] w-32 text-right">{INR(Object.values(rows).reduce((s, r) => s + r.current, 0))}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Segment Report (IndAS 108) */}
+              <div className="bg-[#f5f0ea] px-5 py-2 border-y border-[#ede8e0] mt-2">
+                <span className="text-xs font-black uppercase tracking-widest text-[#5f5344]">Segment Report — IndAS 108 · FY 2025-26</span>
+              </div>
+              <table className="w-full text-xs border-b border-[#ddd2c2]">
+                <thead className="bg-[#faf5ef]">
+                  <tr>
+                    {["Segment", "Revenue", "EBITDA", "EBITDA %", "PAT", "Total Assets", "Headcount"].map((h) => (
+                      <th key={h} className="px-4 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-[#9e8e7a]">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {SEGMENT_REPORT.map((seg) => (
+                    <tr key={seg.segment} className="border-t border-[#f5ede4] hover:bg-[#fdf8f2]">
+                      <td className="px-4 py-2.5 font-semibold text-[#1d1b19]">{seg.segment}</td>
+                      <td className="px-4 py-2.5 text-[#6a6054]">{INR(seg.revenue)}</td>
+                      <td className={`px-4 py-2.5 font-bold ${seg.ebitda >= 0 ? "text-emerald-700" : "text-red-600"}`}>{INR(seg.ebitda)}</td>
+                      <td className="px-4 py-2.5 text-[#6a6054]">{seg.revenue > 0 ? `${((seg.ebitda / seg.revenue) * 100).toFixed(1)}%` : "—"}</td>
+                      <td className={`px-4 py-2.5 font-bold ${seg.pat >= 0 ? "text-emerald-700" : "text-red-600"}`}>{INR(seg.pat)}</td>
+                      <td className="px-4 py-2.5 text-[#6a6054]">{INR(seg.assets)}</td>
+                      <td className="px-4 py-2.5 text-[#6a6054]">{seg.headcount}</td>
+                    </tr>
+                  ))}
+                  <tr className="border-t-2 border-[#ddd2c2] bg-[#f9f6f1] font-black">
+                    <td className="px-4 py-2.5 text-[#2a2017]">Total</td>
+                    <td className="px-4 py-2.5 text-[#2a2017]">{INR(SEGMENT_REPORT.reduce((s, r) => s + r.revenue, 0))}</td>
+                    <td className="px-4 py-2.5 text-emerald-700">{INR(SEGMENT_REPORT.reduce((s, r) => s + r.ebitda, 0))}</td>
+                    <td className="px-4 py-2.5 text-[#6a6054]">—</td>
+                    <td className="px-4 py-2.5 text-emerald-700">{INR(SEGMENT_REPORT.reduce((s, r) => s + r.pat, 0))}</td>
+                    <td className="px-4 py-2.5 text-[#2a2017]">{INR(SEGMENT_REPORT.reduce((s, r) => s + r.assets, 0))}</td>
+                    <td className="px-4 py-2.5 text-[#2a2017]">{SEGMENT_REPORT.reduce((s, r) => s + r.headcount, 0)}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              {/* Related Party Disclosures (IndAS 24) */}
+              <div className="bg-[#f5f0ea] px-5 py-2 border-y border-[#ede8e0] mt-2">
+                <span className="text-xs font-black uppercase tracking-widest text-[#5f5344]">Related Party Transactions — IndAS 24</span>
+              </div>
+              <table className="w-full text-xs border-b border-[#ddd2c2]">
+                <thead className="bg-[#faf5ef]">
+                  <tr>
+                    {["Related Party", "Relationship", "Nature of Transaction", "Amount (FY26)", "Closing Balance"].map((h) => (
+                      <th key={h} className="px-4 py-2.5 text-left text-[10px] font-black uppercase tracking-widest text-[#9e8e7a]">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {RELATED_PARTY.map((r) => (
+                    <tr key={r.party} className="border-t border-[#f5ede4] hover:bg-[#fdf8f2]">
+                      <td className="px-4 py-3 font-semibold text-[#1d1b19]">{r.party}</td>
+                      <td className="px-4 py-3 text-[#6a6054]">{r.relation}</td>
+                      <td className="px-4 py-3 text-[#6a6054]">{r.nature}</td>
+                      <td className="px-4 py-3 font-bold text-[#1d1b19]">{INR(r.amount)}</td>
+                      <td className="px-4 py-3 text-[#9e8e7a]">{r.balance === 0 ? "Nil" : INR(r.balance)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* IndAS Notes */}
+              <div className="bg-[#f5f0ea] px-5 py-2 border-y border-[#ede8e0] mt-2">
+                <span className="text-xs font-black uppercase tracking-widest text-[#5f5344]">Significant Accounting Policies & Notes</span>
+              </div>
+              <div className="grid grid-cols-2 gap-0">
+                {INDAS_NOTES.map((n, i) => (
+                  <div key={n.std} className={`px-5 py-3 border-b border-[#f5ede4] ${i % 2 === 0 ? "border-r border-r-[#ede8e0]" : ""} hover:bg-[#faf7f3]`}>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] font-black bg-[#1d1b19] text-white px-2 py-0.5 rounded-md">{n.std}</span>
+                      <span className="text-xs font-bold text-[#2a2017]">{n.title}</span>
+                    </div>
+                    <p className="text-[11px] text-[#6a6054] leading-relaxed">{n.note}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-between px-5 py-4 bg-[#231c15]">
+                <span className="text-sm font-black text-white pl-2">Vireon Seeding Lab Pvt. Ltd. · CIN: U72900KA2022PTC123456</span>
+                <span className="text-xs text-[#b8a898]">Prepared per IndAS · Companies Act 2013 · ICAI Standards</span>
               </div>
             </div>
           )}

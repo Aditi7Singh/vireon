@@ -305,6 +305,9 @@ class UserRole(str, enum.Enum):
     ADMIN = "ADMIN"
     VIEWER = "VIEWER"
     EDITOR = "EDITOR"
+    CEO = "CEO"
+    CFO = "CFO"
+    FINANCE = "FINANCE"
 
 class Budget(Base):
     __tablename__ = "budgets"

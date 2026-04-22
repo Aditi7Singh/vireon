@@ -59,7 +59,7 @@ export default function Home() {
           <div className="mx-auto mt-5 grid max-w-5xl gap-5 border-y-2 border-[#2f2820] py-5 lg:grid-cols-[1.1fr_0.9fr]">
             <div className="space-y-4 text-center lg:text-left">
               <p className="font-serif text-3xl font-bold uppercase leading-tight text-[#201a14] sm:text-4xl">
-                AI CFO Takes The Helm
+                Finley Takes The Helm
               </p>
               <p className="max-w-2xl text-base italic text-[#4d4134] sm:text-lg lg:pr-8">
                 Transforming financial management for ERPNext teams.
@@ -79,7 +79,7 @@ export default function Home() {
                     <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#ecd9b0]">Front Page Photograph</p>
                     <p className="mt-1 text-lg font-serif font-bold uppercase leading-none">Runway Under Watch</p>
                     <p className="mt-2 text-xs leading-relaxed text-[#f5ecd9]">
-                      Halftone detail, newspaper grit, and a CFO built to keep the cash horizon in view.
+                      Halftone detail, newspaper grit, and Finley keeping the cash horizon in view.
                     </p>
                   </div>
                 </div>
@@ -200,7 +200,7 @@ export default function Home() {
         <section className="border-b-2 border-[#2f2820] bg-[#f5eddc]">
           <div className="flex items-center justify-between border-b-2 border-[#2f2820] px-5 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#5a4a3a] sm:px-8">
             <span>Inside This Edition</span>
-            <span>See page 2 for AI CFO insights</span>
+            <span>See page 2 for Finley insights</span>
           </div>
           <div className="grid gap-0 md:grid-cols-4">
           {[

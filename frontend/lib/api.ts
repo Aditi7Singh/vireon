@@ -79,10 +79,16 @@ async function fetchAPI<T>(
 
       const startTime = performance.now();
 
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("access_token") || localStorage.getItem("auth_token")
+          : null;
+
       const response = await fetch(url, {
         ...fetchOptions,
         signal: controller.signal,
         headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
           "Content-Type": "application/json",
           ...fetchOptions.headers,
         },
@@ -549,6 +555,11 @@ export interface RunwayAnalysisResponse {
   [key: string]: unknown;
 }
 
+export interface AuthTokenResponse {
+  access_token: string;
+  token_type: string;
+}
+
 // Safe wrapper for API calls with error handling and logging
 export async function safeAPICall<T>(
   callFn: () => Promise<T>,
@@ -880,6 +891,12 @@ export const api = {
   getDepreciationExpense: (companyId: string, month: string) =>
     fetchAPI<any>("/depreciation/monthly-expense", { params: { company_id: companyId, month } }),
   getMe: () => fetchAPI<any>("/users/me/"),
+  login: (usernameOrEmail: string, password: string) =>
+    fetchAPI<AuthTokenResponse>("/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ username: usernameOrEmail, password }).toString(),
+    }),
   getStartupHealth: () => fetchAPI<StartupHealth>("/system/startup-health"),
   runStartupRemediation: (action: string, month?: string) =>
     fetchAPI<StartupRemediationResult>("/system/remediate", {

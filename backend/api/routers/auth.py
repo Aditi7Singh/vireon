@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from datetime import timedelta
 from typing import List
 
@@ -13,7 +14,17 @@ router = APIRouter(prefix="", tags=["auth"])
 
 @router.post("/token", response_model=schemas.Token)
 async def login_for_access_token(db: Session = Depends(database.get_db), form_data: OAuth2PasswordRequestForm = Depends()):
-    user = db.query(models.User).filter(models.User.username == form_data.username).first()
+    login_value = form_data.username.strip()
+    user = (
+        db.query(models.User)
+        .filter(
+            or_(
+                models.User.username == login_value,
+                models.User.email == login_value,
+            )
+        )
+        .first()
+    )
     if not user or not auth.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -31,12 +42,18 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(database.get_db)
     db_user = db.query(models.User).filter(models.User.username == user.username).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
+    if user.email:
+        existing_email = db.query(models.User).filter(models.User.email == user.email).first()
+        if existing_email:
+            raise HTTPException(status_code=400, detail="Email already registered")
+
+    role = (user.role or models.UserRole.VIEWER.value).upper()
     hashed_password = auth.get_password_hash(user.password)
     db_user = models.User(
         username=user.username, 
         email=user.email, 
         hashed_password=hashed_password,
-        role=user.role or models.UserRole.VIEWER
+        role=role,
     )
     db.add(db_user)
     db.commit()

@@ -14,7 +14,7 @@ type Policy = {
 const POLICY_OPTIONS = ["source_of_truth", "latest_timestamp_wins", "manual_review"];
 
 const team = [
-  { name: "VIREON AI", role: "CFO", email: "ai@vireon.finance" },
+  { name: "Finley", role: "CFO", email: "finley@vireon.ai" },
   { name: "Aditi Singh", role: "Founder", email: "aditi@vireon.ai" },
   { name: "yagnasri", role: "Finance Ops", email: "yagnasri@vireon.ai" },
 ];
@@ -167,7 +167,7 @@ export default function SettingsPage() {
               </div>
             ))}
           </div>
-          <p className="mt-3 inline-flex items-center gap-1 text-xs text-[#5f5344]"><CheckCircle2 className="h-3.5 w-3.5 text-[#2f6a45]" />VIREON AI is configured as CFO.</p>
+          <p className="mt-3 inline-flex items-center gap-1 text-xs text-[#5f5344]"><CheckCircle2 className="h-3.5 w-3.5 text-[#2f6a45]" />Finley is configured as CFO.</p>
         </section>
 
         {health?.issues?.length > 0 && (

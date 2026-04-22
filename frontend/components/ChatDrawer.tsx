@@ -110,8 +110,8 @@ export function ChatDrawer() {
       } else {
         // Initial greeting
         const greeting = normalizedChatContext 
-          ? `Hello! I'm your AI CFO. I've analyzed the financial data for this ${normalizedChatContext} view. How can I help you?`
-          : "Hello! I'm your AI CFO. I've analyzed your financial data and I'm ready to help you understand your runway, detect anomalies, and answer questions about your business finances.";
+          ? `Hello! I'm Finley. I've analyzed the financial data for this ${normalizedChatContext} view. How can I help you?`
+          : "Hello! I'm Finley, your AI finance agent. I've analyzed your financial data and I'm ready to help you understand runway, detect anomalies, and answer questions about your business finances.";
         
         setMessages([
           {
@@ -220,7 +220,7 @@ export function ChatDrawer() {
           </div>
           <div>
             <h2 className="text-lg font-black text-[#fff7ec] font-outfit tracking-tight">
-              AI Financial Assistant
+              Finley AI Assistant
             </h2>
             <p className="text-[10px] font-bold text-[#c9b9a6] uppercase tracking-widest">Smart Financial Manager</p>
           </div>
@@ -245,7 +245,7 @@ export function ChatDrawer() {
           >
             <div className="flex items-center gap-2 mb-2 px-1">
               <span className="text-[10px] font-black text-[#c8b8a7] uppercase tracking-widest">
-                  {msg.role === "assistant" ? "AI CFO" : "You"}
+                  {msg.role === "assistant" ? "Finley" : "You"}
                </span>
               <span className="text-[10px] text-[#a9947d] font-medium">
                   {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

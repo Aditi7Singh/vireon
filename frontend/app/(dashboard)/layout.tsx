@@ -5,6 +5,7 @@ import ChatDrawer from "@/components/ChatDrawer";
 import { useAppStore } from "@/lib/store";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 
 export default function DashboardLayout({
@@ -12,30 +13,57 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { sidebarExpanded, setUser, setAlertCount, setCriticalAlertCount } = useAppStore();
+  const { setUser, setAlertCount, setCriticalAlertCount } = useAppStore();
+  const router = useRouter();
   const [startupIssues, setStartupIssues] = useState<string[]>([]);
   const [startupActions, setStartupActions] = useState<string[]>([]);
   const [actionBusy, setActionBusy] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
+      const token = localStorage.getItem("access_token") || localStorage.getItem("auth_token");
+      if (!token) {
+        router.replace("/login");
+        return;
+      }
+
       try {
         const user = await api.getMe();
         if (user) {
           const isDemoUser = user.username === "vireon_demo";
-          // Map backend User model to frontend store user format
+
+          const roleNorm = (user.role || "").toUpperCase();
+          const displayName =
+            isDemoUser              ? "Finley"       :
+            user.email === "outlandishaditi11@gmail.com" ? "Aditi Singh" :
+            user.email === "finley@vireon.ai"            ? "Finley"      :
+            user.username;
+
           setUser({
-            name: isDemoUser ? "VIREON AI" : user.username,
-            email: isDemoUser ? "ai@vireon.finance" : (user.email || `${user.username}@vireon.ai`),
-            role: isDemoUser ? "CFO" : user.role
+            name:  displayName,
+            email: isDemoUser ? "finley@vireon.ai" : (user.email || `${user.username}@vireon.ai`),
+            role:  isDemoUser ? "CFO" : roleNorm,
           });
+
+          // Role-based first-visit routing (only redirect if at bare /dashboard)
+          if (window.location.pathname === "/dashboard") {
+            if (roleNorm === "CEO") {
+              router.replace("/dashboard/ceo");
+            } else if (roleNorm === "CFO" || isDemoUser) {
+              router.replace("/dashboard/finance");
+            }
+            // ADMIN stays on /dashboard
+          }
         }
       } catch (error) {
         console.error("Failed to fetch user profile:", error);
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("auth_token");
+        router.replace("/login");
       }
     };
     fetchUser();
-  }, [setUser]);
+  }, [setUser, router]);
 
   useEffect(() => {
     const fetchHealth = async () => {

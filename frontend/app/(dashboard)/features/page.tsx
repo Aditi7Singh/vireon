@@ -418,7 +418,7 @@ export default function FeaturesPage() {
         </section>
 
         <section className="rounded-2xl border border-[#d8cebb] bg-[#fffdf8] p-5 shadow-sm">
-          <h2 className="inline-flex items-center gap-2 text-base font-semibold text-[#3a2f1f]"><Sparkles className="h-4 w-4" />Smart CFO Agent For Leadership</h2>
+          <h2 className="inline-flex items-center gap-2 text-base font-semibold text-[#3a2f1f]"><Sparkles className="h-4 w-4" />Finley Agent For Leadership</h2>
 
           <div className="mt-3 flex flex-wrap gap-2">
             <button onClick={() => openChat("Create a CEO brief with top 5 financial risks and recommended actions")}
@@ -446,7 +446,7 @@ export default function FeaturesPage() {
               {busyAction === "leadership-drill" ? "Running..." : "Run full leadership drill"}
             </button>
             <Link href="/agent" className="inline-flex items-center gap-1 rounded-lg border border-[#d4c7b3] bg-white px-3 py-1.5 text-xs font-semibold text-[#5e4d36] hover:bg-[#f9f3e8]">
-              Open full AI agent <ArrowRight className="h-3.5 w-3.5" />
+              Open full Finley agent <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
         </section>

@@ -8,7 +8,8 @@ import {
   BookOpen, Calculator, Activity, ShieldAlert, Building2, ClipboardList,
   FileText, ShoppingCart, UserCheck, Package, PieChart, Scale,
   Calendar, GitBranch, Layers, DollarSign, Globe,
-  ChevronDown, ChevronUp,
+  ChevronDown, ChevronUp, Leaf, FlaskConical, Server,
+  ScanLine, QrCode, BadgePercent,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -24,7 +25,7 @@ const navSections: NavSection[] = [
     title: "Core",
     items: [
       { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-      { name: "AI CFO Agent", path: "/agent", icon: Bot },
+      { name: "Finley AI Agent", path: "/agent", icon: Bot },
       { name: "Features", path: "/features", icon: Layers },
     ],
   },
@@ -78,11 +79,14 @@ const navSections: NavSection[] = [
   {
     title: "Compliance",
     items: [
-      { name: "Compliance Calendar", path: "/compliance", icon: Calendar },
-      { name: "Tax", path: "/tax", icon: Landmark },
-      { name: "Tax Provisioning", path: "/tax-provisioning", icon: Calculator },
-      { name: "Month-End Close", path: "/month-end-close", icon: ClipboardList },
-      { name: "Accruals", path: "/accruals", icon: BookOpen },
+      { name: "Compliance Calendar", path: "/compliance",   icon: Calendar      },
+      { name: "Tax",                  path: "/tax",          icon: Landmark      },
+      { name: "Tax Provisioning",     path: "/tax-provisioning", icon: Calculator },
+      { name: "GST Center",           path: "/gst",          icon: BadgePercent  },
+      { name: "TDS Management",       path: "/tds",          icon: ScanLine      },
+      { name: "E-Invoicing (IRP)",    path: "/e-invoice",    icon: QrCode        },
+      { name: "Month-End Close",      path: "/month-end-close", icon: ClipboardList },
+      { name: "Accruals",             path: "/accruals",     icon: BookOpen      },
     ],
   },
   {
@@ -93,6 +97,14 @@ const navSections: NavSection[] = [
       { name: "Consolidation", path: "/consolidation", icon: Building2 },
       { name: "Operations", path: "/operations", icon: Workflow },
       { name: "CTO Planner", path: "/dashboard/cto", icon: Cpu },
+    ],
+  },
+  {
+    title: "Portfolio",
+    items: [
+      { name: "Project Portfolio", path: "/projects",  icon: Leaf },
+      { name: "Team & HR",         path: "/team",      icon: FlaskConical },
+      { name: "Cost Centers",      path: "/overhead",  icon: Server },
     ],
   },
   {
