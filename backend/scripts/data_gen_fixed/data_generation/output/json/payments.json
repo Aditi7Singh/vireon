@@ -1,0 +1,3065 @@
+{
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": "0e646fe3-814a-4aac-8354-2430065ff75a",
+      "remote_id": "PMT-89AB43F2",
+      "created_at": "2026-03-04T02:07:43.375797Z",
+      "modified_at": "2026-03-04T02:07:43.375798Z",
+      "transaction_date": "2025-03-31",
+      "contact": "526d61f0-18d0-4825-9e37-0bedaa90f393",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 8000.0,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "78089b50-f867-4d8d-bca2-1af29402be7c",
+          "remote_id": "PMLN-D73150DB",
+          "applied_amount": 8000.0,
+          "applied_date": "2025-03-31",
+          "related_object_id": "875c6f77-2f71-4eac-bef3-f76b619ce07c",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "6006d9b0-6aed-481e-80fc-01b207253dee",
+      "remote_id": "PMT-0210EC28",
+      "created_at": "2026-03-04T02:07:43.375832Z",
+      "modified_at": "2026-03-04T02:07:43.375834Z",
+      "transaction_date": "2025-04-09",
+      "contact": "407569d1-72bf-4375-966b-03adae88cbcd",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 60000.0,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "ae2795fe-0cd1-49ac-9e71-6caf720298d9",
+          "remote_id": "PMLN-C06B9B3D",
+          "applied_amount": 60000.0,
+          "applied_date": "2025-04-09",
+          "related_object_id": "6ecbf406-7a05-4eb8-9930-bc380ae637d3",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "09816ce1-3720-40bf-99dc-c7e10d52dca9",
+      "remote_id": "PMT-033F6E9D",
+      "created_at": "2026-03-04T02:07:43.375866Z",
+      "modified_at": "2026-03-04T02:07:43.375868Z",
+      "transaction_date": "2025-03-16",
+      "contact": "9827f168-b058-4208-84f2-436f80785f55",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 4500.0,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "39965a27-6278-443a-974c-b063405ac672",
+          "remote_id": "PMLN-4D97C38C",
+          "applied_amount": 4500.0,
+          "applied_date": "2025-03-16",
+          "related_object_id": "b15422f1-60ff-40a9-96ae-b80b7589815d",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "38282162-c405-4fd5-85b6-45b3329ef483",
+      "remote_id": "PMT-20C2D585",
+      "created_at": "2026-03-04T02:07:43.375898Z",
+      "modified_at": "2026-03-04T02:07:43.375900Z",
+      "transaction_date": "2025-05-07",
+      "contact": "526d61f0-18d0-4825-9e37-0bedaa90f393",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 8120.0,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "c113eabc-5067-45d6-a931-56419f09fc27",
+          "remote_id": "PMLN-882A8F42",
+          "applied_amount": 8120.0,
+          "applied_date": "2025-05-07",
+          "related_object_id": "2f9896ef-6e63-4063-b7df-dcf6a3997ee8",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "3e3657a0-eb0b-4bff-8223-08f0dcbb57b8",
+      "remote_id": "PMT-73953D7E",
+      "created_at": "2026-03-04T02:07:43.375938Z",
+      "modified_at": "2026-03-04T02:07:43.375940Z",
+      "transaction_date": "2025-04-16",
+      "contact": "9827f168-b058-4208-84f2-436f80785f55",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 4567.5,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "64020b1c-231a-4a68-ac0c-1bca88ebb6ec",
+          "remote_id": "PMLN-D27744AF",
+          "applied_amount": 4567.5,
+          "applied_date": "2025-04-16",
+          "related_object_id": "4d3df241-60da-46d1-87c4-0051e0372b8a",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "70ce1e73-53ae-4e11-8969-e956c6f92a04",
+      "remote_id": "PMT-D764FB01",
+      "created_at": "2026-03-04T02:07:43.375982Z",
+      "modified_at": "2026-03-04T02:07:43.375983Z",
+      "transaction_date": "2025-05-01",
+      "contact": "76126b06-c78a-4784-944b-a68232b4d7ae",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3500.0,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "24cc6195-0144-42f7-9914-e2b84dc49ce9",
+          "remote_id": "PMLN-805842B5",
+          "applied_amount": 3500.0,
+          "applied_date": "2025-05-01",
+          "related_object_id": "b06f2c7b-c0f7-4a9f-8d41-a03baa3180c4",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "60978bf0-37b2-4d30-89c2-d8eda47ca039",
+      "remote_id": "PMT-34AA4082",
+      "created_at": "2026-03-04T02:07:43.376016Z",
+      "modified_at": "2026-03-04T02:07:43.376017Z",
+      "transaction_date": "2025-06-17",
+      "contact": "e3149218-00e4-4aea-b86c-3e86032c3a70",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 33600.0,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "f5da96b4-7eb2-49cf-bafc-3a8032b3374d",
+          "remote_id": "PMLN-45652B4D",
+          "applied_amount": 33600.0,
+          "applied_date": "2025-06-17",
+          "related_object_id": "ff97e9f2-44bc-41b2-b049-b34486dedce9",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "26c58ad8-949a-459c-b12c-6877fff309ea",
+      "remote_id": "PMT-55B2675F",
+      "created_at": "2026-03-04T02:07:43.376053Z",
+      "modified_at": "2026-03-04T02:07:43.376056Z",
+      "transaction_date": "2025-05-31",
+      "contact": "526d61f0-18d0-4825-9e37-0bedaa90f393",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 8241.8,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "e4abe92f-618f-4f57-9565-6af7da7b995a",
+          "remote_id": "PMLN-2F042AA6",
+          "applied_amount": 8241.8,
+          "applied_date": "2025-05-31",
+          "related_object_id": "963ac85a-59bb-4ab8-994c-5f3c09001bc0",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "20a38767-64ce-411d-87e7-43e9898369da",
+      "remote_id": "PMT-86622991",
+      "created_at": "2026-03-04T02:07:43.376103Z",
+      "modified_at": "2026-03-04T02:07:43.376106Z",
+      "transaction_date": "2025-05-22",
+      "contact": "9827f168-b058-4208-84f2-436f80785f55",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 4636.01,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "2b8995aa-a8e2-4ea7-9c0f-ffc04021f093",
+          "remote_id": "PMLN-D31CC581",
+          "applied_amount": 4636.01,
+          "applied_date": "2025-05-22",
+          "related_object_id": "53e5fbea-cc5c-4f2a-a48d-540dd5e294a6",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "4d914637-bfe2-4876-9fba-8ca20e115fa5",
+      "remote_id": "PMT-7941D8E7",
+      "created_at": "2026-03-04T02:07:43.376142Z",
+      "modified_at": "2026-03-04T02:07:43.376144Z",
+      "transaction_date": "2025-05-31",
+      "contact": "76126b06-c78a-4784-944b-a68232b4d7ae",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3552.5,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "f53f5b1c-d91f-4a8a-b950-ed1e80963cda",
+          "remote_id": "PMLN-9F9615C7",
+          "applied_amount": 3552.5,
+          "applied_date": "2025-05-31",
+          "related_object_id": "8b863801-b724-44e6-988d-7924ec5f77f2",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "70474a50-916d-4c38-b00d-b7f55c1da59a",
+      "remote_id": "PMT-AA84DE71",
+      "created_at": "2026-03-04T02:07:43.376174Z",
+      "modified_at": "2026-03-04T02:07:43.376178Z",
+      "transaction_date": "2025-05-31",
+      "contact": "b5877515-569a-40da-a810-dd8c46e7519f",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 2000.0,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "09945c81-cd29-41eb-95bb-9f0c0ad809c0",
+          "remote_id": "PMLN-B108D07E",
+          "applied_amount": 2000.0,
+          "applied_date": "2025-05-31",
+          "related_object_id": "b3e1dc4f-fdce-4224-a163-33d96ae73476",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "c77ba3d8-3072-46c3-89c5-6b4705bb9142",
+      "remote_id": "PMT-AEE84253",
+      "created_at": "2026-03-04T02:07:43.376208Z",
+      "modified_at": "2026-03-04T02:07:43.376210Z",
+      "transaction_date": "2025-07-09",
+      "contact": "526d61f0-18d0-4825-9e37-0bedaa90f393",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 8365.43,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "a7c35cc7-902f-4505-8e29-394adae78534",
+          "remote_id": "PMLN-8DF6035E",
+          "applied_amount": 8365.43,
+          "applied_date": "2025-07-09",
+          "related_object_id": "d6bfacbf-0700-44f9-9104-de456028281d",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "47834c9b-2a16-45c6-8f68-8e9bd93fd84e",
+      "remote_id": "PMT-B1B6A71D",
+      "created_at": "2026-03-04T02:07:43.376242Z",
+      "modified_at": "2026-03-04T02:07:43.376244Z",
+      "transaction_date": "2025-06-16",
+      "contact": "9827f168-b058-4208-84f2-436f80785f55",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 4705.55,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "646fbb44-aafa-45cd-86fd-0f1b236bb43c",
+          "remote_id": "PMLN-C74DB9FC",
+          "applied_amount": 4705.55,
+          "applied_date": "2025-06-16",
+          "related_object_id": "789a98af-ee18-45ee-afec-2e7335afd212",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "f60fff67-3edc-4501-8228-64aaad233e3c",
+      "remote_id": "PMT-A315E584",
+      "created_at": "2026-03-04T02:07:43.376273Z",
+      "modified_at": "2026-03-04T02:07:43.376275Z",
+      "transaction_date": "2025-07-01",
+      "contact": "76126b06-c78a-4784-944b-a68232b4d7ae",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3605.79,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "32fc2b5b-2023-492b-88b9-2d9bc5197b14",
+          "remote_id": "PMLN-72B9563D",
+          "applied_amount": 3605.79,
+          "applied_date": "2025-07-01",
+          "related_object_id": "40e54668-baac-49db-9323-cf841259519a",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "ebc98fdf-a273-44bf-94a2-f385e5a83584",
+      "remote_id": "PMT-7910205C",
+      "created_at": "2026-03-04T02:07:43.376305Z",
+      "modified_at": "2026-03-04T02:07:43.376306Z",
+      "transaction_date": "2025-07-01",
+      "contact": "b5877515-569a-40da-a810-dd8c46e7519f",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 2030.0,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "bd900d9a-c3dd-48ee-b19f-b5e364d91db9",
+          "remote_id": "PMLN-F419609A",
+          "applied_amount": 2030.0,
+          "applied_date": "2025-07-01",
+          "related_object_id": "1172748f-08fd-4c83-975d-3c71367be95f",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "3d1a5eea-3706-486b-91f0-ba72038c0d07",
+      "remote_id": "PMT-527195AB",
+      "created_at": "2026-03-04T02:07:43.376336Z",
+      "modified_at": "2026-03-04T02:07:43.376337Z",
+      "transaction_date": "2025-07-01",
+      "contact": "069e96b6-6448-479a-abb0-d21ee1a6c683",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 2200.0,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "b12c61b9-ac3b-4b73-a71e-9d34c278a8e1",
+          "remote_id": "PMLN-EE1D7087",
+          "applied_amount": 2200.0,
+          "applied_date": "2025-07-01",
+          "related_object_id": "67d24dc5-3085-4d3a-8854-da6552a5f387",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "00eccfd8-d65a-4779-bf84-175452c87392",
+      "remote_id": "PMT-6617C83D",
+      "created_at": "2026-03-04T02:07:43.376368Z",
+      "modified_at": "2026-03-04T02:07:43.376369Z",
+      "transaction_date": "2025-07-31",
+      "contact": "526d61f0-18d0-4825-9e37-0bedaa90f393",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 8490.91,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "7035de8c-279a-4cb4-b379-2316a6baa9d9",
+          "remote_id": "PMLN-F6F09BCB",
+          "applied_amount": 8490.91,
+          "applied_date": "2025-07-31",
+          "related_object_id": "9cdb2459-0ae0-485e-9bc5-340b5ba911d5",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "153e8d90-133d-4e7c-af7a-d2efe644abc6",
+      "remote_id": "PMT-828AC33F",
+      "created_at": "2026-03-04T02:07:43.376399Z",
+      "modified_at": "2026-03-04T02:07:43.376400Z",
+      "transaction_date": "2025-07-16",
+      "contact": "9827f168-b058-4208-84f2-436f80785f55",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 4776.14,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "8e2bdd7f-c5f3-4b7f-8a6f-e750d99176c7",
+          "remote_id": "PMLN-7440EF95",
+          "applied_amount": 4776.14,
+          "applied_date": "2025-07-16",
+          "related_object_id": "094938f0-47dd-4278-81df-1b71e9bc2311",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "127ba74e-86b1-4478-a2fe-faebe01abb1d",
+      "remote_id": "PMT-CE30D897",
+      "created_at": "2026-03-04T02:07:43.376432Z",
+      "modified_at": "2026-03-04T02:07:43.376433Z",
+      "transaction_date": "2025-07-31",
+      "contact": "76126b06-c78a-4784-944b-a68232b4d7ae",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3659.87,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "c71acb13-62bb-43fc-b976-19202bd75184",
+          "remote_id": "PMLN-6F0F31B6",
+          "applied_amount": 3659.87,
+          "applied_date": "2025-07-31",
+          "related_object_id": "99718e1e-ab91-4f02-8808-cf2623283d4b",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "beff6c1a-c816-4ece-968c-85625b2fcc01",
+      "remote_id": "PMT-53A1E8A1",
+      "created_at": "2026-03-04T02:07:43.376463Z",
+      "modified_at": "2026-03-04T02:07:43.376464Z",
+      "transaction_date": "2025-07-31",
+      "contact": "b5877515-569a-40da-a810-dd8c46e7519f",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 2060.45,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "bb0efafc-421a-4f1a-96e6-46a70861ca02",
+          "remote_id": "PMLN-A89C4DB6",
+          "applied_amount": 2060.45,
+          "applied_date": "2025-07-31",
+          "related_object_id": "75263f3b-2eb0-4385-aaaa-c8afe872d908",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "0d1af2af-803c-40e0-b4f4-ed1de74566b2",
+      "remote_id": "PMT-B228A60C",
+      "created_at": "2026-03-04T02:07:43.376494Z",
+      "modified_at": "2026-03-04T02:07:43.376495Z",
+      "transaction_date": "2025-07-31",
+      "contact": "069e96b6-6448-479a-abb0-d21ee1a6c683",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 2233.0,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "3e5aa643-1f9d-46bf-a7a6-90ed3c34608a",
+          "remote_id": "PMLN-CEF02247",
+          "applied_amount": 2233.0,
+          "applied_date": "2025-07-31",
+          "related_object_id": "cfdcad5d-a223-4482-95ab-51d905d04721",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "e1ca685c-36da-4dea-89d4-c61ff6eef807",
+      "remote_id": "PMT-70AF37CD",
+      "created_at": "2026-03-04T02:07:43.376525Z",
+      "modified_at": "2026-03-04T02:07:43.376526Z",
+      "transaction_date": "2025-07-16",
+      "contact": "eeb40c2d-bdf1-43f8-9458-5087a360dac7",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1500.0,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "f809cb13-d765-4d18-8ec2-fd2f67e12340",
+          "remote_id": "PMLN-26E73770",
+          "applied_amount": 1500.0,
+          "applied_date": "2025-07-16",
+          "related_object_id": "65eedfe0-4538-4a6b-afeb-56c51a52945f",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "1d67aef2-7779-451a-a338-46c8af168ecf",
+      "remote_id": "PMT-E242CDAF",
+      "created_at": "2026-03-04T02:07:43.376556Z",
+      "modified_at": "2026-03-04T02:07:43.376557Z",
+      "transaction_date": "2025-08-31",
+      "contact": "526d61f0-18d0-4825-9e37-0bedaa90f393",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 8618.27,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "cb181f29-6a2c-4474-8b32-b80e6071696e",
+          "remote_id": "PMLN-C18C83CD",
+          "applied_amount": 8618.27,
+          "applied_date": "2025-08-31",
+          "related_object_id": "049df13d-6743-4a2a-ad7f-95f71c7dce84",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "5c854875-d2ab-40be-8b5f-ee7a7ac4c35a",
+      "remote_id": "PMT-71A6A928",
+      "created_at": "2026-03-04T02:07:43.376587Z",
+      "modified_at": "2026-03-04T02:07:43.376589Z",
+      "transaction_date": "2025-08-16",
+      "contact": "9827f168-b058-4208-84f2-436f80785f55",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 4847.78,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "6e7a0d7d-521f-4cf6-ab35-38d6556251e7",
+          "remote_id": "PMLN-AAEDF7D8",
+          "applied_amount": 4847.78,
+          "applied_date": "2025-08-16",
+          "related_object_id": "c8d53615-3056-4b9c-ba8a-fd017eb70853",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "a07f7a11-0382-46e0-bbe0-8bd9a9c04cf6",
+      "remote_id": "PMT-0132C313",
+      "created_at": "2026-03-04T02:07:43.376618Z",
+      "modified_at": "2026-03-04T02:07:43.376619Z",
+      "transaction_date": "2025-09-11",
+      "contact": "76126b06-c78a-4784-944b-a68232b4d7ae",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3714.77,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "3b2bce60-f025-443a-89c8-2758dacf7723",
+          "remote_id": "PMLN-B9CF2EE5",
+          "applied_amount": 3714.77,
+          "applied_date": "2025-09-11",
+          "related_object_id": "0a7820bc-a2e4-4dbc-80af-c39acd4127cf",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "9c91a06e-3447-46ef-879f-165ce943987b",
+      "remote_id": "PMT-4E528ED2",
+      "created_at": "2026-03-04T02:07:43.376649Z",
+      "modified_at": "2026-03-04T02:07:43.376651Z",
+      "transaction_date": "2025-09-10",
+      "contact": "b5877515-569a-40da-a810-dd8c46e7519f",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 2091.36,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "057d894b-0e52-4ce2-aad0-995824e0370f",
+          "remote_id": "PMLN-10CD0FDE",
+          "applied_amount": 2091.36,
+          "applied_date": "2025-09-10",
+          "related_object_id": "02886dc8-058e-49d2-9abe-838c41e35fa8",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "24be7de4-7719-472a-98a3-9396b8592b8b",
+      "remote_id": "PMT-EA8B679B",
+      "created_at": "2026-03-04T02:07:43.376682Z",
+      "modified_at": "2026-03-04T02:07:43.376684Z",
+      "transaction_date": "2025-08-31",
+      "contact": "069e96b6-6448-479a-abb0-d21ee1a6c683",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 2266.49,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "c65460ea-ce26-4785-abad-f9cb335006fe",
+          "remote_id": "PMLN-E5F95E1B",
+          "applied_amount": 2266.49,
+          "applied_date": "2025-08-31",
+          "related_object_id": "faa06230-4b37-489d-a6a7-2e8b9babbffe",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "dc527a57-25e6-4121-8786-a9b7a4100d38",
+      "remote_id": "PMT-0D452795",
+      "created_at": "2026-03-04T02:07:43.376714Z",
+      "modified_at": "2026-03-04T02:07:43.376716Z",
+      "transaction_date": "2025-08-16",
+      "contact": "eeb40c2d-bdf1-43f8-9458-5087a360dac7",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1522.5,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "77c8de8c-f32d-4e95-a20e-c709e3626fa7",
+          "remote_id": "PMLN-3024854A",
+          "applied_amount": 1522.5,
+          "applied_date": "2025-08-16",
+          "related_object_id": "2a42efae-f641-4c48-af36-3ba796b2540a",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "274e3467-f54d-45e1-a828-01aacf667901",
+      "remote_id": "PMT-FB418BBF",
+      "created_at": "2026-03-04T02:07:43.376746Z",
+      "modified_at": "2026-03-04T02:07:43.376748Z",
+      "transaction_date": "2025-08-31",
+      "contact": "4f311125-f620-4064-b0e0-ff0e12dba356",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 36000.0,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "6ae53025-4205-4909-bd44-ae5ee3d34d6a",
+          "remote_id": "PMLN-75D10662",
+          "applied_amount": 36000.0,
+          "applied_date": "2025-08-31",
+          "related_object_id": "af559867-52b3-4ea5-a233-f803bf2e007b",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "aee9205d-cc83-4ce7-87d0-a709293d7442",
+      "remote_id": "PMT-C9DB76BF",
+      "created_at": "2026-03-04T02:07:43.376786Z",
+      "modified_at": "2026-03-04T02:07:43.376787Z",
+      "transaction_date": "2025-10-01",
+      "contact": "526d61f0-18d0-4825-9e37-0bedaa90f393",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 8747.55,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "2ea859e1-511e-4cb5-88a9-aaddb510d181",
+          "remote_id": "PMLN-D7839F8C",
+          "applied_amount": 8747.55,
+          "applied_date": "2025-10-01",
+          "related_object_id": "fe076b9e-a72c-406b-8ef9-cc80aa738a27",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "f42393ac-d87f-4bf7-84bd-c555307a5323",
+      "remote_id": "PMT-755F351F",
+      "created_at": "2026-03-04T02:07:43.376817Z",
+      "modified_at": "2026-03-04T02:07:43.376818Z",
+      "transaction_date": "2025-09-16",
+      "contact": "9827f168-b058-4208-84f2-436f80785f55",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 4920.49,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "2cdc32a9-027a-4fa0-8057-b60ea6fd26c9",
+          "remote_id": "PMLN-AB358865",
+          "applied_amount": 4920.49,
+          "applied_date": "2025-09-16",
+          "related_object_id": "14c6d6b7-9020-4894-907d-7cd8e2c5309a",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "977e6559-c012-4d3b-a747-8382a6608f08",
+      "remote_id": "PMT-BD0EDB9D",
+      "created_at": "2026-03-04T02:07:43.376849Z",
+      "modified_at": "2026-03-04T02:07:43.376851Z",
+      "transaction_date": "2025-10-01",
+      "contact": "76126b06-c78a-4784-944b-a68232b4d7ae",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3770.49,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "3753ea2c-176f-40ab-9819-6af8d92b245e",
+          "remote_id": "PMLN-8859DD05",
+          "applied_amount": 3770.49,
+          "applied_date": "2025-10-01",
+          "related_object_id": "aedb7d91-6caf-4f67-84ea-48590e1d3467",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "d622589e-0257-48ce-b891-d87b03cc995c",
+      "remote_id": "PMT-FB73643C",
+      "created_at": "2026-03-04T02:07:43.376881Z",
+      "modified_at": "2026-03-04T02:07:43.376883Z",
+      "transaction_date": "2025-10-01",
+      "contact": "b5877515-569a-40da-a810-dd8c46e7519f",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 2122.73,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "c0c610bd-be6d-4646-b5ea-6986579e3614",
+          "remote_id": "PMLN-B3627CE5",
+          "applied_amount": 2122.73,
+          "applied_date": "2025-10-01",
+          "related_object_id": "c188a312-53da-4bf6-9cba-9ce0ccc3c094",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "ccb7a78a-40ed-46b5-852f-797f373be18f",
+      "remote_id": "PMT-81AB0135",
+      "created_at": "2026-03-04T02:07:43.376913Z",
+      "modified_at": "2026-03-04T02:07:43.376915Z",
+      "transaction_date": "2025-10-01",
+      "contact": "069e96b6-6448-479a-abb0-d21ee1a6c683",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 2300.49,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "812f8ea4-60a3-4bd8-b6da-1652223da9de",
+          "remote_id": "PMLN-D77D455E",
+          "applied_amount": 2300.49,
+          "applied_date": "2025-10-01",
+          "related_object_id": "63568091-8927-4cf0-ab78-a2af329d03cf",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "2c913cc8-8dc4-494a-ae89-e3f4871e360b",
+      "remote_id": "PMT-8CAC664C",
+      "created_at": "2026-03-04T02:07:43.376959Z",
+      "modified_at": "2026-03-04T02:07:43.376961Z",
+      "transaction_date": "2025-09-16",
+      "contact": "eeb40c2d-bdf1-43f8-9458-5087a360dac7",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1545.34,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "9df1e65c-d578-4c06-b174-f44a948da96d",
+          "remote_id": "PMLN-FE452272",
+          "applied_amount": 1545.34,
+          "applied_date": "2025-09-16",
+          "related_object_id": "4fffc6b9-9081-455e-9f8a-23379ea41927",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "be7ca068-7be1-48c5-937e-e868b8e89db2",
+      "remote_id": "PMT-FC50EC36",
+      "created_at": "2026-03-04T02:07:43.376991Z",
+      "modified_at": "2026-03-04T02:07:43.376993Z",
+      "transaction_date": "2025-10-31",
+      "contact": "526d61f0-18d0-4825-9e37-0bedaa90f393",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 8878.76,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "339a7a23-6f6e-42e2-a968-03f4602f13f0",
+          "remote_id": "PMLN-17D111E6",
+          "applied_amount": 8878.76,
+          "applied_date": "2025-10-31",
+          "related_object_id": "136d3828-8820-46e9-af4f-98a864fc6a75",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "1521dbeb-1f66-4df6-86cd-ed0466a9288c",
+      "remote_id": "PMT-955344AE",
+      "created_at": "2026-03-04T02:07:43.377022Z",
+      "modified_at": "2026-03-04T02:07:43.377024Z",
+      "transaction_date": "2025-10-16",
+      "contact": "9827f168-b058-4208-84f2-436f80785f55",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 4994.3,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "bbc156d5-56a7-4e09-bf67-24dff40cfbca",
+          "remote_id": "PMLN-1591593A",
+          "applied_amount": 4994.3,
+          "applied_date": "2025-10-16",
+          "related_object_id": "0d727d14-b84e-4984-a7ff-27820322e05a",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "b6adcf84-3830-4624-98e0-45650214353c",
+      "remote_id": "PMT-F4F5CF4D",
+      "created_at": "2026-03-04T02:07:43.377055Z",
+      "modified_at": "2026-03-04T02:07:43.377056Z",
+      "transaction_date": "2025-10-31",
+      "contact": "76126b06-c78a-4784-944b-a68232b4d7ae",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3827.05,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "8c28011e-0237-4d21-bc68-d6d3cca6e645",
+          "remote_id": "PMLN-DE95C9EA",
+          "applied_amount": 3827.05,
+          "applied_date": "2025-10-31",
+          "related_object_id": "567321b4-43c5-45ed-ac1a-2824c9767ea5",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "6eda8829-6919-467d-957c-cace4e881f77",
+      "remote_id": "PMT-4D4500BC",
+      "created_at": "2026-03-04T02:07:43.377093Z",
+      "modified_at": "2026-03-04T02:07:43.377095Z",
+      "transaction_date": "2025-11-08",
+      "contact": "b5877515-569a-40da-a810-dd8c46e7519f",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 2154.57,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "c39e88a2-9534-4d60-a69e-8d003aff9748",
+          "remote_id": "PMLN-5D91A84D",
+          "applied_amount": 2154.57,
+          "applied_date": "2025-11-08",
+          "related_object_id": "65ef7092-9e16-4698-91c3-eda4b177eeac",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "89af01cd-0543-4a0d-880b-07296c11e96c",
+      "remote_id": "PMT-F291358D",
+      "created_at": "2026-03-04T02:07:43.377128Z",
+      "modified_at": "2026-03-04T02:07:43.377130Z",
+      "transaction_date": "2025-10-31",
+      "contact": "069e96b6-6448-479a-abb0-d21ee1a6c683",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 2335.0,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "751df8af-601a-45b1-83eb-f1b448c89cf9",
+          "remote_id": "PMLN-458B8659",
+          "applied_amount": 2335.0,
+          "applied_date": "2025-10-31",
+          "related_object_id": "570eb291-aa89-4ce6-86c9-51c4a39f1de4",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "b62c3596-8352-45f7-a339-e26edc0e4d76",
+      "remote_id": "PMT-F0D95DBC",
+      "created_at": "2026-03-04T02:07:43.377160Z",
+      "modified_at": "2026-03-04T02:07:43.377162Z",
+      "transaction_date": "2025-10-16",
+      "contact": "eeb40c2d-bdf1-43f8-9458-5087a360dac7",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1568.52,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "a5ae2942-2e0d-4add-8a7c-2881381960b6",
+          "remote_id": "PMLN-8868882E",
+          "applied_amount": 1568.52,
+          "applied_date": "2025-10-16",
+          "related_object_id": "c54abbb8-e07e-4a7a-b40d-8e04d368028c",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "7a7ac5e3-f376-47df-bc38-7522df90a7c9",
+      "remote_id": "PMT-200E317D",
+      "created_at": "2026-03-04T02:07:43.377193Z",
+      "modified_at": "2026-03-04T02:07:43.377194Z",
+      "transaction_date": "2025-10-31",
+      "contact": "61983172-1e52-4082-b893-4275f7e31dae",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1800.0,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "fe6161e3-b912-42b3-9d8a-3796b5c5d6eb",
+          "remote_id": "PMLN-ECBE1EDF",
+          "applied_amount": 1800.0,
+          "applied_date": "2025-10-31",
+          "related_object_id": "4ba9dd3e-8561-476c-92a4-a7748ff0f052",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "b80ac48e-1cf5-435c-85a9-2a1da1113bee",
+      "remote_id": "PMT-3DF33FAE",
+      "created_at": "2026-03-04T02:07:43.377224Z",
+      "modified_at": "2026-03-04T02:07:43.377226Z",
+      "transaction_date": "2025-12-01",
+      "contact": "526d61f0-18d0-4825-9e37-0bedaa90f393",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 9011.94,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "bae707f3-48d8-4134-b05e-c6fec154ca0a",
+          "remote_id": "PMLN-A013026A",
+          "applied_amount": 9011.94,
+          "applied_date": "2025-12-01",
+          "related_object_id": "cddb08df-a5f1-437c-ab12-2fc88e4a9bd3",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "d0359717-1250-4d43-9b60-d2bdf0b3373f",
+      "remote_id": "PMT-E06E8FC3",
+      "created_at": "2026-03-04T02:07:43.377256Z",
+      "modified_at": "2026-03-04T02:07:43.377258Z",
+      "transaction_date": "2025-11-16",
+      "contact": "9827f168-b058-4208-84f2-436f80785f55",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 5069.22,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "944eafd5-0bbc-4fcc-b022-9078daac9f78",
+          "remote_id": "PMLN-B7038D60",
+          "applied_amount": 5069.22,
+          "applied_date": "2025-11-16",
+          "related_object_id": "455db1e2-b666-4286-802c-5fe60333f551",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "4ac15cc8-669e-4fc3-a5f2-b222d7677669",
+      "remote_id": "PMT-F4003FE2",
+      "created_at": "2026-03-04T02:07:43.377289Z",
+      "modified_at": "2026-03-04T02:07:43.377290Z",
+      "transaction_date": "2025-12-01",
+      "contact": "76126b06-c78a-4784-944b-a68232b4d7ae",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3884.46,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "6dbe9a86-ceb8-479e-acd9-a7bc269fffec",
+          "remote_id": "PMLN-6671319B",
+          "applied_amount": 3884.46,
+          "applied_date": "2025-12-01",
+          "related_object_id": "737e9116-9d48-4134-aada-575ff0c0371d",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "bba75533-02de-4455-8502-0a769c0f39b1",
+      "remote_id": "PMT-08A3D4C7",
+      "created_at": "2026-03-04T02:07:43.377322Z",
+      "modified_at": "2026-03-04T02:07:43.377323Z",
+      "transaction_date": "2025-12-01",
+      "contact": "b5877515-569a-40da-a810-dd8c46e7519f",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 2186.89,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "965a4cca-c31b-4f1f-b044-0f9462b8165f",
+          "remote_id": "PMLN-757379A8",
+          "applied_amount": 2186.89,
+          "applied_date": "2025-12-01",
+          "related_object_id": "cd30aaa4-a696-47a5-b7bb-c58e5700ba51",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "3fb23659-6aa1-436b-9e45-f79f0e74129c",
+      "remote_id": "PMT-99CD7C6D",
+      "created_at": "2026-03-04T02:07:43.377355Z",
+      "modified_at": "2026-03-04T02:07:43.377356Z",
+      "transaction_date": "2025-12-01",
+      "contact": "069e96b6-6448-479a-abb0-d21ee1a6c683",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 2370.02,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "815a4870-5da8-43c9-8762-e7cabb65d00d",
+          "remote_id": "PMLN-96F59002",
+          "applied_amount": 2370.02,
+          "applied_date": "2025-12-01",
+          "related_object_id": "36b7cdd6-4718-4541-80fc-f36d7b4ee90f",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "c6e52bda-65ee-405a-9759-0d8adee976db",
+      "remote_id": "PMT-8807113B",
+      "created_at": "2026-03-04T02:07:43.377387Z",
+      "modified_at": "2026-03-04T02:07:43.377389Z",
+      "transaction_date": "2025-11-16",
+      "contact": "eeb40c2d-bdf1-43f8-9458-5087a360dac7",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1592.05,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "7bff0b78-e378-4173-9319-e0a9716c3a08",
+          "remote_id": "PMLN-7798D503",
+          "applied_amount": 1592.05,
+          "applied_date": "2025-11-16",
+          "related_object_id": "9c0f208b-f540-4e35-9e29-1ba9955ad4a1",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "00fbef59-7243-4403-8e69-6901659633de",
+      "remote_id": "PMT-CBA4C9A1",
+      "created_at": "2026-03-04T02:07:43.377425Z",
+      "modified_at": "2026-03-04T02:07:43.377426Z",
+      "transaction_date": "2025-12-01",
+      "contact": "61983172-1e52-4082-b893-4275f7e31dae",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1827.0,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "45b393bb-2481-4c73-8db5-ca2ab90eec3b",
+          "remote_id": "PMLN-A6C37AE2",
+          "applied_amount": 1827.0,
+          "applied_date": "2025-12-01",
+          "related_object_id": "cdc76011-a330-4d55-a518-f41cc5b086ee",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "4d31b5fb-57b5-43fc-a771-2663a61777d8",
+      "remote_id": "PMT-D7412A76",
+      "created_at": "2026-03-04T02:07:43.377460Z",
+      "modified_at": "2026-03-04T02:07:43.377461Z",
+      "transaction_date": "2025-12-31",
+      "contact": "526d61f0-18d0-4825-9e37-0bedaa90f393",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 9147.12,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "4aaa40a4-c315-4af1-af51-773b28c2bf2b",
+          "remote_id": "PMLN-C8176100",
+          "applied_amount": 9147.12,
+          "applied_date": "2025-12-31",
+          "related_object_id": "1c22d8de-aa87-41f2-b725-44fa79355d7c",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "1075b8c2-1694-40d2-abd3-5bec3967a203",
+      "remote_id": "PMT-212F46A4",
+      "created_at": "2026-03-04T02:07:43.377496Z",
+      "modified_at": "2026-03-04T02:07:43.377498Z",
+      "transaction_date": "2025-12-16",
+      "contact": "9827f168-b058-4208-84f2-436f80785f55",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 5145.25,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "feb6fd93-a418-41d6-8fd6-24e4d00026be",
+          "remote_id": "PMLN-38BDAAE4",
+          "applied_amount": 5145.25,
+          "applied_date": "2025-12-16",
+          "related_object_id": "d01209a9-30cd-4aa0-9fbd-123f1fe5baa2",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "13923703-658a-4870-b9b3-4edf3bb2c945",
+      "remote_id": "PMT-0B1B98E7",
+      "created_at": "2026-03-04T02:07:43.377533Z",
+      "modified_at": "2026-03-04T02:07:43.377535Z",
+      "transaction_date": "2026-01-15",
+      "contact": "76126b06-c78a-4784-944b-a68232b4d7ae",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3942.72,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "70143fdd-7a3c-4a3c-83b1-6adc32db2874",
+          "remote_id": "PMLN-881169DF",
+          "applied_amount": 3942.72,
+          "applied_date": "2026-01-15",
+          "related_object_id": "576f2622-bda5-468d-ba6b-0d8d09586acc",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "cf50f6c9-1423-4982-b377-b31160f0e255",
+      "remote_id": "PMT-DDD00B22",
+      "created_at": "2026-03-04T02:07:43.377575Z",
+      "modified_at": "2026-03-04T02:07:43.377577Z",
+      "transaction_date": "2025-12-31",
+      "contact": "b5877515-569a-40da-a810-dd8c46e7519f",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 2219.69,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "8f6ef706-79a6-4206-8c2c-152c29fd50b1",
+          "remote_id": "PMLN-F0E77709",
+          "applied_amount": 2219.69,
+          "applied_date": "2025-12-31",
+          "related_object_id": "a3d948e3-d95f-436d-8f6b-7ed433518358",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "3c7750dc-fe41-414a-89a1-aedd1c2522bb",
+      "remote_id": "PMT-284334A7",
+      "created_at": "2026-03-04T02:07:43.377608Z",
+      "modified_at": "2026-03-04T02:07:43.377610Z",
+      "transaction_date": "2025-12-31",
+      "contact": "069e96b6-6448-479a-abb0-d21ee1a6c683",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 2405.58,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "898ce903-d344-422b-ab98-4a2d29db8dc2",
+          "remote_id": "PMLN-A36DA837",
+          "applied_amount": 2405.58,
+          "applied_date": "2025-12-31",
+          "related_object_id": "62bca854-1523-4d5e-9769-2a72f896f06f",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "05a6f29d-9329-4cc0-89bb-d99e639954c0",
+      "remote_id": "PMT-6C3BD4EB",
+      "created_at": "2026-03-04T02:07:43.377640Z",
+      "modified_at": "2026-03-04T02:07:43.377642Z",
+      "transaction_date": "2025-12-16",
+      "contact": "eeb40c2d-bdf1-43f8-9458-5087a360dac7",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1615.93,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "210ee8ef-4c00-4a5c-ae5a-a84439345e84",
+          "remote_id": "PMLN-0C5A96DE",
+          "applied_amount": 1615.93,
+          "applied_date": "2025-12-16",
+          "related_object_id": "ea405166-225d-47db-ab60-bb21ba7e92cb",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "173ee66f-797d-495b-ba81-ed6953a8e599",
+      "remote_id": "PMT-6CCEF299",
+      "created_at": "2026-03-04T02:07:43.377676Z",
+      "modified_at": "2026-03-04T02:07:43.377678Z",
+      "transaction_date": "2025-12-31",
+      "contact": "61983172-1e52-4082-b893-4275f7e31dae",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1854.4,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "ada87a09-6816-40ff-bdfb-0090b6e1db46",
+          "remote_id": "PMLN-72590A17",
+          "applied_amount": 1854.4,
+          "applied_date": "2025-12-31",
+          "related_object_id": "eb22ed1a-16d5-4bf0-b877-2d0f3411fc6f",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "1558b401-02d0-4c62-b710-2b38ea338fd8",
+      "remote_id": "PMT-677B252A",
+      "created_at": "2026-03-04T02:07:43.377708Z",
+      "modified_at": "2026-03-04T02:07:43.377710Z",
+      "transaction_date": "2026-01-16",
+      "contact": "9827f168-b058-4208-84f2-436f80785f55",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 5222.43,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "350fef04-ea96-438e-b3e3-8fc1c20b46f7",
+          "remote_id": "PMLN-635C624B",
+          "applied_amount": 5222.43,
+          "applied_date": "2026-01-16",
+          "related_object_id": "5391a115-ee37-422f-b347-9d83c611a6f2",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "d507f9ba-ca4a-4b80-a2f5-3fc06b1bcf87",
+      "remote_id": "PMT-6B552050",
+      "created_at": "2026-03-04T02:07:43.377742Z",
+      "modified_at": "2026-03-04T02:07:43.377744Z",
+      "transaction_date": "2026-01-31",
+      "contact": "76126b06-c78a-4784-944b-a68232b4d7ae",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 4001.86,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "3e826740-cddd-4280-aa62-d50ea9a4a288",
+          "remote_id": "PMLN-97E55734",
+          "applied_amount": 4001.86,
+          "applied_date": "2026-01-31",
+          "related_object_id": "befb815b-3217-4849-b1bf-172a9e5bbda8",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "51a3dc38-b84e-45ec-a5be-c818bad75bd5",
+      "remote_id": "PMT-240C3532",
+      "created_at": "2026-03-04T02:07:43.377774Z",
+      "modified_at": "2026-03-04T02:07:43.377776Z",
+      "transaction_date": "2026-01-31",
+      "contact": "b5877515-569a-40da-a810-dd8c46e7519f",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 2252.99,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "fa76edf8-ed68-45e6-b14f-6584cf4af083",
+          "remote_id": "PMLN-85EAD9BC",
+          "applied_amount": 2252.99,
+          "applied_date": "2026-01-31",
+          "related_object_id": "5dcb8779-5a87-431e-8c95-6354a3cd1169",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "d5934dd4-8c0b-43e9-aaa6-662c7b216522",
+      "remote_id": "PMT-E881C131",
+      "created_at": "2026-03-04T02:07:43.377809Z",
+      "modified_at": "2026-03-04T02:07:43.377810Z",
+      "transaction_date": "2026-01-31",
+      "contact": "069e96b6-6448-479a-abb0-d21ee1a6c683",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 2441.66,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "d0fb0acc-c0ee-4dc3-97e0-0ac403427f8d",
+          "remote_id": "PMLN-2041B6A9",
+          "applied_amount": 2441.66,
+          "applied_date": "2026-01-31",
+          "related_object_id": "7fecbde8-e0c4-4079-bedb-6518c8be9ff5",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "a8265356-f4c9-4069-99f8-31b7c336a417",
+      "remote_id": "PMT-D9BBCA25",
+      "created_at": "2026-03-04T02:07:43.377840Z",
+      "modified_at": "2026-03-04T02:07:43.377841Z",
+      "transaction_date": "2026-01-16",
+      "contact": "eeb40c2d-bdf1-43f8-9458-5087a360dac7",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1640.16,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "66d2a556-d15f-402d-b07a-635497fd8ac2",
+          "remote_id": "PMLN-771F5600",
+          "applied_amount": 1640.16,
+          "applied_date": "2026-01-16",
+          "related_object_id": "2c3cbb4e-2d6f-4f3b-be30-3dcdb201eb53",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "7298f577-d032-4b8d-8769-8b9b975a2811",
+      "remote_id": "PMT-FF7734D2",
+      "created_at": "2026-03-04T02:07:43.377871Z",
+      "modified_at": "2026-03-04T02:07:43.377873Z",
+      "transaction_date": "2026-01-31",
+      "contact": "61983172-1e52-4082-b893-4275f7e31dae",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1882.22,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "fc3c4a35-9e50-47b4-84a9-0e4e764430a5",
+          "remote_id": "PMLN-D27C3CB8",
+          "applied_amount": 1882.22,
+          "applied_date": "2026-01-31",
+          "related_object_id": "685f167c-b749-4b67-a7c4-4f032bf0d80c",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "8438b9fc-d2e6-40dc-83f5-3969189c5eb1",
+      "remote_id": "PMT-E528F04E",
+      "created_at": "2026-03-04T02:07:43.377903Z",
+      "modified_at": "2026-03-04T02:07:43.377904Z",
+      "transaction_date": "2025-04-24",
+      "contact": "b14add94-2cd0-4944-bb03-dd9b81e607c3",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 65687.9,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "61494d7e-1f07-4f38-813b-021cf94bf54e",
+          "remote_id": "PMLN-BDACC7B1",
+          "applied_amount": 65687.9,
+          "applied_date": "2025-04-24",
+          "related_object_id": "7c2aad68-c89d-4fc3-b535-6cd007f1c98d",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "782bc355-1662-4a29-9b93-408b696c29b7",
+      "remote_id": "PMT-4E401196",
+      "created_at": "2026-03-04T02:07:43.377944Z",
+      "modified_at": "2026-03-04T02:07:43.377946Z",
+      "transaction_date": "2025-05-16",
+      "contact": "b14add94-2cd0-4944-bb03-dd9b81e607c3",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 65882.5,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "2149f0d6-2516-405f-aa4c-174f9f2d3204",
+          "remote_id": "PMLN-B68415D3",
+          "applied_amount": 65882.5,
+          "applied_date": "2025-05-16",
+          "related_object_id": "d720990d-de5f-4ca1-9bef-6b12ea48e713",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "0687b080-4818-4b03-ac42-f16414e7de59",
+      "remote_id": "PMT-C671DEDF",
+      "created_at": "2026-03-04T02:07:43.377977Z",
+      "modified_at": "2026-03-04T02:07:43.377978Z",
+      "transaction_date": "2025-06-14",
+      "contact": "b14add94-2cd0-4944-bb03-dd9b81e607c3",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 65592.26,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "c067670f-95d8-479b-81c1-49ca68bd947a",
+          "remote_id": "PMLN-6E9E3EDB",
+          "applied_amount": 65592.26,
+          "applied_date": "2025-06-14",
+          "related_object_id": "f1a69059-1748-4295-b02e-fa4cca03de07",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "e76c95ce-3e7c-4a39-ae17-ac4da6ccf9c3",
+      "remote_id": "PMT-FDD1D496",
+      "created_at": "2026-03-04T02:07:43.378009Z",
+      "modified_at": "2026-03-04T02:07:43.378011Z",
+      "transaction_date": "2025-07-19",
+      "contact": "b14add94-2cd0-4944-bb03-dd9b81e607c3",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 80168.63,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "d8851884-1982-4b16-ab07-eb3ed9f6d1f5",
+          "remote_id": "PMLN-CC72D8B0",
+          "applied_amount": 80168.63,
+          "applied_date": "2025-07-19",
+          "related_object_id": "650cfb78-b4bd-485f-a9c8-d0fa588b15f9",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "e70e6b0a-8380-4b7d-98cc-eb87217c7070",
+      "remote_id": "PMT-A0EF59DE",
+      "created_at": "2026-03-04T02:07:43.378042Z",
+      "modified_at": "2026-03-04T02:07:43.378044Z",
+      "transaction_date": "2025-08-17",
+      "contact": "b14add94-2cd0-4944-bb03-dd9b81e607c3",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 79659.54,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "eb6107a7-1d6e-4d29-b2b8-a7ee1583ff01",
+          "remote_id": "PMLN-A6E223E5",
+          "applied_amount": 79659.54,
+          "applied_date": "2025-08-17",
+          "related_object_id": "a71c9204-f2d1-45cc-8b7f-b9ee63ae73ab",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "47b5a4c6-d9ba-4531-8109-8c0c15f3423c",
+      "remote_id": "PMT-A9A565DF",
+      "created_at": "2026-03-04T02:07:43.378079Z",
+      "modified_at": "2026-03-04T02:07:43.378081Z",
+      "transaction_date": "2025-09-17",
+      "contact": "b14add94-2cd0-4944-bb03-dd9b81e607c3",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 80969.75,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "8e5c358b-9b39-4360-9096-8323327dc902",
+          "remote_id": "PMLN-AE1A5B94",
+          "applied_amount": 80969.75,
+          "applied_date": "2025-09-17",
+          "related_object_id": "1f85d021-2f71-49ab-917b-c8e080346566",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "6a8f525e-d05b-41d0-8fdd-b44454967783",
+      "remote_id": "PMT-04AF1698",
+      "created_at": "2026-03-04T02:07:43.378110Z",
+      "modified_at": "2026-03-04T02:07:43.378111Z",
+      "transaction_date": "2025-10-17",
+      "contact": "b14add94-2cd0-4944-bb03-dd9b81e607c3",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 92091.14,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "7c314425-5c2a-4083-8826-2c5a1e6b29d0",
+          "remote_id": "PMLN-DDE1BFB6",
+          "applied_amount": 92091.14,
+          "applied_date": "2025-10-17",
+          "related_object_id": "1bdb753b-2fe3-47e1-86b0-266fae16410a",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "8c7f6375-b344-4d18-b68e-5803305a1209",
+      "remote_id": "PMT-E204A207",
+      "created_at": "2026-03-04T02:07:43.378145Z",
+      "modified_at": "2026-03-04T02:07:43.378147Z",
+      "transaction_date": "2025-11-15",
+      "contact": "b14add94-2cd0-4944-bb03-dd9b81e607c3",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 92342.31,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "ad608a13-5237-4e07-895c-d39cb06d29da",
+          "remote_id": "PMLN-B7028B16",
+          "applied_amount": 92342.31,
+          "applied_date": "2025-11-15",
+          "related_object_id": "ca4dfddc-74ba-47a1-b8dd-e79e9b52fd0d",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "a4bc6640-1e3c-4705-afd3-b131864adac1",
+      "remote_id": "PMT-FBA036B5",
+      "created_at": "2026-03-04T02:07:43.378178Z",
+      "modified_at": "2026-03-04T02:07:43.378180Z",
+      "transaction_date": "2025-12-25",
+      "contact": "b14add94-2cd0-4944-bb03-dd9b81e607c3",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 91487.07,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "f88217e1-a9c5-4562-a8aa-cd732d670a5b",
+          "remote_id": "PMLN-0DCCB479",
+          "applied_amount": 91487.07,
+          "applied_date": "2025-12-25",
+          "related_object_id": "9c2c5b39-c302-4e33-bdbc-206e899f9a23",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "cec69a9a-c194-4e08-8e94-7c33e66fad73",
+      "remote_id": "PMT-09BE3D9C",
+      "created_at": "2026-03-04T02:07:43.378213Z",
+      "modified_at": "2026-03-04T02:07:43.378214Z",
+      "transaction_date": "2026-01-22",
+      "contact": "b14add94-2cd0-4944-bb03-dd9b81e607c3",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 117955.92,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "ef86d567-f53d-4244-a0f0-81403b552181",
+          "remote_id": "PMLN-4AF01DEA",
+          "applied_amount": 117955.92,
+          "applied_date": "2026-01-22",
+          "related_object_id": "1e9a459e-307c-4ec5-9da0-0fade799eb6f",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "0d0e4cfc-9480-4266-92bb-66996f588431",
+      "remote_id": "PMT-AF27D612",
+      "created_at": "2026-03-04T02:07:43.378248Z",
+      "modified_at": "2026-03-04T02:07:43.378249Z",
+      "transaction_date": "2025-05-04",
+      "contact": "2d0fae8a-af74-494d-9841-4d5bb35e434f",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 9967.27,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "fac7d38b-efd2-43fa-b2a3-e4253568e4fa",
+          "remote_id": "PMLN-3F67265F",
+          "applied_amount": 9967.27,
+          "applied_date": "2025-05-04",
+          "related_object_id": "dcb5752d-ce15-4893-b2c8-ebccb83dbdf3",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "9cd38d84-d03c-473e-beec-a1323c49c63f",
+      "remote_id": "PMT-AE5E907C",
+      "created_at": "2026-03-04T02:07:43.378280Z",
+      "modified_at": "2026-03-04T02:07:43.378281Z",
+      "transaction_date": "2025-06-11",
+      "contact": "2d0fae8a-af74-494d-9841-4d5bb35e434f",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 10474.35,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "4f4040bf-8e61-474a-aebb-d267ab5a6173",
+          "remote_id": "PMLN-84544160",
+          "applied_amount": 10474.35,
+          "applied_date": "2025-06-11",
+          "related_object_id": "7b9a701c-cd06-494d-b724-a74e7b9f0b2b",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "8ab51137-9eb8-4dc3-b388-9061404d6b3e",
+      "remote_id": "PMT-6F69D0A9",
+      "created_at": "2026-03-04T02:07:43.378312Z",
+      "modified_at": "2026-03-04T02:07:43.378314Z",
+      "transaction_date": "2025-07-09",
+      "contact": "2d0fae8a-af74-494d-9841-4d5bb35e434f",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 10511.97,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "1d1dae82-72e5-4308-9329-e3109f9e747c",
+          "remote_id": "PMLN-91C4D7C0",
+          "applied_amount": 10511.97,
+          "applied_date": "2025-07-09",
+          "related_object_id": "89cc5d91-f676-4680-8a76-a01352b4773e",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "9fda8523-8049-4dd5-9e8b-8ef1827373b8",
+      "remote_id": "PMT-73CF9E20",
+      "created_at": "2026-03-04T02:07:43.378344Z",
+      "modified_at": "2026-03-04T02:07:43.378346Z",
+      "transaction_date": "2025-08-02",
+      "contact": "2d0fae8a-af74-494d-9841-4d5bb35e434f",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 11307.37,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "cf952ceb-0f27-48c6-b44c-0e89d15b5d7b",
+          "remote_id": "PMLN-8AABBC63",
+          "applied_amount": 11307.37,
+          "applied_date": "2025-08-02",
+          "related_object_id": "ef7a00fc-dd13-4262-ba1c-0ed28a7338ea",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "4289d25d-f10b-4e0d-8b20-0441e0b32e1e",
+      "remote_id": "PMT-F333D841",
+      "created_at": "2026-03-04T02:07:43.378377Z",
+      "modified_at": "2026-03-04T02:07:43.378379Z",
+      "transaction_date": "2025-09-02",
+      "contact": "2d0fae8a-af74-494d-9841-4d5bb35e434f",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 11886.16,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "1544dc40-cadb-4270-ade8-08d7cf4ad920",
+          "remote_id": "PMLN-2FDF8F6A",
+          "applied_amount": 11886.16,
+          "applied_date": "2025-09-02",
+          "related_object_id": "0d7aa81f-c148-47d0-aaa0-c945a6da5b41",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "6e91dd51-0064-42bc-9cf0-d6b23b54388b",
+      "remote_id": "PMT-A482E2C1",
+      "created_at": "2026-03-04T02:07:43.378410Z",
+      "modified_at": "2026-03-04T02:07:43.378412Z",
+      "transaction_date": "2025-10-04",
+      "contact": "2d0fae8a-af74-494d-9841-4d5bb35e434f",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 12443.51,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "6b1c0022-6de6-4421-aae5-d16c39ac2052",
+          "remote_id": "PMLN-D79C8808",
+          "applied_amount": 12443.51,
+          "applied_date": "2025-10-04",
+          "related_object_id": "954800fa-9905-4a9c-a542-c08e701559d9",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "78d6e67d-af4c-46a8-8061-9b7c05b99469",
+      "remote_id": "PMT-ED403228",
+      "created_at": "2026-03-04T02:07:43.378443Z",
+      "modified_at": "2026-03-04T02:07:43.378444Z",
+      "transaction_date": "2025-11-05",
+      "contact": "2d0fae8a-af74-494d-9841-4d5bb35e434f",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 12889.39,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "863c77f3-0331-4e04-8532-c68415cc624b",
+          "remote_id": "PMLN-7D05C43B",
+          "applied_amount": 12889.39,
+          "applied_date": "2025-11-05",
+          "related_object_id": "389524a7-c000-413b-b003-d0651ab7d5c3",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "d206250c-1375-4960-b471-2849ea4e65d5",
+      "remote_id": "PMT-0BFFB2C5",
+      "created_at": "2026-03-04T02:07:43.378478Z",
+      "modified_at": "2026-03-04T02:07:43.378479Z",
+      "transaction_date": "2025-12-06",
+      "contact": "2d0fae8a-af74-494d-9841-4d5bb35e434f",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 18245,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "16e34a84-a2f8-472f-86ac-b5e907e57330",
+          "remote_id": "PMLN-B7FBDEEC",
+          "applied_amount": 18245,
+          "applied_date": "2025-12-06",
+          "related_object_id": "d049c8a5-e3c1-49b4-8c5f-b953d33ee471",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "2ce3bae8-f55c-419d-a830-5cdc1cc1e244",
+      "remote_id": "PMT-8E9D0F6B",
+      "created_at": "2026-03-04T02:07:43.378510Z",
+      "modified_at": "2026-03-04T02:07:43.378512Z",
+      "transaction_date": "2026-01-10",
+      "contact": "2d0fae8a-af74-494d-9841-4d5bb35e434f",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 13756.87,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "065af957-82a1-4423-979e-764ec8338c60",
+          "remote_id": "PMLN-452C0C82",
+          "applied_amount": 13756.87,
+          "applied_date": "2026-01-10",
+          "related_object_id": "e848c4fb-a5bb-40c0-a60f-c0f1e8096a3b",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "efea356c-2a06-47bc-85a0-a10988f2b9db",
+      "remote_id": "PMT-563ADE03",
+      "created_at": "2026-03-04T02:07:43.378541Z",
+      "modified_at": "2026-03-04T02:07:43.378543Z",
+      "transaction_date": "2025-04-09",
+      "contact": "654f27ef-9270-41fe-b305-16a514e005b9",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "ee11060c-2c27-42f7-94f0-4840265c156c",
+          "remote_id": "PMLN-294ADF36",
+          "applied_amount": 3500,
+          "applied_date": "2025-04-09",
+          "related_object_id": "fcc20a56-2b10-4cc4-af03-60cbf95de957",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "f122ad28-d701-496b-933e-10b3e5b95a92",
+      "remote_id": "PMT-B7AAD29F",
+      "created_at": "2026-03-04T02:07:43.378634Z",
+      "modified_at": "2026-03-04T02:07:43.378636Z",
+      "transaction_date": "2025-04-01",
+      "contact": "065bac99-7a9a-4ee5-b25e-22bd77ef8c69",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "d73231df-86e6-4399-8214-131fa5ee0921",
+          "remote_id": "PMLN-96DAFB3B",
+          "applied_amount": 1500,
+          "applied_date": "2025-04-01",
+          "related_object_id": "0b130fb0-caf8-4665-9c63-1911d5b9c3b7",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "65f3255b-10fe-4914-856e-b5a1c3fedab9",
+      "remote_id": "PMT-CEA37F09",
+      "created_at": "2026-03-04T02:07:43.378666Z",
+      "modified_at": "2026-03-04T02:07:43.378668Z",
+      "transaction_date": "2025-04-08",
+      "contact": "58d41ae7-03b8-46e2-a8d2-07f714ec6876",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 800,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "6c0f161d-23fc-4f07-a3d6-828028a174f8",
+          "remote_id": "PMLN-4263657C",
+          "applied_amount": 800,
+          "applied_date": "2025-04-08",
+          "related_object_id": "8509a8ec-a82b-43e0-926e-0c7af9ecab9b",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "555ddfbf-5084-4935-9108-b23d63b0dde9",
+      "remote_id": "PMT-05A4EDCD",
+      "created_at": "2026-03-04T02:07:43.378698Z",
+      "modified_at": "2026-03-04T02:07:43.378699Z",
+      "transaction_date": "2025-04-19",
+      "contact": "8e9eaca9-e9be-497d-97ef-90af7b218b86",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1195.16,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "c8e16ad1-1dba-4c7a-8a1d-581b0b6c1f86",
+          "remote_id": "PMLN-CA79189E",
+          "applied_amount": 1195.16,
+          "applied_date": "2025-04-19",
+          "related_object_id": "deccf10e-ec02-41de-b313-ffd94944d584",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "d529f991-9162-4b3c-b4aa-2239d4279e66",
+      "remote_id": "PMT-D9329946",
+      "created_at": "2026-03-04T02:07:43.378729Z",
+      "modified_at": "2026-03-04T02:07:43.378731Z",
+      "transaction_date": "2025-04-27",
+      "contact": "f53db716-9bda-4edf-be9b-1a104e839468",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 961.97,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "46cd686f-e2e8-48ba-a280-8a855465cd83",
+          "remote_id": "PMLN-16F37C84",
+          "applied_amount": 961.97,
+          "applied_date": "2025-04-27",
+          "related_object_id": "a46d1563-b3a8-4b76-a69a-a7b29e878fac",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "639eb4fa-8623-4235-a452-7a75c9b5eb6a",
+      "remote_id": "PMT-58E0D117",
+      "created_at": "2026-03-04T02:07:43.378760Z",
+      "modified_at": "2026-03-04T02:07:43.378762Z",
+      "transaction_date": "2025-05-09",
+      "contact": "654f27ef-9270-41fe-b305-16a514e005b9",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "c89e5f76-8353-4e89-b8ee-2a4f4cb2ed4c",
+          "remote_id": "PMLN-C28117DC",
+          "applied_amount": 3500,
+          "applied_date": "2025-05-09",
+          "related_object_id": "9523b782-6cf2-4f66-96fe-3116c9710473",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "d7923534-71ad-4394-b1bd-4b719bc976cf",
+      "remote_id": "PMT-823E15A6",
+      "created_at": "2026-03-04T02:07:43.378791Z",
+      "modified_at": "2026-03-04T02:07:43.378793Z",
+      "transaction_date": "2025-05-20",
+      "contact": "065bac99-7a9a-4ee5-b25e-22bd77ef8c69",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "c4f9c4ad-bafd-47ff-a491-391b82e41dfb",
+          "remote_id": "PMLN-6F59188D",
+          "applied_amount": 1500,
+          "applied_date": "2025-05-20",
+          "related_object_id": "f0efa5aa-6d4f-4a12-a8ee-99b65df84ee5",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "df56884d-30bd-4ac7-bac9-147adefc634c",
+      "remote_id": "PMT-2768E603",
+      "created_at": "2026-03-04T02:07:43.378822Z",
+      "modified_at": "2026-03-04T02:07:43.378824Z",
+      "transaction_date": "2025-05-14",
+      "contact": "58d41ae7-03b8-46e2-a8d2-07f714ec6876",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 800,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "9948cd11-3436-4fff-a749-792eb39bb8de",
+          "remote_id": "PMLN-B7607393",
+          "applied_amount": 800,
+          "applied_date": "2025-05-14",
+          "related_object_id": "e4ff78c1-5995-4f9f-ae32-2894ce1a9ea1",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "d63e1aeb-96ca-449a-a75b-b9e5000b40db",
+      "remote_id": "PMT-ED155CA4",
+      "created_at": "2026-03-04T02:07:43.378854Z",
+      "modified_at": "2026-03-04T02:07:43.378855Z",
+      "transaction_date": "2025-06-01",
+      "contact": "8e9eaca9-e9be-497d-97ef-90af7b218b86",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1109.9,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "0ba56aa0-58c5-4cfd-a3be-774924c29f5a",
+          "remote_id": "PMLN-EB9F9994",
+          "applied_amount": 1109.9,
+          "applied_date": "2025-06-01",
+          "related_object_id": "596a8458-f979-403f-b44d-ef4daad09b6f",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "291c6ac5-1ce0-49ed-813b-fa00f258d202",
+      "remote_id": "PMT-D1F743F4",
+      "created_at": "2026-03-04T02:07:43.378887Z",
+      "modified_at": "2026-03-04T02:07:43.378889Z",
+      "transaction_date": "2025-05-12",
+      "contact": "f53db716-9bda-4edf-be9b-1a104e839468",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 703.18,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "b66baf2d-acb3-410f-ac1c-3350f6b83850",
+          "remote_id": "PMLN-FEC81B37",
+          "applied_amount": 703.18,
+          "applied_date": "2025-05-12",
+          "related_object_id": "30539599-e5c0-48fa-892c-2ed026ccb474",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "4c022b4a-4ed8-48ef-9e79-12ca5e7820f7",
+      "remote_id": "PMT-A0244BB2",
+      "created_at": "2026-03-04T02:07:43.378919Z",
+      "modified_at": "2026-03-04T02:07:43.378921Z",
+      "transaction_date": "2025-06-04",
+      "contact": "654f27ef-9270-41fe-b305-16a514e005b9",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "2f526bd6-c3bd-47df-8b8a-e06328ed41c6",
+          "remote_id": "PMLN-49CE55D0",
+          "applied_amount": 3500,
+          "applied_date": "2025-06-04",
+          "related_object_id": "992ded97-c34f-4de5-af71-f958a7f8615d",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "8e97c5e4-6b1e-432a-9f54-fbca5d83f1fa",
+      "remote_id": "PMT-40814F35",
+      "created_at": "2026-03-04T02:07:43.378967Z",
+      "modified_at": "2026-03-04T02:07:43.378969Z",
+      "transaction_date": "2025-06-17",
+      "contact": "065bac99-7a9a-4ee5-b25e-22bd77ef8c69",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "77d0720f-2c21-4af2-bec7-d781d6e22291",
+          "remote_id": "PMLN-6EC5FD38",
+          "applied_amount": 1500,
+          "applied_date": "2025-06-17",
+          "related_object_id": "7a0dac56-d364-409f-ae77-be1b32281cc1",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "b2c65b0b-043b-45d7-bf72-ed4a200e6b29",
+      "remote_id": "PMT-53A8EF20",
+      "created_at": "2026-03-04T02:07:43.379001Z",
+      "modified_at": "2026-03-04T02:07:43.379003Z",
+      "transaction_date": "2025-06-11",
+      "contact": "58d41ae7-03b8-46e2-a8d2-07f714ec6876",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 800,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "1ccd1e55-7836-4bc2-9ea3-2a22a1365e9e",
+          "remote_id": "PMLN-E0E6491B",
+          "applied_amount": 800,
+          "applied_date": "2025-06-11",
+          "related_object_id": "d7b982de-9649-416c-ad45-fd3db3fb534c",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "24c3744e-5ec4-4e3a-a26a-816559c267c0",
+      "remote_id": "PMT-446E5F81",
+      "created_at": "2026-03-04T02:07:43.379032Z",
+      "modified_at": "2026-03-04T02:07:43.379034Z",
+      "transaction_date": "2025-06-17",
+      "contact": "8e9eaca9-e9be-497d-97ef-90af7b218b86",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1735.0,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "66cf2b02-d5ba-4539-b8c8-de3e8a6be7f1",
+          "remote_id": "PMLN-4F53A164",
+          "applied_amount": 1735.0,
+          "applied_date": "2025-06-17",
+          "related_object_id": "1636891f-b537-4fbb-93b7-959ad7672042",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "bd0d0323-2634-4555-ac94-673ce5dc73cd",
+      "remote_id": "PMT-CA9A46F5",
+      "created_at": "2026-03-04T02:07:43.379063Z",
+      "modified_at": "2026-03-04T02:07:43.379067Z",
+      "transaction_date": "2025-06-27",
+      "contact": "f53db716-9bda-4edf-be9b-1a104e839468",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 937.92,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "018c5a16-0eba-4623-baa2-044f98dd8893",
+          "remote_id": "PMLN-7AF121FC",
+          "applied_amount": 937.92,
+          "applied_date": "2025-06-27",
+          "related_object_id": "db5f6d41-cc1b-4fe4-a67c-e6191a95f2a0",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "4cc0d43f-a7ff-4785-876b-c3a4ea7d3481",
+      "remote_id": "PMT-E033CE28",
+      "created_at": "2026-03-04T02:07:43.379100Z",
+      "modified_at": "2026-03-04T02:07:43.379101Z",
+      "transaction_date": "2025-07-05",
+      "contact": "654f27ef-9270-41fe-b305-16a514e005b9",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "40ee23ab-2003-4b1a-b0f4-127c0cd656bc",
+          "remote_id": "PMLN-4FC7ADCD",
+          "applied_amount": 3500,
+          "applied_date": "2025-07-05",
+          "related_object_id": "df2b512e-cbfe-4df4-b535-d0100745f155",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "65fc6b98-283a-4498-96ba-fdaa5456dcf1",
+      "remote_id": "PMT-55F5D857",
+      "created_at": "2026-03-04T02:07:43.379133Z",
+      "modified_at": "2026-03-04T02:07:43.379135Z",
+      "transaction_date": "2025-07-08",
+      "contact": "065bac99-7a9a-4ee5-b25e-22bd77ef8c69",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "18e2ae2d-1ff4-4273-951e-879b239fa4f4",
+          "remote_id": "PMLN-C59EEF4B",
+          "applied_amount": 1500,
+          "applied_date": "2025-07-08",
+          "related_object_id": "3a49561d-07f3-488c-88ce-616e4cbd72f7",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "1d2cb041-a466-47ff-b5a2-259ba31aadd5",
+      "remote_id": "PMT-8E737D15",
+      "created_at": "2026-03-04T02:07:43.379166Z",
+      "modified_at": "2026-03-04T02:07:43.379168Z",
+      "transaction_date": "2025-07-15",
+      "contact": "58d41ae7-03b8-46e2-a8d2-07f714ec6876",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 800,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "3839106d-03f0-4eda-8f45-8a0ebf5906fa",
+          "remote_id": "PMLN-0822FACA",
+          "applied_amount": 800,
+          "applied_date": "2025-07-15",
+          "related_object_id": "000a402c-8d8a-456d-80d1-e502f757f9e2",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "eb40770d-38a1-4e13-84be-23588c65364b",
+      "remote_id": "PMT-4FA8EB94",
+      "created_at": "2026-03-04T02:07:43.379197Z",
+      "modified_at": "2026-03-04T02:07:43.379198Z",
+      "transaction_date": "2025-07-14",
+      "contact": "8e9eaca9-e9be-497d-97ef-90af7b218b86",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1182.83,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "62cd3a47-d2e3-4dd3-a270-f0ac2002d461",
+          "remote_id": "PMLN-E63880F8",
+          "applied_amount": 1182.83,
+          "applied_date": "2025-07-14",
+          "related_object_id": "c936b756-84f2-4268-9784-466db597f020",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "e621b53d-c6de-436d-aacc-588b08c971fd",
+      "remote_id": "PMT-28AB1592",
+      "created_at": "2026-03-04T02:07:43.379229Z",
+      "modified_at": "2026-03-04T02:07:43.379231Z",
+      "transaction_date": "2025-07-23",
+      "contact": "f53db716-9bda-4edf-be9b-1a104e839468",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1059.27,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "23cfed87-6aee-4fef-83f2-068a1f134ce3",
+          "remote_id": "PMLN-5B48B771",
+          "applied_amount": 1059.27,
+          "applied_date": "2025-07-23",
+          "related_object_id": "1c6d1bca-000f-4b72-b45f-6a425b835e7f",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "bd9c8ca3-4ae3-478e-97d9-f6f975d5ef9d",
+      "remote_id": "PMT-E67D564C",
+      "created_at": "2026-03-04T02:07:43.379260Z",
+      "modified_at": "2026-03-04T02:07:43.379261Z",
+      "transaction_date": "2025-08-01",
+      "contact": "654f27ef-9270-41fe-b305-16a514e005b9",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "1f0cdecb-3f6a-4125-a457-99cde5ed453a",
+          "remote_id": "PMLN-114B59DF",
+          "applied_amount": 3500,
+          "applied_date": "2025-08-01",
+          "related_object_id": "66f375db-ef42-4e25-b219-17e84d97ad8f",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "34f9c3dc-1a3d-4f76-a8ba-5266c64c0ea2",
+      "remote_id": "PMT-2525601A",
+      "created_at": "2026-03-04T02:07:43.379290Z",
+      "modified_at": "2026-03-04T02:07:43.379292Z",
+      "transaction_date": "2025-08-13",
+      "contact": "065bac99-7a9a-4ee5-b25e-22bd77ef8c69",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "db6e8534-1cbd-48f2-8f26-da05b103b3c1",
+          "remote_id": "PMLN-D53D69CA",
+          "applied_amount": 1500,
+          "applied_date": "2025-08-13",
+          "related_object_id": "137a414f-0dff-4ff4-a5f7-03d0681dd2e8",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "1bf30cb2-8d3b-4d3c-b55c-cfc0a0081b33",
+      "remote_id": "PMT-53A22499",
+      "created_at": "2026-03-04T02:07:43.379321Z",
+      "modified_at": "2026-03-04T02:07:43.379322Z",
+      "transaction_date": "2025-08-22",
+      "contact": "58d41ae7-03b8-46e2-a8d2-07f714ec6876",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 800,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "a881e096-49fc-4be6-8824-cd97870b7760",
+          "remote_id": "PMLN-FAD8CBD6",
+          "applied_amount": 800,
+          "applied_date": "2025-08-22",
+          "related_object_id": "f30589e0-f9a5-4444-bd61-070fb5a0b50a",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "37e3d995-87eb-4bcc-b4f4-13acb6859e2a",
+      "remote_id": "PMT-D7440385",
+      "created_at": "2026-03-04T02:07:43.379351Z",
+      "modified_at": "2026-03-04T02:07:43.379353Z",
+      "transaction_date": "2025-08-29",
+      "contact": "8e9eaca9-e9be-497d-97ef-90af7b218b86",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 2037.85,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "bbc345d8-70e9-4db3-b1c8-0a811bc921e6",
+          "remote_id": "PMLN-53315C2C",
+          "applied_amount": 2037.85,
+          "applied_date": "2025-08-29",
+          "related_object_id": "80a5a81a-345e-4765-a3c6-dc9710d1e987",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "f7ec0a1c-8edd-454c-8230-446609f4a237",
+      "remote_id": "PMT-629DA9BB",
+      "created_at": "2026-03-04T02:07:43.379382Z",
+      "modified_at": "2026-03-04T02:07:43.379384Z",
+      "transaction_date": "2025-08-06",
+      "contact": "f53db716-9bda-4edf-be9b-1a104e839468",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 429.54,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "b7ef3597-57c4-4ee4-bd5f-380f473e4bbc",
+          "remote_id": "PMLN-7CF5BCF1",
+          "applied_amount": 429.54,
+          "applied_date": "2025-08-06",
+          "related_object_id": "f0695a83-39c9-4448-a8a3-04c4079460d1",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "d6e8f585-5c14-4094-a03e-607eb35ef65d",
+      "remote_id": "PMT-6A0E8C1E",
+      "created_at": "2026-03-04T02:07:43.379414Z",
+      "modified_at": "2026-03-04T02:07:43.379416Z",
+      "transaction_date": "2025-09-09",
+      "contact": "654f27ef-9270-41fe-b305-16a514e005b9",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "e58e0582-3226-457e-a692-8caf237c856d",
+          "remote_id": "PMLN-17560D3C",
+          "applied_amount": 3500,
+          "applied_date": "2025-09-09",
+          "related_object_id": "7fec12d9-c17f-4f64-9c10-ef13f4e2716e",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "ce73fc60-46a4-44a2-8ea1-5668e78d466c",
+      "remote_id": "PMT-DC727FC7",
+      "created_at": "2026-03-04T02:07:43.379452Z",
+      "modified_at": "2026-03-04T02:07:43.379454Z",
+      "transaction_date": "2025-09-18",
+      "contact": "065bac99-7a9a-4ee5-b25e-22bd77ef8c69",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "b6752c7d-ae75-4379-b48a-40132e18fee2",
+          "remote_id": "PMLN-05205EE1",
+          "applied_amount": 1500,
+          "applied_date": "2025-09-18",
+          "related_object_id": "254d2f15-fdf5-4b88-adaa-3d196b2a31d0",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "9cd63e54-b300-433d-b9bd-de058c5771d4",
+      "remote_id": "PMT-8D371468",
+      "created_at": "2026-03-04T02:07:43.379484Z",
+      "modified_at": "2026-03-04T02:07:43.379486Z",
+      "transaction_date": "2025-09-04",
+      "contact": "58d41ae7-03b8-46e2-a8d2-07f714ec6876",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 800,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "d15685fd-9352-424a-9783-e741c72cfc95",
+          "remote_id": "PMLN-A0210878",
+          "applied_amount": 800,
+          "applied_date": "2025-09-04",
+          "related_object_id": "d9b72cf7-4c8b-48c7-a3c3-fc9617930a7f",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "ccf8bfe0-7d9d-4c29-8b63-996038695853",
+      "remote_id": "PMT-31470F85",
+      "created_at": "2026-03-04T02:07:43.379516Z",
+      "modified_at": "2026-03-04T02:07:43.379518Z",
+      "transaction_date": "2025-09-30",
+      "contact": "8e9eaca9-e9be-497d-97ef-90af7b218b86",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1088.5,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "c870e5ec-4def-450d-af96-dc87d7a0f08e",
+          "remote_id": "PMLN-5D197439",
+          "applied_amount": 1088.5,
+          "applied_date": "2025-09-30",
+          "related_object_id": "e2a62970-7deb-4f9e-9065-add1caa85909",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "c932e4b1-b843-4bba-b2f3-653e3072ad2c",
+      "remote_id": "PMT-CCBE16A4",
+      "created_at": "2026-03-04T02:07:43.379551Z",
+      "modified_at": "2026-03-04T02:07:43.379553Z",
+      "transaction_date": "2025-09-16",
+      "contact": "f53db716-9bda-4edf-be9b-1a104e839468",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 922.33,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "ae6d8ab2-5d5b-4b19-95c4-41dad26daee0",
+          "remote_id": "PMLN-3EFECCC5",
+          "applied_amount": 922.33,
+          "applied_date": "2025-09-16",
+          "related_object_id": "18c8c5ab-209f-4396-8f6a-5b19e0738e44",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "d16ed775-9e66-4a02-b465-f9401a967354",
+      "remote_id": "PMT-1A3D439F",
+      "created_at": "2026-03-04T02:07:43.379583Z",
+      "modified_at": "2026-03-04T02:07:43.379585Z",
+      "transaction_date": "2025-10-02",
+      "contact": "654f27ef-9270-41fe-b305-16a514e005b9",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "6fd8aec9-2d02-4041-9531-2c3d325720aa",
+          "remote_id": "PMLN-89E14C10",
+          "applied_amount": 3500,
+          "applied_date": "2025-10-02",
+          "related_object_id": "8ee55bbd-9b6e-4348-b403-b0dfc190348b",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "72d74faa-cb12-41b6-b1e8-c3356fc4d99f",
+      "remote_id": "PMT-0E7AD56B",
+      "created_at": "2026-03-04T02:07:43.379614Z",
+      "modified_at": "2026-03-04T02:07:43.379615Z",
+      "transaction_date": "2025-10-11",
+      "contact": "065bac99-7a9a-4ee5-b25e-22bd77ef8c69",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "a8537b80-6757-4c6c-aeed-b54767fbd2df",
+          "remote_id": "PMLN-8DABE1EC",
+          "applied_amount": 1500,
+          "applied_date": "2025-10-11",
+          "related_object_id": "1519a583-aae6-42dd-9654-cb4063d00730",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "682bdcb7-40b5-49b5-8a4a-39d96aacd771",
+      "remote_id": "PMT-4E646F84",
+      "created_at": "2026-03-04T02:07:43.379645Z",
+      "modified_at": "2026-03-04T02:07:43.379646Z",
+      "transaction_date": "2025-10-22",
+      "contact": "58d41ae7-03b8-46e2-a8d2-07f714ec6876",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 800,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "15dedcc3-ebd7-4574-9e56-74703d003b5c",
+          "remote_id": "PMLN-8DA59E2E",
+          "applied_amount": 800,
+          "applied_date": "2025-10-22",
+          "related_object_id": "f9eed662-0660-4088-9938-77a4fc507424",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "1c2b50e9-8d3d-463d-8042-862bf33762fa",
+      "remote_id": "PMT-B9FA22BC",
+      "created_at": "2026-03-04T02:07:43.379680Z",
+      "modified_at": "2026-03-04T02:07:43.379681Z",
+      "transaction_date": "2025-10-22",
+      "contact": "8e9eaca9-e9be-497d-97ef-90af7b218b86",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1969.31,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "1e94e09c-719d-4295-a698-8c060b901ce3",
+          "remote_id": "PMLN-99929AD7",
+          "applied_amount": 1969.31,
+          "applied_date": "2025-10-22",
+          "related_object_id": "6ed81586-fdce-4cce-a099-e9faa1d5a65e",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "69d6d412-a375-4488-aeca-92d69f2f8f48",
+      "remote_id": "PMT-1C69A0ED",
+      "created_at": "2026-03-04T02:07:43.379711Z",
+      "modified_at": "2026-03-04T02:07:43.379712Z",
+      "transaction_date": "2025-10-17",
+      "contact": "f53db716-9bda-4edf-be9b-1a104e839468",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 956.5,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "59956aa9-7032-4222-9302-cad023e11e6e",
+          "remote_id": "PMLN-4D94DBCD",
+          "applied_amount": 956.5,
+          "applied_date": "2025-10-17",
+          "related_object_id": "05a5686c-a794-4e59-9195-04d81ae22aab",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "5b18f5d9-93ef-4168-9dfe-0d03e9e75787",
+      "remote_id": "PMT-2CE49C0D",
+      "created_at": "2026-03-04T02:07:43.379754Z",
+      "modified_at": "2026-03-04T02:07:43.379756Z",
+      "transaction_date": "2025-11-10",
+      "contact": "654f27ef-9270-41fe-b305-16a514e005b9",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "6476ddc1-3e75-46ba-9689-ff59c09e14cd",
+          "remote_id": "PMLN-108AB935",
+          "applied_amount": 3500,
+          "applied_date": "2025-11-10",
+          "related_object_id": "065ae2dd-1b88-4a33-b197-d91a325a0edb",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "3f06ca53-6a6d-4440-8da9-eca7a53043eb",
+      "remote_id": "PMT-9F9431B2",
+      "created_at": "2026-03-04T02:07:43.379785Z",
+      "modified_at": "2026-03-04T02:07:43.379787Z",
+      "transaction_date": "2025-12-03",
+      "contact": "065bac99-7a9a-4ee5-b25e-22bd77ef8c69",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "c64db546-59b9-4b90-a784-4b9bda3fe36e",
+          "remote_id": "PMLN-049150BA",
+          "applied_amount": 1500,
+          "applied_date": "2025-12-03",
+          "related_object_id": "16a68fc9-cca3-4ae1-833b-3d094d8be081",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "42f4be63-99fc-4be3-b22e-b99abf80322d",
+      "remote_id": "PMT-1FEC8510",
+      "created_at": "2026-03-04T02:07:43.379816Z",
+      "modified_at": "2026-03-04T02:07:43.379817Z",
+      "transaction_date": "2025-11-13",
+      "contact": "58d41ae7-03b8-46e2-a8d2-07f714ec6876",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 800,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "f6add05e-37c1-4911-9840-4ee08cd2ca81",
+          "remote_id": "PMLN-C0B4DE5E",
+          "applied_amount": 800,
+          "applied_date": "2025-11-13",
+          "related_object_id": "546ebb2d-0014-4eb1-824a-c9b659162594",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "36829690-8961-4c91-b355-ddf258a976e2",
+      "remote_id": "PMT-2A0EDFB6",
+      "created_at": "2026-03-04T02:07:43.379847Z",
+      "modified_at": "2026-03-04T02:07:43.379848Z",
+      "transaction_date": "2025-11-12",
+      "contact": "8e9eaca9-e9be-497d-97ef-90af7b218b86",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1765.3,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "e4f2b10b-faad-458c-b5a5-19af4071ea19",
+          "remote_id": "PMLN-886077A9",
+          "applied_amount": 1765.3,
+          "applied_date": "2025-11-12",
+          "related_object_id": "90ad43a4-ffbf-452c-974c-687a6527d667",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "2ee84b72-af8a-416a-98f3-a7cde4d01926",
+      "remote_id": "PMT-BBDE59C0",
+      "created_at": "2026-03-04T02:07:43.379882Z",
+      "modified_at": "2026-03-04T02:07:43.379884Z",
+      "transaction_date": "2025-11-08",
+      "contact": "f53db716-9bda-4edf-be9b-1a104e839468",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 661.16,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "eb02d0a8-1056-416c-a493-9da15f7ce9ff",
+          "remote_id": "PMLN-16E5FF2F",
+          "applied_amount": 661.16,
+          "applied_date": "2025-11-08",
+          "related_object_id": "eb8a1a23-a7be-4999-8163-1177bfd30751",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "11108ba9-c677-4620-a99e-31bcbd04efb4",
+      "remote_id": "PMT-FD8AA64A",
+      "created_at": "2026-03-04T02:07:43.379913Z",
+      "modified_at": "2026-03-04T02:07:43.379914Z",
+      "transaction_date": "2025-12-02",
+      "contact": "654f27ef-9270-41fe-b305-16a514e005b9",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "e83c478e-9aff-4514-9789-c0a549c0d5cf",
+          "remote_id": "PMLN-2D4AB674",
+          "applied_amount": 3500,
+          "applied_date": "2025-12-02",
+          "related_object_id": "d3dfec64-a819-4e98-94b8-76237ebb3137",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "56e7095c-b481-41fb-aa65-6eee731b54e8",
+      "remote_id": "PMT-C8A99DAE",
+      "created_at": "2026-03-04T02:07:43.379957Z",
+      "modified_at": "2026-03-04T02:07:43.379959Z",
+      "transaction_date": "2025-12-21",
+      "contact": "065bac99-7a9a-4ee5-b25e-22bd77ef8c69",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "a673f233-66ad-4d3b-82e2-6fcbd0b13a83",
+          "remote_id": "PMLN-D4207E1F",
+          "applied_amount": 1500,
+          "applied_date": "2025-12-21",
+          "related_object_id": "90ee8c18-478e-4685-8e6f-bf3952cb0271",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "0de85baa-4840-487c-b0ab-74930db2c946",
+      "remote_id": "PMT-56B724CD",
+      "created_at": "2026-03-04T02:07:43.379989Z",
+      "modified_at": "2026-03-04T02:07:43.379991Z",
+      "transaction_date": "2025-12-27",
+      "contact": "58d41ae7-03b8-46e2-a8d2-07f714ec6876",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 800,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "7ec61c0b-20c4-4d52-9685-763c26e93fca",
+          "remote_id": "PMLN-8493EB86",
+          "applied_amount": 800,
+          "applied_date": "2025-12-27",
+          "related_object_id": "ec27885c-e9a8-44ea-8ba1-8412855971e2",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "eae76b9f-7915-4b5d-adf8-205480834ba1",
+      "remote_id": "PMT-3F626398",
+      "created_at": "2026-03-04T02:07:43.380021Z",
+      "modified_at": "2026-03-04T02:07:43.380022Z",
+      "transaction_date": "2025-12-15",
+      "contact": "8e9eaca9-e9be-497d-97ef-90af7b218b86",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1168.53,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "804936fe-6c6c-424d-a1bf-5523418a18a1",
+          "remote_id": "PMLN-3BDC18C2",
+          "applied_amount": 1168.53,
+          "applied_date": "2025-12-15",
+          "related_object_id": "819a4f22-74b6-47e1-a2a6-cac81284f836",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "a3811f02-1358-46f9-8b42-e30b9106b3a4",
+      "remote_id": "PMT-9C7ECCD5",
+      "created_at": "2026-03-04T02:07:43.380051Z",
+      "modified_at": "2026-03-04T02:07:43.380053Z",
+      "transaction_date": "2025-12-22",
+      "contact": "f53db716-9bda-4edf-be9b-1a104e839468",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1118.45,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "1de6fa14-3221-4718-9e54-b1ae1d1990fc",
+          "remote_id": "PMLN-7A84F4CD",
+          "applied_amount": 1118.45,
+          "applied_date": "2025-12-22",
+          "related_object_id": "920ee5f2-b9b6-4b99-bc3b-b738c517765b",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "807be7ae-ab76-4152-8d2c-9e1d6d7daf6a",
+      "remote_id": "PMT-B4A8F614",
+      "created_at": "2026-03-04T02:07:43.380095Z",
+      "modified_at": "2026-03-04T02:07:43.380098Z",
+      "transaction_date": "2026-01-01",
+      "contact": "654f27ef-9270-41fe-b305-16a514e005b9",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "f0a0c8e7-deb7-4450-aab4-b932c92eae1d",
+          "remote_id": "PMLN-5153D31C",
+          "applied_amount": 3500,
+          "applied_date": "2026-01-01",
+          "related_object_id": "c1744c43-8e71-423b-8153-d2264708989f",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "5c549484-04a3-42c1-a4a3-79d400fc1593",
+      "remote_id": "PMT-FE4FD347",
+      "created_at": "2026-03-04T02:07:43.380132Z",
+      "modified_at": "2026-03-04T02:07:43.380133Z",
+      "transaction_date": "2026-01-10",
+      "contact": "065bac99-7a9a-4ee5-b25e-22bd77ef8c69",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 1500,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "658936db-0a85-4302-95b9-82e57965f3ce",
+          "remote_id": "PMLN-4B848CAB",
+          "applied_amount": 1500,
+          "applied_date": "2026-01-10",
+          "related_object_id": "df598a68-2097-401b-a6e0-69ebf705ca2d",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "e10a1a7c-5d86-4a43-af28-3e2759360ca0",
+      "remote_id": "PMT-6FA07F68",
+      "created_at": "2026-03-04T02:07:43.380168Z",
+      "modified_at": "2026-03-04T02:07:43.380171Z",
+      "transaction_date": "2026-01-02",
+      "contact": "58d41ae7-03b8-46e2-a8d2-07f714ec6876",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 800,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "172e2f90-9cac-4bcb-b66b-c96705c26500",
+          "remote_id": "PMLN-09414C3D",
+          "applied_amount": 800,
+          "applied_date": "2026-01-02",
+          "related_object_id": "a24358fb-b1de-4a0e-b660-4e8cbdf0989d",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "4ec47e8a-82d6-428a-aee3-ca86dfc2c70a",
+      "remote_id": "PMT-4BA2C786",
+      "created_at": "2026-03-04T02:07:43.380215Z",
+      "modified_at": "2026-03-04T02:07:43.380217Z",
+      "transaction_date": "2026-01-08",
+      "contact": "8e9eaca9-e9be-497d-97ef-90af7b218b86",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 2085.31,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "a9aae479-a74a-4155-acee-e0e614ab4c76",
+          "remote_id": "PMLN-8DE56854",
+          "applied_amount": 2085.31,
+          "applied_date": "2026-01-08",
+          "related_object_id": "b1f3cbe4-de3a-462f-b115-dff4082e6bf1",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "66b05153-1752-42ea-83fd-b9579d37b4c5",
+      "remote_id": "PMT-4FC20257",
+      "created_at": "2026-03-04T02:07:43.380258Z",
+      "modified_at": "2026-03-04T02:07:43.380261Z",
+      "transaction_date": "2026-01-19",
+      "contact": "f53db716-9bda-4edf-be9b-1a104e839468",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 458.51,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "418659d0-c97d-49d3-b20a-9f3ce0db17a3",
+          "remote_id": "PMLN-272C333B",
+          "applied_amount": 458.51,
+          "applied_date": "2026-01-19",
+          "related_object_id": "53825817-a702-4bfd-a012-687e627966c0",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "427cbfb7-36d7-4466-8b9b-037f3cbf71c0",
+      "remote_id": "PMT-DFFBB778",
+      "created_at": "2026-03-04T02:07:43.380303Z",
+      "modified_at": "2026-03-04T02:07:43.380305Z",
+      "transaction_date": "2025-09-21",
+      "contact": "654f27ef-9270-41fe-b305-16a514e005b9",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 3500.0,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "470fdb5d-30df-4e7e-876f-3fadbfdacd3e",
+          "remote_id": "PMLN-5CE419C5",
+          "applied_amount": 3500.0,
+          "applied_date": "2025-09-21",
+          "related_object_id": "b6968a80-28c6-4ee6-a67b-d9d1039cdf05",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    },
+    {
+      "id": "a391b855-5971-42b2-b10c-51f8b1b6e4d7",
+      "remote_id": "PMT-BFE093AB",
+      "created_at": "2026-03-04T02:07:43.380347Z",
+      "modified_at": "2026-03-04T02:07:43.380350Z",
+      "transaction_date": "2025-12-22",
+      "contact": "ef1ba464-d759-45ef-964c-cb41dd43e16c",
+      "account": "6e936236-255d-450a-bf4f-f5acbac6dcd7",
+      "total_amount": 25000.0,
+      "currency": "USD",
+      "company": "5880fa9d-d0bc-4739-b343-6bfcefcc67c2",
+      "applied_to_lines": [
+        {
+          "id": "8b522032-c858-4284-a499-8ce9213d85b9",
+          "remote_id": "PMLN-80343E61",
+          "applied_amount": 25000.0,
+          "applied_date": "2025-12-22",
+          "related_object_id": "2f342e99-2d90-40c3-9b7b-6ab2ff0490fe",
+          "related_object_type": "INVOICE"
+        }
+      ],
+      "remote_was_deleted": false
+    }
+  ]
+}

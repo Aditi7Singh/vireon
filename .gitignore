@@ -1,0 +1,44 @@
+.env
+.env.local
+backend/.env
+backend/.env.local
+
+# AWS deployment secrets - never commit real values
+scripts/aws/config.bat
+frontend/.env.production
+
+# OS artifacts
+.DS_Store
+
+# Local Python environments
+backend/.venv/
+.venv/
+
+# Python cache artifacts
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Local SQLite and scheduler artifacts
+backend/*.db
+backend/celerybeat-schedule
+backend/celerybeat-schedule.db
+
+# Local runtime artifacts
+*.log
+*.db
+
+# Frontend local build/test artifacts
+frontend/node_modules/
+frontend/.next/
+frontend/playwright-report/
+frontend/test-results/
+
+# Terraform
+infra/terraform/.terraform/
+infra/terraform/*.tfstate
+infra/terraform/*.tfstate.backup
+infra/terraform/*.tfvars
+infra/terraform/.terraform.lock.hcl

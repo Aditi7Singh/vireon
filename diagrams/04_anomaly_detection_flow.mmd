@@ -1,0 +1,54 @@
+flowchart TD
+    Start["🚨 Trigger Anomaly Scan<br/>POST /alerts/scan-now<br/>OR Celery Beat Hourly"] --> LoadGL["Load GL Transactions<br/>90-day lookback<br/>FROM Expense table"]
+    
+    LoadGL --> GroupBy["Group by Category<br/>Salaries | Cloud | Travel<br/>Meals | Misc | etc."]
+    
+    GroupBy --> Baseline["Calculate Baselines<br/>baseline_avg = MEAN<br/>baseline_std = STD"]
+    
+    Baseline --> DetectAnom["Detect Anomalies<br/>Per Transaction:"]
+    
+    DetectAnom --> ThresholdCheck{Compare:<br/>amount vs<br/>baseline × threshold?}
+    
+    ThresholdCheck -->|amount > avg × 1.5| CRITICAL["⚠️ CRITICAL SPIKE<br/>Severity: CRITICAL<br/>Runway Impact: HIGH<br/>> 50% above baseline"]
+    
+    ThresholdCheck -->|amount > avg × 1.15| WARNING["⚠️ WARNING SPIKE<br/>Severity: WARNING<br/>Runway Impact: LOW<br/>15-50% above baseline"]
+    
+    ThresholdCheck -->|amount < avg × 1.15| NORMAL["✓ NORMAL<br/>No alert needed"]
+    
+    CRITICAL --> Generate["Generate Alert<br/>alert_id, company_id<br/>severity, type, description<br/>expected_value, actual_value<br/>delta_pct, status=open"]
+    
+    WARNING --> Generate
+    NORMAL --> End1["🔚 Continue to next<br/>transaction"]
+    
+    Generate --> Persist["INSERT INTO anomalies<br/>Persist to Database"]
+    
+    Persist --> Frontend["📱 Frontend Polling<br/>GET /alerts?company_id=..."]
+    
+    Frontend --> Display["Display in AlertList<br/>🔴 Red banner for CRITICAL<br/>🟡 Yellow for WARNING<br/>Show delta_pct, impact"]
+    
+    Display --> Action{"User<br/>Action?"}
+    
+    Action -->|View Details| Drill["Drill-down: Show all<br/>related transactions"]
+    
+    Action -->|Dismiss| Dismiss["PATCH /alerts/{id}/dismiss<br/>status = dismissed<br/>Alert no longer shown"]
+    
+    Action -->|No Action| Monitor["Continue monitoring..."]
+    
+    Drill --> End2["🔚"]
+    Dismiss --> End3["🔚"]
+    Monitor --> End4["🔚"]
+    End1 --> End5["🔚"]
+    
+    style Start fill:#ff6b6b
+    style CRITICAL fill:#ff6b6b
+    style WARNING fill:#ffd93d
+    style NORMAL fill:#6bcf7f
+    style Generate fill:#ff9999
+    style Persist fill:#ffcc99
+    style Frontend fill:#fff3e0
+    style Display fill:#fff3e0
+    style Action fill:#e1f5ff
+    style End2 fill:#f1f8e9
+    style End3 fill:#f1f8e9
+    style End4 fill:#f1f8e9
+    style End5 fill:#f1f8e9

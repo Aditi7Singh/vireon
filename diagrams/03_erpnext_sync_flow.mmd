@@ -1,0 +1,64 @@
+sequenceDiagram
+    participant Schedule as ⏰ Scheduler
+    participant Tasks as 🔄 Celery Task
+    participant ERP as 🔗 ERPNextClient
+    participant ERPNext as 📊 ERPNext API
+    participant DB as 💾 Database
+
+    Schedule->>Tasks: Trigger sync (daily 2 AM)
+    activate Tasks
+    
+    Tasks->>ERP: Check circuit breaker
+    activate ERP
+    ERP-->>ERP: Is circuit open? NO
+    
+    Tasks->>ERPNext: GET /api/resource/Sales Invoice
+    activate ERPNext
+    ERPNext-->>ERP: [{name, customer, amount, taxes, date}]
+    deactivate ERPNext
+    ERP-->>Tasks: Cache (5 min TTL)
+    
+    Tasks->>ERPNext: GET /api/resource/Purchase Invoice
+    activate ERPNext
+    ERPNext-->>ERP: [{name, supplier, amount, taxes, date}]
+    deactivate ERPNext
+    
+    Tasks->>ERPNext: GET /api/resource/Payment Entry
+    activate ERPNext
+    ERPNext-->>ERP: [{type, amount, account, date}]
+    deactivate ERPNext
+    
+    Tasks->>ERPNext: GET /api/resource/GL Entry
+    activate ERPNext
+    ERPNext-->>ERP: [{account, debit, credit, date}]
+    deactivate ERPNext
+    
+    ERP-->>Tasks: All data fetched
+    deactivate ERP
+    
+    Tasks->>Tasks: Transform & validate
+    Tasks->>Tasks: Map ERPNext → Vireon fields
+    Tasks->>Tasks: Calculate derived metrics
+    
+    Tasks->>DB: INSERT/UPDATE accounts
+    Tasks->>DB: INSERT/UPDATE contacts
+    Tasks->>DB: INSERT/UPDATE invoices
+    Tasks->>DB: INSERT/UPDATE expenses
+    
+    Tasks->>DB: Calculate MonthlyMetric snapshot
+    DB->>DB: metric_month = 2024-03-01
+    DB->>DB: revenue = SUM(invoices)
+    DB->>DB: expenses = SUM(expenses)
+    DB->>DB: burn_rate = expenses
+    DB->>DB: runway_months = cash / burn_rate
+    
+    Tasks->>DB: INSERT INTO monthly_metrics
+    
+    DB-->>Tasks: ✓ Sync complete
+    deactivate Tasks
+
+    style Schedule fill:#fff8e1
+    style Tasks fill:#fff3e0
+    style ERP fill:#e0f2f1
+    style ERPNext fill:#ffe0b2
+    style DB fill:#fce4ec

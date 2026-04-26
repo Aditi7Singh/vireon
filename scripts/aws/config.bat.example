@@ -1,0 +1,54 @@
+@echo off
+REM ============================================================
+REM config.bat.example
+REM Copy this to config.bat and fill in your real values.
+REM config.bat is gitignored and should NEVER be committed.
+REM ============================================================
+
+REM ── AWS Settings ─────────────────────────────────────────────
+set AWS_REGION=ap-south-1
+
+REM ── ECR Repository Names ─────────────────────────────────────
+set ECR_REPO_BACKEND=vireon-backend
+set ECR_REPO_WORKER=vireon-worker
+
+REM ── App Runner ───────────────────────────────────────────────
+set APPRUNNER_SERVICE_NAME=vireon-backend
+
+REM ── ECS Fargate (Workers) ────────────────────────────────────
+set ECS_CLUSTER_NAME=vireon-workers
+
+REM ── RDS PostgreSQL ───────────────────────────────────────────
+set RDS_IDENTIFIER=vireon-postgres
+set DB_NAME=vireon
+set DB_USER=vireon
+set DB_PASSWORD=CHANGE_ME_STRONG_PASSWORD
+
+REM ── ElastiCache Redis ────────────────────────────────────────
+set REDIS_CLUSTER_ID=vireon-redis
+
+REM ── S3 Bucket (must be globally unique) ──────────────────────
+set S3_BUCKET=vireon-documents-CHANGE_ME
+
+REM ── Application Secrets ──────────────────────────────────────
+set GROQ_API_KEY=CHANGE_ME
+set APP_SECRET_KEY=CHANGE_ME_LONG_RANDOM_STRING
+set MERGE_API_KEY=
+set COMPANY_NAME=SeedlingLabs
+
+REM ── CORS ─────────────────────────────────────────────────────
+set ALLOWED_ORIGINS=http://localhost:3000
+
+REM ── Validate required fields ─────────────────────────────────
+if "%DB_PASSWORD%"=="CHANGE_ME_STRONG_PASSWORD" (
+    echo [ERROR] Please edit scripts\aws\config.bat and set DB_PASSWORD
+    exit /b 1
+)
+if "%S3_BUCKET%"=="vireon-documents-CHANGE_ME" (
+    echo [ERROR] Please edit scripts\aws\config.bat and set a unique S3_BUCKET name
+    exit /b 1
+)
+if "%GROQ_API_KEY%"=="CHANGE_ME" (
+    echo [ERROR] Please edit scripts\aws\config.bat and set GROQ_API_KEY
+    exit /b 1
+)

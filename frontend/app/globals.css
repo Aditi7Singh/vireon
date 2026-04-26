@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 35 45% 95%;
+    --foreground: 24 22% 13%;
+    --card: 38 50% 98%;
+    --card-foreground: 24 22% 13%;
+    --popover: 38 50% 98%;
+    --popover-foreground: 24 22% 13%;
+    --primary: 24 60% 41%;
+    --primary-foreground: 35 60% 97%;
+    --secondary: 34 35% 90%;
+    --secondary-foreground: 24 22% 18%;
+    --muted: 34 35% 92%;
+    --muted-foreground: 30 15% 38%;
+    --accent: 28 45% 88%;
+    --accent-foreground: 24 22% 18%;
+    --destructive: 0 70% 48%;
+    --destructive-foreground: 35 60% 97%;
+    --border: 31 28% 82%;
+    --input: 31 28% 82%;
+    --ring: 24 60% 41%;
+    --radius: 1rem;
+    --chart-1: 24 60% 41%;
+    --chart-2: 15 58% 49%;
+    --chart-3: 41 80% 47%;
+    --chart-4: 142 34% 39%;
+    --chart-5: 210 25% 45%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground selection:bg-amber-500/25 font-sans antialiased overflow-x-hidden;
+    background-image:
+      radial-gradient(at 8% 0%, rgba(212, 149, 94, 0.12) 0px, transparent 52%),
+      radial-gradient(at 100% 0%, rgba(240, 212, 180, 0.22) 0px, transparent 55%);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    @apply bg-white/75 backdrop-blur-xl border border-[#e6d8c7] shadow-lg;
+  }
+
+  .glass-card-hover {
+    @apply hover:bg-white hover:border-[#cfb496] transition-all duration-300;
+  }
+
+  /* Professional Button Affordance */
+  .btn-primary {
+    @apply bg-[#9a5d34] text-white font-bold py-2 px-4 rounded-lg transition-all active:scale-95 hover:bg-[#7f4c2a] disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-secondary {
+    @apply bg-[#fff9f2] text-[#3c2f24] font-bold py-2 px-4 rounded-lg border border-[#e1d2c1] transition-all active:scale-95 hover:bg-white hover:text-[#2f241b];
+  }
+
+  .text-glow-indigo {
+    text-shadow: 0 0 8px rgba(56, 189, 248, 0.2);
+  }
+
+  .text-glow-emerald {
+    text-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-[#d1bea8] rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-[#bda689];
+}

@@ -1,0 +1,93 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: vireon
+      POSTGRES_USER: vireon
+      POSTGRES_PASSWORD: vireon123
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    environment:
+      - MH_MAILDIR_PATH=/maildir
+      - MH_STORAGE=maildir
+
+  backend:
+    build: 
+      context: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - BACKEND_URL=http://backend:8000
+      - USE_LOCAL_LLM=false
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - redis
+      - postgres
+      - mailhog
+
+  worker:
+    build: 
+      context: ./backend
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - BACKEND_URL=http://backend:8000
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+    command: celery -A anomaly.celery_app worker -l info
+    depends_on:
+      - redis
+      - postgres
+      - mailhog
+
+  beat:
+    build: 
+      context: ./backend
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - BACKEND_URL=http://backend:8000
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+    command: celery -A anomaly.celery_app beat -l info
+    depends_on:
+      - redis
+      - postgres
+      - mailhog
+
+  frontend:
+    build: 
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

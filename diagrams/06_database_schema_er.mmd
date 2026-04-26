@@ -1,0 +1,135 @@
+erDiagram
+    COMPANIES {
+        uuid id PK
+        string name UK
+        string stage
+        numeric initial_cash
+        date founding_date
+    }
+    
+    ACCOUNTS {
+        uuid id PK
+        string remote_id UK
+        uuid company_id FK
+        string name
+        string classification
+        numeric current_balance
+    }
+    
+    CONTACTS {
+        uuid id PK
+        string remote_id UK
+        uuid company_id FK
+        string name
+        string type
+        string email
+        string tax_number
+    }
+    
+    INVOICES {
+        uuid id PK
+        string remote_id UK
+        uuid company_id FK
+        uuid contact_id FK
+        string invoice_number
+        date issue_date
+        numeric total_amount
+        numeric tax_amount
+        string status
+        string type
+    }
+    
+    EXPENSES {
+        uuid id PK
+        string remote_id UK
+        uuid company_id FK
+        uuid account_id FK
+        uuid contact_id FK
+        date transaction_date
+        numeric total_amount
+        string category
+        numeric tax_amount
+    }
+    
+    MONTHLY_METRICS {
+        uuid id PK
+        uuid company_id FK
+        date metric_month UK
+        numeric total_revenue
+        numeric total_expenses
+        numeric burn_rate
+        numeric runway_months
+        numeric ending_cash
+    }
+    
+    ANOMALIES {
+        uuid id PK
+        uuid company_id FK
+        date anomaly_date
+        string severity
+        string type
+        text description
+        numeric expected_value
+        numeric actual_value
+        string status
+    }
+    
+    BUDGETS {
+        uuid id PK
+        uuid company_id FK
+        date period_start
+        date period_end
+    }
+    
+    BUDGET_LINES {
+        uuid id PK
+        uuid budget_id FK
+        string category
+        numeric budgeted_amount
+        numeric actual_amount
+    }
+    
+    FORECASTS {
+        uuid id PK
+        uuid company_id FK
+        date forecast_month
+        numeric forecast_cash
+        numeric forecast_revenue
+        numeric confidence_interval
+    }
+    
+    USERS {
+        uuid id PK
+        string username UK
+        string email UK
+        string password_hash
+        string role
+        boolean is_active
+    }
+    
+    CHAT_SESSIONS {
+        string session_id PK
+        uuid company_id FK
+        uuid user_id FK
+        jsonb messages
+        timestamp last_message_at
+    }
+    
+    COMPANIES ||--o{ ACCOUNTS : "has"
+    COMPANIES ||--o{ CONTACTS : "has"
+    COMPANIES ||--o{ INVOICES : "has"
+    COMPANIES ||--o{ EXPENSES : "has"
+    COMPANIES ||--o{ MONTHLY_METRICS : "generates"
+    COMPANIES ||--o{ ANOMALIES : "triggers"
+    COMPANIES ||--o{ BUDGETS : "tracks"
+    COMPANIES ||--o{ FORECASTS : "produces"
+    COMPANIES ||--o{ CHAT_SESSIONS : "owns"
+    
+    CONTACTS ||--o{ INVOICES : "appears on"
+    CONTACTS ||--o{ EXPENSES : "paid to"
+    
+    ACCOUNTS ||--o{ EXPENSES : "categorizes"
+    
+    BUDGETS ||--o{ BUDGET_LINES : "contains"
+    
+    USERS ||--o{ CHAT_SESSIONS : "starts"

@@ -1,0 +1,303 @@
+{
+  "companies": [
+    {
+      "id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "name": "SeedlingLabs",
+      "initial_cash": 1000000.0,
+      "stage": "series_a"
+    }
+  ],
+  "invoices": [
+    {
+      "id": "195e62e3-17de-4a1e-8093-96f0cd86e564",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "invoice_number": "INV-202401-0001",
+      "issue_date": "2024-01-01T00:00:00",
+      "total_amount": 9000.0,
+      "status": "paid"
+    },
+    {
+      "id": "e12ab04b-fd2a-4933-ab53-44d89b063d21",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "invoice_number": "INV-202401-0002",
+      "issue_date": "2024-01-01T00:00:00",
+      "total_amount": 9000.0,
+      "status": "paid"
+    },
+    {
+      "id": "4143c926-5609-4566-be8f-d406c1f74045",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "invoice_number": "INV-202401-0003",
+      "issue_date": "2024-01-01T00:00:00",
+      "total_amount": 9000.0,
+      "status": "paid"
+    },
+    {
+      "id": "5a566014-7892-4e80-88f0-da7b2a60f364",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "invoice_number": "INV-202401-0004",
+      "issue_date": "2024-01-01T00:00:00",
+      "total_amount": 9000.0,
+      "status": "paid"
+    },
+    {
+      "id": "a0766086-1bd9-43c9-9263-954391c1baff",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "invoice_number": "INV-202401-0005",
+      "issue_date": "2024-01-01T00:00:00",
+      "total_amount": 9000.0,
+      "status": "paid"
+    },
+    {
+      "id": "7d68679b-6e96-4d9c-8756-1a794f3c109c",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "invoice_number": "INV-202401-0001",
+      "issue_date": "2024-01-31T00:00:00",
+      "total_amount": 9000.0,
+      "status": "paid"
+    },
+    {
+      "id": "3ab48d31-0dfd-472c-be14-3f22a6fd32c0",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "invoice_number": "INV-202401-0002",
+      "issue_date": "2024-01-31T00:00:00",
+      "total_amount": 9000.0,
+      "status": "paid"
+    },
+    {
+      "id": "e1d7f43f-80ea-49d0-9d13-df9e3fa3a54c",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "invoice_number": "INV-202401-0003",
+      "issue_date": "2024-01-31T00:00:00",
+      "total_amount": 9000.0,
+      "status": "paid"
+    },
+    {
+      "id": "ee7e35a6-cb24-4669-bf5d-553c1fd3c8a5",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "invoice_number": "INV-202401-0004",
+      "issue_date": "2024-01-31T00:00:00",
+      "total_amount": 9000.0,
+      "status": "paid"
+    },
+    {
+      "id": "0548fd74-adc9-4fe5-be22-bea79e94e8eb",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "invoice_number": "INV-202401-0005",
+      "issue_date": "2024-01-31T00:00:00",
+      "total_amount": 9000.0,
+      "status": "paid"
+    },
+    {
+      "id": "4b92006e-e02e-4657-b420-472984d8a34b",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "invoice_number": "INV-202403-0001",
+      "issue_date": "2024-03-01T00:00:00",
+      "total_amount": 9000.0,
+      "status": "paid"
+    },
+    {
+      "id": "e55ac650-26db-4d95-8ca5-57be5f74d225",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "invoice_number": "INV-202403-0002",
+      "issue_date": "2024-03-01T00:00:00",
+      "total_amount": 9000.0,
+      "status": "paid"
+    },
+    {
+      "id": "12ebab16-0ed8-47d0-96c3-786273aa82e9",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "invoice_number": "INV-202403-0003",
+      "issue_date": "2024-03-01T00:00:00",
+      "total_amount": 9000.0,
+      "status": "paid"
+    },
+    {
+      "id": "08c525c5-05c3-44b6-b7af-401a3c178615",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "invoice_number": "INV-202403-0004",
+      "issue_date": "2024-03-01T00:00:00",
+      "total_amount": 9000.0,
+      "status": "paid"
+    },
+    {
+      "id": "2073fd2d-99ac-448a-9624-15dfd253c773",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "invoice_number": "INV-202403-0005",
+      "issue_date": "2024-03-01T00:00:00",
+      "total_amount": 9000.0,
+      "status": "paid"
+    }
+  ],
+  "expenses": [
+    {
+      "id": "af8953ec-a4b1-4622-84e8-414c4c3d9ac8",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-01-01T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Cloud"
+    },
+    {
+      "id": "c13a900d-8f59-41bd-b3ee-1ad08cf3478b",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-01-01T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Software"
+    },
+    {
+      "id": "f98eaaf5-c983-4f49-95c7-31cfcb715f22",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-01-01T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Marketing"
+    },
+    {
+      "id": "17958c0d-60b5-40e2-ac1b-3a5df982c620",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-01-01T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Cloud"
+    },
+    {
+      "id": "908dc484-5c9c-490c-b7fd-8ecb7772c8cc",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-01-01T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Software"
+    },
+    {
+      "id": "c3e28a36-0e39-4ae5-b9bf-79c6a3d2ba77",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-01-01T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Payroll"
+    },
+    {
+      "id": "d595a036-185b-4908-a6c0-8c53bfb9180e",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-01-01T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Payroll"
+    },
+    {
+      "id": "e0cdf5ea-29b4-4506-9225-0895ddc5574b",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-01-01T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Marketing"
+    },
+    {
+      "id": "1e4429cc-bbc2-4a26-a956-ab53b53286cc",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-01-31T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Payroll"
+    },
+    {
+      "id": "d5fb68d0-6da7-4f19-9e9d-2fd57f59d702",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-01-31T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Software"
+    },
+    {
+      "id": "3d1d61b5-7f0d-4981-898c-7cfbe84bdaaa",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-01-31T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Payroll"
+    },
+    {
+      "id": "cac6d1c4-e3d9-48ca-87f0-5fbf8d50f741",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-01-31T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Cloud"
+    },
+    {
+      "id": "27592a67-c02d-4f70-b018-42955b35a169",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-01-31T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Payroll"
+    },
+    {
+      "id": "23e8e400-45d4-40db-877b-9e83beb9ffda",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-01-31T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Marketing"
+    },
+    {
+      "id": "16f2ec53-f77e-4bd6-be01-1cd66911fcac",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-01-31T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Marketing"
+    },
+    {
+      "id": "f15a4799-9bff-4b65-a68d-ebd4a6923198",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-01-31T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Cloud"
+    },
+    {
+      "id": "5f8026e7-58b1-4cc0-a26a-dd7aed1c54c1",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-03-01T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Payroll"
+    },
+    {
+      "id": "bda475ce-8f21-42cc-914d-a3e183648b94",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-03-01T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Cloud"
+    },
+    {
+      "id": "8e0a3724-e693-4bb5-874e-e58afa5abf13",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-03-01T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Marketing"
+    },
+    {
+      "id": "1017e948-2862-4f1f-90ae-974e552c11de",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-03-01T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Payroll"
+    },
+    {
+      "id": "24c6904e-d17c-4a7b-baad-bba2652fb097",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-03-01T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Marketing"
+    },
+    {
+      "id": "0cfc0ec1-3c40-4f9a-bb88-039cfcce1489",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-03-01T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Marketing"
+    },
+    {
+      "id": "5c9e8404-1137-4c31-b41d-52abf0adb215",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-03-01T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Software"
+    },
+    {
+      "id": "ec42d821-cb01-47d6-8f40-fd7700adc4ff",
+      "company_id": "f3610fd3-9cb3-4bb1-b62a-2137814ad8a8",
+      "transaction_date": "2024-03-01T00:00:00",
+      "total_amount": 10000.0,
+      "category": "Software"
+    }
+  ],
+  "monthly_metrics": []
+}

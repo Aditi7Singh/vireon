@@ -1,0 +1,21 @@
+# Agent Dependencies
+# =================
+# LangGraph Agent with Groq/Ollama support
+# Install with: pip install -r requirements_agent.txt
+
+langgraph==0.2.55
+langgraph-checkpoint-sqlite==2.0.1
+langchain==0.3.7
+langchain-core==0.3.29
+langchain-community==0.3.7
+langchain-groq==0.2.3
+langchain-ollama==0.2.1
+langchain-openai==0.2.14
+
+# HTTP client
+httpx==0.27.0
+
+# Environment variables
+python-dotenv==1.0.1
+
+# Note: sqlite3 is built-in for checkpointer

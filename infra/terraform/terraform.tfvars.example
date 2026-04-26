@@ -1,0 +1,32 @@
+# Copy this to terraform.tfvars and fill in your values
+# NEVER commit terraform.tfvars to git
+
+aws_region   = "us-east-1"
+project_name = "vireon"
+environment  = "prod"
+
+# Instance sizing (scale up as needed)
+db_instance_class = "db.t3.micro"   # db.t3.small for more headroom
+redis_node_type   = "cache.t3.micro"
+
+backend_cpu    = 512
+backend_memory = 1024
+frontend_cpu   = 256
+frontend_memory = 512
+worker_cpu     = 256
+worker_memory  = 512
+
+# Required secrets
+secret_key   = "CHANGE_ME_use_openssl_rand_hex_32"
+groq_api_key = "gsk_..."
+
+# Optional integrations
+merge_api_key    = ""
+merge_secret_key = ""
+
+# Custom domain (leave empty to use ALB DNS name)
+domain_name         = ""
+acm_certificate_arn = ""
+# Example with domain:
+# domain_name         = "app.yourdomain.com"
+# acm_certificate_arn = "arn:aws:acm:us-east-1:123456789:certificate/abc-123"

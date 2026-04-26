@@ -1,0 +1,49 @@
+graph TD
+    Input["📊 INPUT PARAMETERS<br/>Current State:<br/>Cash: $2M<br/>Revenue: $500k/month<br/>Expenses: $600k/month<br/>Runway: 20 months"]
+    
+    Input -->|Branch 1| Hire["👥 Scenario: Hire 5 Engineers<br/>Salary: $120k/year each<br/>Additional burn: $50k/month"]
+    
+    Input -->|Branch 2| Revenue["📈 Scenario: +25% Revenue Growth<br/>New revenue: $625k/month<br/>Expenses: unchanged $600k"]
+    
+    Input -->|Branch 3| CostCut["💰 Scenario: Cut $100k/month<br/>Negotiate vendor rates<br/>Shut down office"]
+    
+    Hire --> HireCalc["CALC: Net Burn<br/>New = $600k + $50k - $500k<br/>= $150k/month"]
+    
+    Revenue --> RevCalc["CALC: Net Burn<br/>New = $600k - $625k<br/>= -$25k/month PROFIT!"]
+    
+    CostCut --> CostCalc["CALC: Net Burn<br/>New = $500k - $500k<br/>= $0 BREAK-EVEN!"]
+    
+    HireCalc --> HireRunway["Runway Calc:<br/>$2M ÷ $150k = 13.3 months<br/>Impact: -6.7 months LOST"]
+    
+    RevCalc --> RevRunway["Runway Calc:<br/>-$25k = NEGATIVE burn<br/>= INFINITE runway<br/>Impact: +13.3 months GAINED"]
+    
+    CostCalc --> CostRunway["Runway Calc:<br/>Break-even point<br/>= INFINITE runway<br/>Impact: +20 months GAINED"]
+    
+    HireRunway --> Output1["❌ SCENARIO RESULT<br/>Hiring reduces runway<br/>Critical ⚠️"]
+    
+    RevRunway --> Output2["✅ SCENARIO RESULT<br/>Revenue growth makes profitable<br/>Recommended ✓"]
+    
+    CostRunway --> Output3["✅ SCENARIO RESULT<br/>Cost cutting achieves profitability<br/>Recommended ✓"]
+    
+    Output1 --> Dashboard["📊 DASHBOARD OUTPUT<br/>Display in Scenarios page<br/>Side-by-side comparison<br/>Show runway impact chart"]
+    
+    Output2 --> Dashboard
+    Output3 --> Dashboard
+    
+    Dashboard --> Agent["🤖 AGENT OUTPUT<br/>Communicate findings in chat<br/>Suggest optimal scenario<br/>Provide recommendations"]
+    
+    style Input fill:#e1f5ff
+    style Hire fill:#fff3e0
+    style Revenue fill:#fff3e0
+    style CostCut fill:#fff3e0
+    style HireCalc fill:#e8f5e9
+    style RevCalc fill:#e8f5e9
+    style CostCalc fill:#e8f5e9
+    style HireRunway fill:#fce4ec
+    style RevRunway fill:#fce4ec
+    style CostRunway fill:#fce4ec
+    style Output1 fill:#ffebee
+    style Output2 fill:#e8f5e9
+    style Output3 fill:#e8f5e9
+    style Dashboard fill:#f1f8e9
+    style Agent fill:#f3e5f5

@@ -1,0 +1,65 @@
+sequenceDiagram
+    participant User as 👤 User
+    participant Frontend as 🎨 Frontend
+    participant API as 🔌 API Gateway
+    participant Classify as 1️⃣ Classify Node
+    participant Agent as 2️⃣ Agent Node
+    participant Tools as 3️⃣ Tools Node
+    participant Analyze as 4️⃣ Analyze Node
+    participant DB as 💾 Database
+
+    User->>Frontend: "What's my runway?"
+    Frontend->>API: POST /agent/chat
+    activate API
+    
+    API->>DB: Fetch company context
+    DB-->>API: {cash, burn_rate, revenue}
+    
+    API->>Classify: Classify query
+    activate Classify
+    Classify-->>Classify: "What's my runway?" → "simple"
+    Classify-->>API: query_type = "simple"
+    deactivate Classify
+    
+    API->>Agent: Select LLM + invoke
+    activate Agent
+    Agent->>Agent: Load Qwen3 (fast model)
+    Agent->>Agent: Build CFO system prompt
+    Agent->>Agent: Bind 10 tools + invoke LLM
+    Agent-->>API: AIMessage + tool_calls
+    deactivate Agent
+    
+    API->>Tools: Execute tools
+    activate Tools
+    
+    Tools->>DB: get_cash_balance()
+    DB-->>Tools: {cash: 2350000}
+    
+    Tools->>DB: get_burn_rate()
+    DB-->>Tools: {burn: 125000, breakdown}
+    
+    Tools->>Tools: get_runway() = 2350000 / 125000
+    Tools-->>Tools: {runway: 18.8 months, zero_date}
+    
+    Tools-->>API: [ToolMessage, ToolMessage, ToolMessage]
+    deactivate Tools
+    
+    API->>Analyze: Check errors
+    activate Analyze
+    Analyze-->>Analyze: error_count < 3 ✓
+    Analyze-->>API: proceed
+    deactivate Analyze
+    
+    API-->>Frontend: {response: "Your runway is 18.8 months...", timestamp}
+    deactivate API
+    
+    Frontend-->>User: Display in ChatDrawer
+
+    style User fill:#e1f5ff
+    style Frontend fill:#fff3e0
+    style API fill:#f3e5f5
+    style Classify fill:#e8f5e9
+    style Agent fill:#e8f5e9
+    style Tools fill:#e8f5e9
+    style Analyze fill:#e8f5e9
+    style DB fill:#fce4ec
