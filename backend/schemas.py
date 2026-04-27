@@ -28,6 +28,7 @@ class LedgerProductTag(str, Enum):
     orchard = "orchard"
     sprouts = "sprouts"
     ai_lab = "ai_lab"
+    vireon_core = "vireon_core"  # Legacy product tag for backwards compatibility.
     shared = "shared"
     unallocated = "unallocated"
 
@@ -41,6 +42,7 @@ class LedgerOfficeTag(str, Enum):
 
 class LedgerSource(str, Enum):
     erpnext = "erpnext"
+    manual = "manual"  # Legacy source kept for backwards compatibility.
     manual_cto = "manual_cto"
     manual_marketing = "manual_marketing"
     manual_finance = "manual_finance"

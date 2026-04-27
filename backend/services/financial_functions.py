@@ -218,7 +218,7 @@ def cash_conversion_cycle(
 def cash_runway_extended(
     current_cash: float,
     monthly_burn: float,
-    monthly_revenue: float,
+    monthly_revenue: float = 0.0,
     monthly_growth_rate: float = 0.0,
 ) -> Dict[str, Union[float, str]]:
     """
@@ -244,7 +244,14 @@ def cash_runway_extended(
     """
     if any(x is None for x in [current_cash, monthly_burn, monthly_revenue]):
         logger.warning("cash_runway_extended: None values detected")
-        return {"runway_months": 0, "profitability_month": None, "peak_cash": current_cash, "peak_cash_month": 0}
+        return {
+            "runway_months": 0,
+            "months_of_runway": 0,
+            "critical_status": True,
+            "profitability_month": None,
+            "peak_cash": current_cash,
+            "peak_cash_month": 0,
+        }
     
     current_cash = max(0, current_cash)
     monthly_burn = max(0, monthly_burn)
@@ -288,6 +295,8 @@ def cash_runway_extended(
     
     result = {
         "runway_months": runway_months,
+        "months_of_runway": runway_months,
+        "critical_status": runway_months < 6,
         "profitability_month": profitability_month,
         "peak_cash": round(peak_cash, 2),
         "peak_cash_month": peak_cash_month,
@@ -527,7 +536,7 @@ def net_profit(
         logger.warning("net_profit: None values detected")
         return 0.0
     
-    operating_profit = max(0, operating_profit)
+    # Allow negative values (losses) for realistic P&L behavior.
     interest_expense = max(0, interest_expense)
     tax_expense = max(0, tax_expense)
     
@@ -593,14 +602,36 @@ def profit_margins(
     """
     if revenue is None:
         logger.warning("profit_margins: Revenue is None")
-        return {"gross_margin": 0.0, "operating_margin": 0.0, "net_margin": 0.0}
+        return {
+            "gross_margin": 0.0,
+            "operating_margin": 0.0,
+            "net_margin": 0.0,
+            "gross_profit_margin": 0.0,
+            "operating_profit_margin": 0.0,
+            "net_profit_margin": 0.0,
+            "gross_margin_pct": 0.0,
+            "operating_margin_pct": 0.0,
+            "net_margin_pct": 0.0,
+        }
     
     revenue = max(0.01, revenue)
-    
+
+    gross_ratio = gross_profit / revenue
+    operating_ratio = operating_profit / revenue
+    net_ratio = net_profit / revenue
+
     margins = {
-        "gross_margin": round((max(0, gross_profit) / revenue) * 100, 2),
-        "operating_margin": round((max(0, operating_profit) / revenue) * 100, 2),
-        "net_margin": round((max(0, net_profit) / revenue) * 100, 2),
+        # Ratio-based fields (0-1) for compatibility with existing tests/callers.
+        "gross_margin": round(gross_ratio, 4),
+        "operating_margin": round(operating_ratio, 4),
+        "net_margin": round(net_ratio, 4),
+        "gross_profit_margin": round(gross_ratio, 4),
+        "operating_profit_margin": round(operating_ratio, 4),
+        "net_profit_margin": round(net_ratio, 4),
+        # Percentage convenience fields retained for UIs/reporting.
+        "gross_margin_pct": round(gross_ratio * 100, 2),
+        "operating_margin_pct": round(operating_ratio * 100, 2),
+        "net_margin_pct": round(net_ratio * 100, 2),
     }
     
     logger.info(f"profit_margins: GM={margins['gross_margin']}%, OM={margins['operating_margin']}%, NM={margins['net_margin']}%")
@@ -644,7 +675,7 @@ def debt_to_equity_ratio(
     de_ratio = total_debt / total_equity
     
     logger.info(f"debt_to_equity_ratio: Debt={total_debt}, Equity={total_equity}, D/E={de_ratio:.2f}")
-    return round(de_ratio, 2)
+    return de_ratio
 
 
 def debt_to_assets_ratio(
@@ -1034,7 +1065,12 @@ def metric_vs_benchmark(
     """
     if actual_value is None or benchmark_value is None:
         logger.warning("metric_vs_benchmark: None values detected")
-        return {"difference": 0, "percent_difference": 0, "status": "Unknown"}
+        return {
+            "difference": 0,
+            "percent_difference": 0,
+            "variance_pct": 0,
+            "status": "Unknown",
+        }
     
     benchmark = max(0.01, benchmark_value)
     
@@ -1052,6 +1088,7 @@ def metric_vs_benchmark(
     result = {
         "difference": round(diff, 2),
         "percent_difference": round(pct_diff, 2),
+        "variance_pct": round(pct_diff, 2),
         "status": status,
     }
     

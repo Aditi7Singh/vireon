@@ -1,11 +1,11 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import {
   Crown, Shield, Bot, TrendingUp, BarChart3, Zap, Lock,
-  CheckCircle2, ArrowRight,
+  CheckCircle2, ArrowRight, LogOut, User, AlertCircle,
 } from "lucide-react";
 
 const DEMO_USERS = [
@@ -51,9 +51,9 @@ const DEMO_USERS = [
 ];
 
 const PLATFORM_STATS = [
-  { icon: BarChart3,  value: "38+",    label: "Finance modules" },
-  { icon: Zap,        value: "100+",   label: "AI agent tools" },
-  { icon: TrendingUp, value: "3",      label: "Active projects" },
+  { icon: BarChart3,   value: "45+",  label: "Finance modules" },
+  { icon: Zap,         value: "100+", label: "AI agent tools" },
+  { icon: TrendingUp,  value: "3",    label: "Active projects" },
   { icon: CheckCircle2,value: "6+",   label: "Compliance regions" },
 ];
 
@@ -64,6 +64,42 @@ export default function LoginPage() {
   const [selectedRole, setSelectedRole] = useState<string>(DEMO_USERS[0].role);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [existingSession, setExistingSession] = useState<{ name: string; role: string; redirectTo: string } | null>(null);
+
+  useEffect(() => {
+    const token = typeof window !== "undefined"
+      ? (localStorage.getItem("access_token") || localStorage.getItem("auth_token"))
+      : null;
+    if (!token) return;
+
+    api.getMe().then((user) => {
+      if (user) {
+        const roleNorm = (user.role || "").toUpperCase();
+        const displayName =
+          user.email === "outlandishaditi11@gmail.com" ? "Aditi Singh" :
+          user.email === "finley@vireon.ai" ? "Finley" :
+          user.username;
+        const redirectTo =
+          roleNorm === "CEO" ? "/dashboard/ceo" :
+          roleNorm === "CFO" ? "/dashboard/finance" :
+          "/dashboard";
+        setExistingSession({ name: displayName, role: roleNorm, redirectTo });
+      }
+    }).catch(() => {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("auth_token");
+    });
+  }, []);
+
+  const handleContinue = () => {
+    if (existingSession) router.replace(existingSession.redirectTo);
+  };
+
+  const handleSignOutAndSwitch = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("auth_token");
+    setExistingSession(null);
+  };
 
   const handleSelect = (user: typeof DEMO_USERS[0]) => {
     setUsernameOrEmail(user.login);
@@ -84,7 +120,7 @@ export default function LoginPage() {
       const selected = DEMO_USERS.find((u) => u.login === usernameOrEmail.trim());
       router.replace(selected?.redirectTo ?? "/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      setError(err instanceof Error ? err.message : "Login failed. Please check your credentials.");
     } finally {
       setLoading(false);
     }
@@ -95,7 +131,6 @@ export default function LoginPage() {
 
       {/* ── Left: Branding Panel ── */}
       <div className="hidden lg:flex flex-col justify-between w-[46%] bg-[#1a1410] px-12 py-10 relative overflow-hidden">
-        {/* Subtle ambient glow */}
         <div className="absolute top-0 left-0 w-80 h-80 bg-[#b45309]/20 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#7c3aed]/15 rounded-full blur-[140px] translate-x-1/3 translate-y-1/3 pointer-events-none" />
 
@@ -120,8 +155,9 @@ export default function LoginPage() {
               <span className="text-[#f59e0b]"> powered by AI.</span>
             </h1>
             <p className="mt-4 text-sm leading-relaxed text-[#c8b89e]">
-              Vireon unifies financial data, AI-driven insights, and autonomous workflows
-              for your CFO, CEO, and finance team — in one platform built for high-growth startups.
+              Vireon unifies financial data, AI-driven insights, and autonomous workflows —
+              from QuickBooks-style accounting to TurboTax compliance, Gusto payroll,
+              and enterprise ERP intelligence in one platform.
             </p>
           </div>
 
@@ -142,9 +178,11 @@ export default function LoginPage() {
           <div className="space-y-2">
             {[
               "Finley · Autonomous AI CFO with 100+ financial tools",
-              "Sprout · Orchard · AI Lab project cost tracking",
-              "India FY budget, GST, TDS & PF compliance",
+              "Bank reconciliation, journal entries & multi-currency",
+              "GST, TDS, income tax & PF/ESI compliance (India)",
+              "Payroll, expense claims & time tracking built-in",
               "Runway forecasting with Monte Carlo simulation",
+              "Invoice management, AR/AP aging & collections AI",
             ].map((f) => (
               <div key={f} className="flex items-start gap-2.5">
                 <CheckCircle2 className="h-3.5 w-3.5 mt-0.5 shrink-0 text-[#f59e0b]" />
@@ -154,14 +192,13 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Bottom tag */}
         <p className="relative z-10 text-[10px] text-[#6b5948]">
           © 2026 Vireon Seeding Lab · Confidential demo environment
         </p>
       </div>
 
       {/* ── Right: Login Panel ── */}
-      <div className="flex flex-1 flex-col justify-center px-6 py-10 sm:px-10 lg:px-16 bg-[#faf7f2]">
+      <div className="flex flex-1 flex-col justify-center px-6 py-10 sm:px-10 lg:px-16 bg-[#faf7f2] overflow-y-auto">
         <div className="mx-auto w-full max-w-md">
 
           {/* Mobile logo */}
@@ -172,13 +209,46 @@ export default function LoginPage() {
             <span className="text-base font-black text-[#1f1a15]">Vireon</span>
           </div>
 
-          <h2 className="text-2xl font-black text-[#1f1a15]">Sign in to Vireon</h2>
+          {/* Existing session banner */}
+          {existingSession && (
+            <div className="mb-6 rounded-2xl border border-[#d9c29a] bg-[#fff9ec] p-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-[#b45309] shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-[#7c3a0f]">Already signed in</p>
+                  <p className="text-xs text-[#8c6a3f] mt-0.5">
+                    You're signed in as <strong>{existingSession.name}</strong> ({existingSession.role})
+                  </p>
+                  <div className="flex gap-2 mt-3">
+                    <button
+                      onClick={handleContinue}
+                      className="flex items-center gap-1.5 rounded-lg bg-[#1f1a15] px-3 py-1.5 text-xs font-bold text-[#fff6ea] hover:bg-[#15110d] transition-all"
+                    >
+                      <User className="h-3.5 w-3.5" />
+                      Continue as {existingSession.name}
+                    </button>
+                    <button
+                      onClick={handleSignOutAndSwitch}
+                      className="flex items-center gap-1.5 rounded-lg border border-[#e5d9c8] bg-white px-3 py-1.5 text-xs font-bold text-[#7a6a57] hover:bg-[#f5f0ea] transition-all"
+                    >
+                      <LogOut className="h-3.5 w-3.5" />
+                      Switch Role
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <h2 className="text-2xl font-black text-[#1f1a15]">
+            {existingSession ? "Sign in as a different role" : "Sign in to Vireon"}
+          </h2>
           <p className="mt-1 text-sm text-[#7a6a57]">Choose a role to explore the platform</p>
 
           {/* Role cards */}
           <div className="mt-6 space-y-3">
             {DEMO_USERS.map((user) => {
-              const Icon     = user.icon;
+              const Icon = user.icon;
               const isActive = selectedRole === user.role;
               return (
                 <button
@@ -195,7 +265,7 @@ export default function LoginPage() {
                   <div className="flex items-start gap-3">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
                       style={{ background: user.color + "20" }}>
-                      <Icon className="h-4.5 w-4.5" style={{ color: user.color }} />
+                      <Icon className="h-4 w-4" style={{ color: user.color }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">

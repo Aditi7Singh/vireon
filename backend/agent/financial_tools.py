@@ -50,10 +50,21 @@ class Tool_CalculateFinancialRatios(FinancialAnalysisTool):
             financial_data: Dict with keys like revenue, net_income, total_assets, etc.
         """
         from backend.services.financial_functions import (
-            current_ratio, quick_ratio, gross_margin, operating_margin,
-            net_margin, debt_to_equity, interest_coverage_ratio,
-            return_on_assets
+            current_ratio,
+            quick_ratio,
+            gross_profit,
+            operating_profit,
+            profit_margins,
+            debt_to_equity_ratio,
+            interest_coverage_ratio,
+            return_on_assets,
         )
+
+        revenue = financial_data.get("revenue", 0)
+        gp = gross_profit(revenue, financial_data.get("cogs", 0))
+        op = operating_profit(gp, financial_data.get("operating_expenses", 0))
+        np = financial_data.get("net_income", 0)
+        margins = profit_margins(revenue, gp, op, np)
         
         return {
             "current_ratio": current_ratio(
@@ -65,18 +76,9 @@ class Tool_CalculateFinancialRatios(FinancialAnalysisTool):
                 financial_data.get("inventory", 0),
                 financial_data.get("current_liabilities", 0)
             ),
-            "gross_margin": gross_margin(
-                financial_data.get("revenue", 0),
-                financial_data.get("cogs", 0)
-            ),
-            "operating_margin": operating_margin(
-                financial_data.get("gross_profit", 0),
-                financial_data.get("operating_expenses", 0)
-            ) / financial_data.get("revenue", 1) if financial_data.get("revenue", 0) > 0 else 0,
-            "net_margin": net_margin(
-                financial_data.get("net_income", 0),
-                financial_data.get("revenue", 0)
-            ),
+            "gross_margin": margins["gross_margin"],
+            "operating_margin": margins["operating_margin"],
+            "net_margin": margins["net_margin"],
             "debt_to_equity": debt_to_equity_ratio(
                 financial_data.get("total_debt", 0),
                 financial_data.get("total_equity", 0)
@@ -1109,6 +1111,72 @@ class Tool_ComprehensiveFinancialReview(FinancialAnalysisTool):
         }
 
 
+class Tool_DuPontDecomposition(FinancialAnalysisTool):
+    """Decompose ROE into core operating drivers"""
+
+    def __init__(self):
+        super().__init__(
+            name="DuPont Decomposition",
+            description="Break down ROE into margin, turnover, and leverage components"
+        )
+
+    def execute(self, net_income: float, revenue: float, total_assets: float, total_equity: float) -> Dict[str, Any]:
+        net_margin = (net_income / revenue) if revenue else 0.0
+        asset_turnover = (revenue / total_assets) if total_assets else 0.0
+        equity_multiplier = (total_assets / total_equity) if total_equity else 0.0
+        roe = net_margin * asset_turnover * equity_multiplier
+        return {
+            "net_margin": round(net_margin, 4),
+            "asset_turnover": round(asset_turnover, 4),
+            "equity_multiplier": round(equity_multiplier, 4),
+            "roe": round(roe, 4),
+        }
+
+
+class Tool_RunwayStressTest(FinancialAnalysisTool):
+    """Stress test runway under higher burn scenarios"""
+
+    def __init__(self):
+        super().__init__(
+            name="Runway Stress Test",
+            description="Estimate runway under base, moderate stress, and severe stress burn cases"
+        )
+
+    def execute(self, current_cash: float, monthly_burn: float) -> Dict[str, Any]:
+        def _runway(cash: float, burn: float) -> float:
+            return round((cash / burn), 2) if burn > 0 else 120.0
+
+        base = _runway(current_cash, monthly_burn)
+        moderate = _runway(current_cash, monthly_burn * 1.2)
+        severe = _runway(current_cash, monthly_burn * 1.5)
+        return {
+            "base_runway_months": base,
+            "moderate_stress_runway_months": moderate,
+            "severe_stress_runway_months": severe,
+            "risk_flag": severe < 6,
+        }
+
+
+class Tool_CollectionsRiskScore(FinancialAnalysisTool):
+    """Collections risk scoring from AR behavior"""
+
+    def __init__(self):
+        super().__init__(
+            name="Collections Risk Score",
+            description="Score receivables collection risk from DSO and overdue exposure"
+        )
+
+    def execute(self, dso: float, overdue_ratio: float) -> Dict[str, Any]:
+        score = 100
+        score -= max(0, dso - 45) * 1.2
+        score -= max(0.0, overdue_ratio) * 100 * 0.8
+        score = max(0, min(100, round(score, 1)))
+        return {
+            "collections_risk_score": score,
+            "status": "Low" if score >= 75 else "Moderate" if score >= 50 else "High",
+        }
+
+
 # ============================================================================
 # REGISTRY OF ALL TOOLS
 # ============================================================================
@@ -1156,6 +1224,11 @@ def get_all_financial_tools() -> Dict[str, FinancialAnalysisTool]:
         # Category 6: Benchmarking & Recommendations (5)
         Tool_GenerateRecommendations(),
         Tool_ComprehensiveFinancialReview(),
+
+        # Additional strategic tools
+        Tool_DuPontDecomposition(),
+        Tool_RunwayStressTest(),
+        Tool_CollectionsRiskScore(),
     ]
     
     return {tool.name: tool for tool in tools}

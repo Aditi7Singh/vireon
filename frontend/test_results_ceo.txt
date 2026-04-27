@@ -1,0 +1,1917 @@
+
+Running 25 tests using 7 workers
+
+  ✘   3 [chromium] › tests/ceo-dashboard.spec.ts:11:9 › CEO Dashboard Page › renders CEO Dashboard heading (7.8s)
+  ✘   7 [chromium] › tests/ceo-dashboard.spec.ts:32:9 › CEO Dashboard Page › has CSV export button (7.8s)
+  ✘   4 [chromium] › tests/ceo-dashboard.spec.ts:20:9 › CEO Dashboard Page › has month selector input (7.8s)
+  ✘   5 [chromium] › tests/ceo-dashboard.spec.ts:43:9 › CEO Dashboard Page › displays Net Burn KPI card (7.8s)
+  ✘   2 [chromium] › tests/ceo-dashboard.spec.ts:15:9 › CEO Dashboard Page › shows financial health subtitle with month (7.8s)
+  ✘   6 [chromium] › tests/ceo-dashboard.spec.ts:37:9 › CEO Dashboard Page › has PDF export button (7.8s)
+  ✘  11 [chromium] › tests/ceo-dashboard.spec.ts:43:9 › CEO Dashboard Page › displays Net Burn KPI card (retry #1) (7.4s)
+  ✘   9 [chromium] › tests/ceo-dashboard.spec.ts:32:9 › CEO Dashboard Page › has CSV export button (retry #1) (7.5s)
+  ✘  10 [chromium] › tests/ceo-dashboard.spec.ts:11:9 › CEO Dashboard Page › renders CEO Dashboard heading (retry #1) (7.4s)
+  ✘   8 [chromium] › tests/ceo-dashboard.spec.ts:20:9 › CEO Dashboard Page › has month selector input (retry #1) (7.5s)
+  ✘  13 [chromium] › tests/ceo-dashboard.spec.ts:15:9 › CEO Dashboard Page › shows financial health subtitle with month (retry #1) (7.4s)
+  ✘  12 [chromium] › tests/ceo-dashboard.spec.ts:37:9 › CEO Dashboard Page › has PDF export button (retry #1) (7.5s)
+  ✘   1 [chromium] › tests/ceo-dashboard.spec.ts:25:9 › CEO Dashboard Page › month selector has a value (17.9s)
+  ✘  15 [chromium] › tests/ceo-dashboard.spec.ts:51:9 › CEO Dashboard Page › displays Cash Balance KPI card (7.2s)
+  ✘  19 [chromium] › tests/ceo-dashboard.spec.ts:60:9 › CEO Dashboard Page › displays GM Avg KPI card (7.2s)
+  ✘  17 [chromium] › tests/ceo-dashboard.spec.ts:64:9 › CEO Dashboard Page › Burn Multiple shows industry target reference (7.2s)
+  ✘  18 [chromium] › tests/ceo-dashboard.spec.ts:55:9 › CEO Dashboard Page › displays Headcount KPI card (7.2s)
+  ✘  14 [chromium] › tests/ceo-dashboard.spec.ts:47:9 › CEO Dashboard Page › displays Burn Multiple KPI card (7.2s)
+  ✘  16 [chromium] › tests/ceo-dashboard.spec.ts:68:9 › CEO Dashboard Page › Net Burn shows month-over-month change (7.2s)
+  ✘  23 [chromium] › tests/ceo-dashboard.spec.ts:60:9 › CEO Dashboard Page › displays GM Avg KPI card (retry #1) (7.9s)
+  ✘  24 [chromium] › tests/ceo-dashboard.spec.ts:55:9 › CEO Dashboard Page › displays Headcount KPI card (retry #1) (7.9s)
+  ✘  25 [chromium] › tests/ceo-dashboard.spec.ts:47:9 › CEO Dashboard Page › displays Burn Multiple KPI card (retry #1) (7.9s)
+  ✘  22 [chromium] › tests/ceo-dashboard.spec.ts:64:9 › CEO Dashboard Page › Burn Multiple shows industry target reference (retry #1) (7.9s)
+  ✘  26 [chromium] › tests/ceo-dashboard.spec.ts:68:9 › CEO Dashboard Page › Net Burn shows month-over-month change (retry #1) (7.9s)
+  ✘  21 [chromium] › tests/ceo-dashboard.spec.ts:51:9 › CEO Dashboard Page › displays Cash Balance KPI card (retry #1) (7.9s)
+  ✘  20 [chromium] › tests/ceo-dashboard.spec.ts:25:9 › CEO Dashboard Page › month selector has a value (retry #1) (16.7s)
+  ✘  30 [chromium] › tests/ceo-dashboard.spec.ts:82:9 › CEO Dashboard Page › renders Top Cost Drivers section (7.1s)
+  ✘  28 [chromium] › tests/ceo-dashboard.spec.ts:77:9 › CEO Dashboard Page › renders Cost Breakdown chart (7.2s)
+  ✘  27 [chromium] › tests/ceo-dashboard.spec.ts:73:9 › CEO Dashboard Page › renders 6-Month Burn & Cash Trajectory chart (7.2s)
+  ✘  29 [chromium] › tests/ceo-dashboard.spec.ts:86:9 › CEO Dashboard Page › renders Key Metrics & Ratios section (7.1s)
+  ✘  31 [chromium] › tests/ceo-dashboard.spec.ts:90:9 › CEO Dashboard Page › shows Revenue per Employee metric (7.1s)
+  ✘  32 [chromium] › tests/ceo-dashboard.spec.ts:94:9 › CEO Dashboard Page › shows Avg Cost per Employee metric (7.2s)
+  ✘  33 [chromium] › tests/ceo-dashboard.spec.ts:98:9 › CEO Dashboard Page › shows Headcount Ratio metric (6.3s)
+  ✘  35 [chromium] › tests/ceo-dashboard.spec.ts:73:9 › CEO Dashboard Page › renders 6-Month Burn & Cash Trajectory chart (retry #1) (7.5s)
+  ✘  37 [chromium] › tests/ceo-dashboard.spec.ts:77:9 › CEO Dashboard Page › renders Cost Breakdown chart (retry #1) (7.6s)
+  ✘  38 [chromium] › tests/ceo-dashboard.spec.ts:94:9 › CEO Dashboard Page › shows Avg Cost per Employee metric (retry #1) (7.5s)
+  ✘  39 [chromium] › tests/ceo-dashboard.spec.ts:90:9 › CEO Dashboard Page › shows Revenue per Employee metric (retry #1) (7.5s)
+  ✘  36 [chromium] › tests/ceo-dashboard.spec.ts:86:9 › CEO Dashboard Page › renders Key Metrics & Ratios section (retry #1) (7.5s)
+  ✘  34 [chromium] › tests/ceo-dashboard.spec.ts:82:9 › CEO Dashboard Page › renders Top Cost Drivers section (retry #1) (7.6s)
+  ✘  40 [chromium] › tests/ceo-dashboard.spec.ts:98:9 › CEO Dashboard Page › shows Headcount Ratio metric (retry #1) (6.5s)
+  ✘  45 [chromium] › tests/ceo-dashboard.spec.ts:124:9 › CEO Dashboard Page › CEO dashboard renders on mobile viewport (6.8s)
+  ✘  42 [chromium] › tests/ceo-dashboard.spec.ts:107:9 › CEO Dashboard Page › renders Product Performance & Profitability table (6.8s)
+  ✘  41 [chromium] › tests/ceo-dashboard.spec.ts:102:9 › CEO Dashboard Page › shows Cash Position metric (6.8s)
+  ✘  44 [chromium] › tests/ceo-dashboard.spec.ts:119:9 › CEO Dashboard Page › renders AI-Powered Recommendations section (6.8s)
+  ✘  43 [chromium] › tests/ceo-dashboard.spec.ts:111:9 › CEO Dashboard Page › product table has correct headers (6.9s)
+  ✘  46 [chromium] › tests/ceo-dashboard.spec.ts:124:9 › CEO Dashboard Page › CEO dashboard renders on mobile viewport (retry #1) (7.3s)
+  ✘  48 [chromium] › tests/ceo-dashboard.spec.ts:119:9 › CEO Dashboard Page › renders AI-Powered Recommendations section (retry #1) (7.3s)
+  ✘  47 [chromium] › tests/ceo-dashboard.spec.ts:107:9 › CEO Dashboard Page › renders Product Performance & Profitability table (retry #1) (7.3s)
+  ✘  49 [chromium] › tests/ceo-dashboard.spec.ts:102:9 › CEO Dashboard Page › shows Cash Position metric (retry #1) (7.3s)
+  ✘  50 [chromium] › tests/ceo-dashboard.spec.ts:111:9 › CEO Dashboard Page › product table has correct headers (retry #1) (7.3s)
+
+
+  1) [chromium] › tests/ceo-dashboard.spec.ts:11:9 › CEO Dashboard Page › renders CEO Dashboard heading 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('h1:has-text("CEO Dashboard")')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('h1:has-text("CEO Dashboard")')[22m
+
+
+      10 |     // ── Page Structure ────────────────────────────────────────────────
+      11 |     test('renders CEO Dashboard heading', async ({ page }) => {
+    > 12 |         await expect(page.locator('h1:has-text("CEO Dashboard")')).toBeVisible();
+         |                                                                    ^
+      13 |     });
+      14 |
+      15 |     test('shows financial health subtitle with month', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:12:68
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-da905-nders-CEO-Dashboard-heading-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-da905-nders-CEO-Dashboard-heading-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-da905-nders-CEO-Dashboard-heading-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('h1:has-text("CEO Dashboard")')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('h1:has-text("CEO Dashboard")')[22m
+
+
+      10 |     // ── Page Structure ────────────────────────────────────────────────
+      11 |     test('renders CEO Dashboard heading', async ({ page }) => {
+    > 12 |         await expect(page.locator('h1:has-text("CEO Dashboard")')).toBeVisible();
+         |                                                                    ^
+      13 |     });
+      14 |
+      15 |     test('shows financial health subtitle with month', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:12:68
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-da905-nders-CEO-Dashboard-heading-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-da905-nders-CEO-Dashboard-heading-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-da905-nders-CEO-Dashboard-heading-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-da905-nders-CEO-Dashboard-heading-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboar-da905-nders-CEO-Dashboard-heading-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests/ceo-dashboard.spec.ts:15:9 › CEO Dashboard Page › shows financial health subtitle with month 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Financial health')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Financial health')[22m
+
+
+      14 |
+      15 |     test('shows financial health subtitle with month', async ({ page }) => {
+    > 16 |         await expect(page.locator('text=Financial health')).toBeVisible();
+         |                                                             ^
+      17 |     });
+      18 |
+      19 |     // ── Month Selector ────────────────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:16:61
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-ca554--health-subtitle-with-month-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-ca554--health-subtitle-with-month-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-ca554--health-subtitle-with-month-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Financial health')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Financial health')[22m
+
+
+      14 |
+      15 |     test('shows financial health subtitle with month', async ({ page }) => {
+    > 16 |         await expect(page.locator('text=Financial health')).toBeVisible();
+         |                                                             ^
+      17 |     });
+      18 |
+      19 |     // ── Month Selector ────────────────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:16:61
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-ca554--health-subtitle-with-month-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-ca554--health-subtitle-with-month-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-ca554--health-subtitle-with-month-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-ca554--health-subtitle-with-month-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboar-ca554--health-subtitle-with-month-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › tests/ceo-dashboard.spec.ts:20:9 › CEO Dashboard Page › has month selector input ─
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('input[type="month"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('input[type="month"]')[22m
+
+
+      20 |     test('has month selector input', async ({ page }) => {
+      21 |         const monthInput = page.locator('input[type="month"]');
+    > 22 |         await expect(monthInput).toBeVisible();
+         |                                  ^
+      23 |     });
+      24 |
+      25 |     test('month selector has a value', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:22:34
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-has-month-selector-input-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-has-month-selector-input-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboard-Page-has-month-selector-input-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('input[type="month"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('input[type="month"]')[22m
+
+
+      20 |     test('has month selector input', async ({ page }) => {
+      21 |         const monthInput = page.locator('input[type="month"]');
+    > 22 |         await expect(monthInput).toBeVisible();
+         |                                  ^
+      23 |     });
+      24 |
+      25 |     test('month selector has a value', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:22:34
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-has-month-selector-input-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-has-month-selector-input-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboard-Page-has-month-selector-input-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-has-month-selector-input-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboard-Page-has-month-selector-input-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium] › tests/ceo-dashboard.spec.ts:25:9 › CEO Dashboard Page › month selector has a value 
+
+    TimeoutError: locator.inputValue: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[type="month"]')[22m
+
+
+      25 |     test('month selector has a value', async ({ page }) => {
+      26 |         const monthInput = page.locator('input[type="month"]');
+    > 27 |         const currentValue = await monthInput.inputValue();
+         |                                               ^
+      28 |         expect(currentValue.length).toBeGreaterThan(0);
+      29 |     });
+      30 |
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:27:47
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-month-selector-has-a-value-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-month-selector-has-a-value-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboard-Page-month-selector-has-a-value-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: locator.inputValue: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[type="month"]')[22m
+
+
+      25 |     test('month selector has a value', async ({ page }) => {
+      26 |         const monthInput = page.locator('input[type="month"]');
+    > 27 |         const currentValue = await monthInput.inputValue();
+         |                                               ^
+      28 |         expect(currentValue.length).toBeGreaterThan(0);
+      29 |     });
+      30 |
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:27:47
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-month-selector-has-a-value-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-month-selector-has-a-value-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboard-Page-month-selector-has-a-value-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-month-selector-has-a-value-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboard-Page-month-selector-has-a-value-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium] › tests/ceo-dashboard.spec.ts:32:9 › CEO Dashboard Page › has CSV export button ────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('button:has-text("CSV")')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('button:has-text("CSV")')[22m
+
+
+      32 |     test('has CSV export button', async ({ page }) => {
+      33 |         const csvBtn = page.locator('button:has-text("CSV")');
+    > 34 |         await expect(csvBtn).toBeVisible();
+         |                              ^
+      35 |     });
+      36 |
+      37 |     test('has PDF export button', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:34:30
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-has-CSV-export-button-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-has-CSV-export-button-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboard-Page-has-CSV-export-button-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('button:has-text("CSV")')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('button:has-text("CSV")')[22m
+
+
+      32 |     test('has CSV export button', async ({ page }) => {
+      33 |         const csvBtn = page.locator('button:has-text("CSV")');
+    > 34 |         await expect(csvBtn).toBeVisible();
+         |                              ^
+      35 |     });
+      36 |
+      37 |     test('has PDF export button', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:34:30
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-has-CSV-export-button-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-has-CSV-export-button-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboard-Page-has-CSV-export-button-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-has-CSV-export-button-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboard-Page-has-CSV-export-button-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [chromium] › tests/ceo-dashboard.spec.ts:37:9 › CEO Dashboard Page › has PDF export button ────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('button:has-text("PDF")')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('button:has-text("PDF")')[22m
+
+
+      37 |     test('has PDF export button', async ({ page }) => {
+      38 |         const pdfBtn = page.locator('button:has-text("PDF")');
+    > 39 |         await expect(pdfBtn).toBeVisible();
+         |                              ^
+      40 |     });
+      41 |
+      42 |     // ── KPI Cards ─────────────────────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:39:30
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-has-PDF-export-button-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-has-PDF-export-button-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboard-Page-has-PDF-export-button-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('button:has-text("PDF")')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('button:has-text("PDF")')[22m
+
+
+      37 |     test('has PDF export button', async ({ page }) => {
+      38 |         const pdfBtn = page.locator('button:has-text("PDF")');
+    > 39 |         await expect(pdfBtn).toBeVisible();
+         |                              ^
+      40 |     });
+      41 |
+      42 |     // ── KPI Cards ─────────────────────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:39:30
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-has-PDF-export-button-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-has-PDF-export-button-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboard-Page-has-PDF-export-button-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-has-PDF-export-button-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboard-Page-has-PDF-export-button-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [chromium] › tests/ceo-dashboard.spec.ts:43:9 › CEO Dashboard Page › displays Net Burn KPI card 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('p:has-text("Net Burn")').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('p:has-text("Net Burn")').first()[22m
+
+
+      42 |     // ── KPI Cards ─────────────────────────────────────────────────────
+      43 |     test('displays Net Burn KPI card', async ({ page }) => {
+    > 44 |         await expect(page.locator('p:has-text("Net Burn")').first()).toBeVisible();
+         |                                                                      ^
+      45 |     });
+      46 |
+      47 |     test('displays Burn Multiple KPI card', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:44:70
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-displays-Net-Burn-KPI-card-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-displays-Net-Burn-KPI-card-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboard-Page-displays-Net-Burn-KPI-card-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('p:has-text("Net Burn")').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('p:has-text("Net Burn")').first()[22m
+
+
+      42 |     // ── KPI Cards ─────────────────────────────────────────────────────
+      43 |     test('displays Net Burn KPI card', async ({ page }) => {
+    > 44 |         await expect(page.locator('p:has-text("Net Burn")').first()).toBeVisible();
+         |                                                                      ^
+      45 |     });
+      46 |
+      47 |     test('displays Burn Multiple KPI card', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:44:70
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-displays-Net-Burn-KPI-card-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-displays-Net-Burn-KPI-card-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboard-Page-displays-Net-Burn-KPI-card-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-displays-Net-Burn-KPI-card-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboard-Page-displays-Net-Burn-KPI-card-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [chromium] › tests/ceo-dashboard.spec.ts:47:9 › CEO Dashboard Page › displays Burn Multiple KPI card 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('p:has-text("Burn Multiple")').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('p:has-text("Burn Multiple")').first()[22m
+
+
+      46 |
+      47 |     test('displays Burn Multiple KPI card', async ({ page }) => {
+    > 48 |         await expect(page.locator('p:has-text("Burn Multiple")').first()).toBeVisible();
+         |                                                                           ^
+      49 |     });
+      50 |
+      51 |     test('displays Cash Balance KPI card', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:48:75
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-2d3d2-lays-Burn-Multiple-KPI-card-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-2d3d2-lays-Burn-Multiple-KPI-card-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-2d3d2-lays-Burn-Multiple-KPI-card-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('p:has-text("Burn Multiple")').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('p:has-text("Burn Multiple")').first()[22m
+
+
+      46 |
+      47 |     test('displays Burn Multiple KPI card', async ({ page }) => {
+    > 48 |         await expect(page.locator('p:has-text("Burn Multiple")').first()).toBeVisible();
+         |                                                                           ^
+      49 |     });
+      50 |
+      51 |     test('displays Cash Balance KPI card', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:48:75
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-2d3d2-lays-Burn-Multiple-KPI-card-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-2d3d2-lays-Burn-Multiple-KPI-card-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-2d3d2-lays-Burn-Multiple-KPI-card-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-2d3d2-lays-Burn-Multiple-KPI-card-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboar-2d3d2-lays-Burn-Multiple-KPI-card-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [chromium] › tests/ceo-dashboard.spec.ts:51:9 › CEO Dashboard Page › displays Cash Balance KPI card 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('p:has-text("Cash Balance")')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('p:has-text("Cash Balance")')[22m
+
+
+      50 |
+      51 |     test('displays Cash Balance KPI card', async ({ page }) => {
+    > 52 |         await expect(page.locator('p:has-text("Cash Balance")')).toBeVisible();
+         |                                                                  ^
+      53 |     });
+      54 |
+      55 |     test('displays Headcount KPI card', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:52:66
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-7d2f8-plays-Cash-Balance-KPI-card-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-7d2f8-plays-Cash-Balance-KPI-card-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-7d2f8-plays-Cash-Balance-KPI-card-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('p:has-text("Cash Balance")')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('p:has-text("Cash Balance")')[22m
+
+
+      50 |
+      51 |     test('displays Cash Balance KPI card', async ({ page }) => {
+    > 52 |         await expect(page.locator('p:has-text("Cash Balance")')).toBeVisible();
+         |                                                                  ^
+      53 |     });
+      54 |
+      55 |     test('displays Headcount KPI card', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:52:66
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-7d2f8-plays-Cash-Balance-KPI-card-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-7d2f8-plays-Cash-Balance-KPI-card-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-7d2f8-plays-Cash-Balance-KPI-card-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-7d2f8-plays-Cash-Balance-KPI-card-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboar-7d2f8-plays-Cash-Balance-KPI-card-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [chromium] › tests/ceo-dashboard.spec.ts:55:9 › CEO Dashboard Page › displays Headcount KPI card 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('p.text-xs:has-text("Headcount")').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('p.text-xs:has-text("Headcount")').first()[22m
+
+
+      55 |     test('displays Headcount KPI card', async ({ page }) => {
+      56 |         // Use specific selector since "Headcount" appears in multiple places
+    > 57 |         await expect(page.locator('p.text-xs:has-text("Headcount")').first()).toBeVisible();
+         |                                                                               ^
+      58 |     });
+      59 |
+      60 |     test('displays GM Avg KPI card', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:57:79
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-displays-Headcount-KPI-card-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-displays-Headcount-KPI-card-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboard-Page-displays-Headcount-KPI-card-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('p.text-xs:has-text("Headcount")').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('p.text-xs:has-text("Headcount")').first()[22m
+
+
+      55 |     test('displays Headcount KPI card', async ({ page }) => {
+      56 |         // Use specific selector since "Headcount" appears in multiple places
+    > 57 |         await expect(page.locator('p.text-xs:has-text("Headcount")').first()).toBeVisible();
+         |                                                                               ^
+      58 |     });
+      59 |
+      60 |     test('displays GM Avg KPI card', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:57:79
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-displays-Headcount-KPI-card-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-displays-Headcount-KPI-card-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboard-Page-displays-Headcount-KPI-card-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-displays-Headcount-KPI-card-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboard-Page-displays-Headcount-KPI-card-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [chromium] › tests/ceo-dashboard.spec.ts:60:9 › CEO Dashboard Page › displays GM Avg KPI card 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=GM Avg')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=GM Avg')[22m
+
+
+      59 |
+      60 |     test('displays GM Avg KPI card', async ({ page }) => {
+    > 61 |         await expect(page.locator('text=GM Avg')).toBeVisible();
+         |                                                   ^
+      62 |     });
+      63 |
+      64 |     test('Burn Multiple shows industry target reference', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:61:51
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-displays-GM-Avg-KPI-card-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-displays-GM-Avg-KPI-card-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboard-Page-displays-GM-Avg-KPI-card-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=GM Avg')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=GM Avg')[22m
+
+
+      59 |
+      60 |     test('displays GM Avg KPI card', async ({ page }) => {
+    > 61 |         await expect(page.locator('text=GM Avg')).toBeVisible();
+         |                                                   ^
+      62 |     });
+      63 |
+      64 |     test('Burn Multiple shows industry target reference', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:61:51
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-displays-GM-Avg-KPI-card-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-displays-GM-Avg-KPI-card-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboard-Page-displays-GM-Avg-KPI-card-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-displays-GM-Avg-KPI-card-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboard-Page-displays-GM-Avg-KPI-card-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [chromium] › tests/ceo-dashboard.spec.ts:64:9 › CEO Dashboard Page › Burn Multiple shows industry target reference 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Target: 1.5x')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Target: 1.5x')[22m
+
+
+      63 |
+      64 |     test('Burn Multiple shows industry target reference', async ({ page }) => {
+    > 65 |         await expect(page.locator('text=Target: 1.5x')).toBeVisible();
+         |                                                         ^
+      66 |     });
+      67 |
+      68 |     test('Net Burn shows month-over-month change', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:65:57
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-4be6a-s-industry-target-reference-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-4be6a-s-industry-target-reference-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-4be6a-s-industry-target-reference-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Target: 1.5x')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Target: 1.5x')[22m
+
+
+      63 |
+      64 |     test('Burn Multiple shows industry target reference', async ({ page }) => {
+    > 65 |         await expect(page.locator('text=Target: 1.5x')).toBeVisible();
+         |                                                         ^
+      66 |     });
+      67 |
+      68 |     test('Net Burn shows month-over-month change', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:65:57
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-4be6a-s-industry-target-reference-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-4be6a-s-industry-target-reference-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-4be6a-s-industry-target-reference-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-4be6a-s-industry-target-reference-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboar-4be6a-s-industry-target-reference-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) [chromium] › tests/ceo-dashboard.spec.ts:68:9 › CEO Dashboard Page › Net Burn shows month-over-month change 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=vs last month')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=vs last month')[22m
+
+
+      67 |
+      68 |     test('Net Burn shows month-over-month change', async ({ page }) => {
+    > 69 |         await expect(page.locator('text=vs last month')).toBeVisible();
+         |                                                          ^
+      70 |     });
+      71 |
+      72 |     // ── Charts ────────────────────────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:69:58
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-fbcc7-ows-month-over-month-change-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-fbcc7-ows-month-over-month-change-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-fbcc7-ows-month-over-month-change-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=vs last month')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=vs last month')[22m
+
+
+      67 |
+      68 |     test('Net Burn shows month-over-month change', async ({ page }) => {
+    > 69 |         await expect(page.locator('text=vs last month')).toBeVisible();
+         |                                                          ^
+      70 |     });
+      71 |
+      72 |     // ── Charts ────────────────────────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:69:58
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-fbcc7-ows-month-over-month-change-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-fbcc7-ows-month-over-month-change-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-fbcc7-ows-month-over-month-change-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-fbcc7-ows-month-over-month-change-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboar-fbcc7-ows-month-over-month-change-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  14) [chromium] › tests/ceo-dashboard.spec.ts:73:9 › CEO Dashboard Page › renders 6-Month Burn & Cash Trajectory chart 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=6-Month Burn & Cash Trajectory')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=6-Month Burn & Cash Trajectory')[22m
+
+
+      72 |     // ── Charts ────────────────────────────────────────────────────────
+      73 |     test('renders 6-Month Burn & Cash Trajectory chart', async ({ page }) => {
+    > 74 |         await expect(page.locator('text=6-Month Burn & Cash Trajectory')).toBeVisible();
+         |                                                                           ^
+      75 |     });
+      76 |
+      77 |     test('renders Cost Breakdown chart', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:74:75
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-9097a--Burn-Cash-Trajectory-chart-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-9097a--Burn-Cash-Trajectory-chart-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-9097a--Burn-Cash-Trajectory-chart-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=6-Month Burn & Cash Trajectory')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=6-Month Burn & Cash Trajectory')[22m
+
+
+      72 |     // ── Charts ────────────────────────────────────────────────────────
+      73 |     test('renders 6-Month Burn & Cash Trajectory chart', async ({ page }) => {
+    > 74 |         await expect(page.locator('text=6-Month Burn & Cash Trajectory')).toBeVisible();
+         |                                                                           ^
+      75 |     });
+      76 |
+      77 |     test('renders Cost Breakdown chart', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:74:75
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-9097a--Burn-Cash-Trajectory-chart-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-9097a--Burn-Cash-Trajectory-chart-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-9097a--Burn-Cash-Trajectory-chart-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-9097a--Burn-Cash-Trajectory-chart-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboar-9097a--Burn-Cash-Trajectory-chart-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  15) [chromium] › tests/ceo-dashboard.spec.ts:77:9 › CEO Dashboard Page › renders Cost Breakdown chart 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Cost Breakdown')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Cost Breakdown')[22m
+
+
+      76 |
+      77 |     test('renders Cost Breakdown chart', async ({ page }) => {
+    > 78 |         await expect(page.locator('text=Cost Breakdown')).toBeVisible();
+         |                                                           ^
+      79 |     });
+      80 |
+      81 |     // ── Financial Health Section ──────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:78:59
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-da617-enders-Cost-Breakdown-chart-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-da617-enders-Cost-Breakdown-chart-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-da617-enders-Cost-Breakdown-chart-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Cost Breakdown')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Cost Breakdown')[22m
+
+
+      76 |
+      77 |     test('renders Cost Breakdown chart', async ({ page }) => {
+    > 78 |         await expect(page.locator('text=Cost Breakdown')).toBeVisible();
+         |                                                           ^
+      79 |     });
+      80 |
+      81 |     // ── Financial Health Section ──────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:78:59
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-da617-enders-Cost-Breakdown-chart-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-da617-enders-Cost-Breakdown-chart-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-da617-enders-Cost-Breakdown-chart-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-da617-enders-Cost-Breakdown-chart-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboar-da617-enders-Cost-Breakdown-chart-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  16) [chromium] › tests/ceo-dashboard.spec.ts:82:9 › CEO Dashboard Page › renders Top Cost Drivers section 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Top Cost Drivers')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Top Cost Drivers')[22m
+
+
+      81 |     // ── Financial Health Section ──────────────────────────────────────
+      82 |     test('renders Top Cost Drivers section', async ({ page }) => {
+    > 83 |         await expect(page.locator('text=Top Cost Drivers')).toBeVisible();
+         |                                                             ^
+      84 |     });
+      85 |
+      86 |     test('renders Key Metrics & Ratios section', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:83:61
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-c2137-rs-Top-Cost-Drivers-section-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-c2137-rs-Top-Cost-Drivers-section-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-c2137-rs-Top-Cost-Drivers-section-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Top Cost Drivers')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Top Cost Drivers')[22m
+
+
+      81 |     // ── Financial Health Section ──────────────────────────────────────
+      82 |     test('renders Top Cost Drivers section', async ({ page }) => {
+    > 83 |         await expect(page.locator('text=Top Cost Drivers')).toBeVisible();
+         |                                                             ^
+      84 |     });
+      85 |
+      86 |     test('renders Key Metrics & Ratios section', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:83:61
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-c2137-rs-Top-Cost-Drivers-section-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-c2137-rs-Top-Cost-Drivers-section-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-c2137-rs-Top-Cost-Drivers-section-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-c2137-rs-Top-Cost-Drivers-section-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboar-c2137-rs-Top-Cost-Drivers-section-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  17) [chromium] › tests/ceo-dashboard.spec.ts:86:9 › CEO Dashboard Page › renders Key Metrics & Ratios section 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Key Metrics & Ratios')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Key Metrics & Ratios')[22m
+
+
+      85 |
+      86 |     test('renders Key Metrics & Ratios section', async ({ page }) => {
+    > 87 |         await expect(page.locator('text=Key Metrics & Ratios')).toBeVisible();
+         |                                                                 ^
+      88 |     });
+      89 |
+      90 |     test('shows Revenue per Employee metric', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:87:65
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-87a17--Key-Metrics-Ratios-section-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-87a17--Key-Metrics-Ratios-section-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-87a17--Key-Metrics-Ratios-section-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Key Metrics & Ratios')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Key Metrics & Ratios')[22m
+
+
+      85 |
+      86 |     test('renders Key Metrics & Ratios section', async ({ page }) => {
+    > 87 |         await expect(page.locator('text=Key Metrics & Ratios')).toBeVisible();
+         |                                                                 ^
+      88 |     });
+      89 |
+      90 |     test('shows Revenue per Employee metric', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:87:65
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-87a17--Key-Metrics-Ratios-section-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-87a17--Key-Metrics-Ratios-section-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-87a17--Key-Metrics-Ratios-section-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-87a17--Key-Metrics-Ratios-section-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboar-87a17--Key-Metrics-Ratios-section-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  18) [chromium] › tests/ceo-dashboard.spec.ts:90:9 › CEO Dashboard Page › shows Revenue per Employee metric 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Revenue per Employee')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Revenue per Employee')[22m
+
+
+      89 |
+      90 |     test('shows Revenue per Employee metric', async ({ page }) => {
+    > 91 |         await expect(page.locator('text=Revenue per Employee')).toBeVisible();
+         |                                                                 ^
+      92 |     });
+      93 |
+      94 |     test('shows Avg Cost per Employee metric', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:91:65
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-331ab-Revenue-per-Employee-metric-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-331ab-Revenue-per-Employee-metric-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-331ab-Revenue-per-Employee-metric-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Revenue per Employee')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Revenue per Employee')[22m
+
+
+      89 |
+      90 |     test('shows Revenue per Employee metric', async ({ page }) => {
+    > 91 |         await expect(page.locator('text=Revenue per Employee')).toBeVisible();
+         |                                                                 ^
+      92 |     });
+      93 |
+      94 |     test('shows Avg Cost per Employee metric', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:91:65
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-331ab-Revenue-per-Employee-metric-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-331ab-Revenue-per-Employee-metric-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-331ab-Revenue-per-Employee-metric-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-331ab-Revenue-per-Employee-metric-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboar-331ab-Revenue-per-Employee-metric-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  19) [chromium] › tests/ceo-dashboard.spec.ts:94:9 › CEO Dashboard Page › shows Avg Cost per Employee metric 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Avg Cost per Employee')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Avg Cost per Employee')[22m
+
+
+      93 |
+      94 |     test('shows Avg Cost per Employee metric', async ({ page }) => {
+    > 95 |         await expect(page.locator('text=Avg Cost per Employee')).toBeVisible();
+         |                                                                  ^
+      96 |     });
+      97 |
+      98 |     test('shows Headcount Ratio metric', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:95:66
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-2a06c-vg-Cost-per-Employee-metric-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-2a06c-vg-Cost-per-Employee-metric-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-2a06c-vg-Cost-per-Employee-metric-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Avg Cost per Employee')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Avg Cost per Employee')[22m
+
+
+      93 |
+      94 |     test('shows Avg Cost per Employee metric', async ({ page }) => {
+    > 95 |         await expect(page.locator('text=Avg Cost per Employee')).toBeVisible();
+         |                                                                  ^
+      96 |     });
+      97 |
+      98 |     test('shows Headcount Ratio metric', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:95:66
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-2a06c-vg-Cost-per-Employee-metric-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-2a06c-vg-Cost-per-Employee-metric-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-2a06c-vg-Cost-per-Employee-metric-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-2a06c-vg-Cost-per-Employee-metric-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboar-2a06c-vg-Cost-per-Employee-metric-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  20) [chromium] › tests/ceo-dashboard.spec.ts:98:9 › CEO Dashboard Page › shows Headcount Ratio metric 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('span:has-text("Headcount Ratio")')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('span:has-text("Headcount Ratio")')[22m
+
+
+       97 |
+       98 |     test('shows Headcount Ratio metric', async ({ page }) => {
+    >  99 |         await expect(page.locator('span:has-text("Headcount Ratio")')).toBeVisible();
+          |                                                                        ^
+      100 |     });
+      101 |
+      102 |     test('shows Cash Position metric', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:99:72
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-50548-hows-Headcount-Ratio-metric-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-50548-hows-Headcount-Ratio-metric-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-50548-hows-Headcount-Ratio-metric-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('span:has-text("Headcount Ratio")')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('span:has-text("Headcount Ratio")')[22m
+
+
+       97 |
+       98 |     test('shows Headcount Ratio metric', async ({ page }) => {
+    >  99 |         await expect(page.locator('span:has-text("Headcount Ratio")')).toBeVisible();
+          |                                                                        ^
+      100 |     });
+      101 |
+      102 |     test('shows Cash Position metric', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:99:72
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-50548-hows-Headcount-Ratio-metric-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-50548-hows-Headcount-Ratio-metric-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-50548-hows-Headcount-Ratio-metric-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-50548-hows-Headcount-Ratio-metric-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboar-50548-hows-Headcount-Ratio-metric-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  21) [chromium] › tests/ceo-dashboard.spec.ts:102:9 › CEO Dashboard Page › shows Cash Position metric 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('span:has-text("Cash Position")')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('span:has-text("Cash Position")')[22m
+
+
+      101 |
+      102 |     test('shows Cash Position metric', async ({ page }) => {
+    > 103 |         await expect(page.locator('span:has-text("Cash Position")')).toBeVisible();
+          |                                                                      ^
+      104 |     });
+      105 |
+      106 |     // ── Product Performance Table ─────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:103:70
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-shows-Cash-Position-metric-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-shows-Cash-Position-metric-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboard-Page-shows-Cash-Position-metric-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('span:has-text("Cash Position")')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('span:has-text("Cash Position")')[22m
+
+
+      101 |
+      102 |     test('shows Cash Position metric', async ({ page }) => {
+    > 103 |         await expect(page.locator('span:has-text("Cash Position")')).toBeVisible();
+          |                                                                      ^
+      104 |     });
+      105 |
+      106 |     // ── Product Performance Table ─────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:103:70
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-shows-Cash-Position-metric-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-shows-Cash-Position-metric-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboard-Page-shows-Cash-Position-metric-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboard-Page-shows-Cash-Position-metric-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboard-Page-shows-Cash-Position-metric-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  22) [chromium] › tests/ceo-dashboard.spec.ts:107:9 › CEO Dashboard Page › renders Product Performance & Profitability table 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Product Performance & Profitability')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Product Performance & Profitability')[22m
+
+
+      106 |     // ── Product Performance Table ─────────────────────────────────────
+      107 |     test('renders Product Performance & Profitability table', async ({ page }) => {
+    > 108 |         await expect(page.locator('text=Product Performance & Profitability')).toBeVisible();
+          |                                                                                ^
+      109 |     });
+      110 |
+      111 |     test('product table has correct headers', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:108:80
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-b05db-ormance-Profitability-table-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-b05db-ormance-Profitability-table-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-b05db-ormance-Profitability-table-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Product Performance & Profitability')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Product Performance & Profitability')[22m
+
+
+      106 |     // ── Product Performance Table ─────────────────────────────────────
+      107 |     test('renders Product Performance & Profitability table', async ({ page }) => {
+    > 108 |         await expect(page.locator('text=Product Performance & Profitability')).toBeVisible();
+          |                                                                                ^
+      109 |     });
+      110 |
+      111 |     test('product table has correct headers', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:108:80
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-b05db-ormance-Profitability-table-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-b05db-ormance-Profitability-table-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-b05db-ormance-Profitability-table-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-b05db-ormance-Profitability-table-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboar-b05db-ormance-Profitability-table-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  23) [chromium] › tests/ceo-dashboard.spec.ts:111:9 › CEO Dashboard Page › product table has correct headers 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('th:has-text("Product")')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('th:has-text("Product")')[22m
+
+
+      112 |         const headers = ['Product', 'Revenue', 'Cost', 'Gross Margin', 'Margin %', 'Status'];
+      113 |         for (const header of headers) {
+    > 114 |             await expect(page.locator(`th:has-text("${header}")`)).toBeVisible();
+          |                                                                    ^
+      115 |         }
+      116 |     });
+      117 |
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:114:68
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-6a9ea-t-table-has-correct-headers-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-6a9ea-t-table-has-correct-headers-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-6a9ea-t-table-has-correct-headers-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('th:has-text("Product")')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('th:has-text("Product")')[22m
+
+
+      112 |         const headers = ['Product', 'Revenue', 'Cost', 'Gross Margin', 'Margin %', 'Status'];
+      113 |         for (const header of headers) {
+    > 114 |             await expect(page.locator(`th:has-text("${header}")`)).toBeVisible();
+          |                                                                    ^
+      115 |         }
+      116 |     });
+      117 |
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:114:68
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-6a9ea-t-table-has-correct-headers-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-6a9ea-t-table-has-correct-headers-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-6a9ea-t-table-has-correct-headers-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-6a9ea-t-table-has-correct-headers-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboar-6a9ea-t-table-has-correct-headers-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  24) [chromium] › tests/ceo-dashboard.spec.ts:119:9 › CEO Dashboard Page › renders AI-Powered Recommendations section 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=AI-Powered Recommendations')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=AI-Powered Recommendations')[22m
+
+
+      118 |     // ── AI Recommendations ────────────────────────────────────────────
+      119 |     test('renders AI-Powered Recommendations section', async ({ page }) => {
+    > 120 |         await expect(page.locator('text=AI-Powered Recommendations')).toBeVisible();
+          |                                                                       ^
+      121 |     });
+      122 |
+      123 |     // ── Responsive Layout ─────────────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:120:71
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-593d3-red-Recommendations-section-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-593d3-red-Recommendations-section-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-593d3-red-Recommendations-section-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=AI-Powered Recommendations')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=AI-Powered Recommendations')[22m
+
+
+      118 |     // ── AI Recommendations ────────────────────────────────────────────
+      119 |     test('renders AI-Powered Recommendations section', async ({ page }) => {
+    > 120 |         await expect(page.locator('text=AI-Powered Recommendations')).toBeVisible();
+          |                                                                       ^
+      121 |     });
+      122 |
+      123 |     // ── Responsive Layout ─────────────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:120:71
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-593d3-red-Recommendations-section-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-593d3-red-Recommendations-section-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-593d3-red-Recommendations-section-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-593d3-red-Recommendations-section-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboar-593d3-red-Recommendations-section-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  25) [chromium] › tests/ceo-dashboard.spec.ts:124:9 › CEO Dashboard Page › CEO dashboard renders on mobile viewport 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('h1:has-text("CEO Dashboard")')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('h1:has-text("CEO Dashboard")')[22m
+
+
+      124 |     test('CEO dashboard renders on mobile viewport', async ({ page }) => {
+      125 |         await page.setViewportSize({ width: 375, height: 812 });
+    > 126 |         await expect(page.locator('h1:has-text("CEO Dashboard")')).toBeVisible();
+          |                                                                    ^
+      127 |     });
+      128 | });
+      129 |
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:126:68
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-43988--renders-on-mobile-viewport-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-43988--renders-on-mobile-viewport-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-43988--renders-on-mobile-viewport-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('h1:has-text("CEO Dashboard")')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('h1:has-text("CEO Dashboard")')[22m
+
+
+      124 |     test('CEO dashboard renders on mobile viewport', async ({ page }) => {
+      125 |         await page.setViewportSize({ width: 375, height: 812 });
+    > 126 |         await expect(page.locator('h1:has-text("CEO Dashboard")')).toBeVisible();
+          |                                                                    ^
+      127 |     });
+      128 | });
+      129 |
+        at /Users/asingh/vireon/frontend/tests/ceo-dashboard.spec.ts:126:68
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-43988--renders-on-mobile-viewport-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-43988--renders-on-mobile-viewport-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ceo-dashboard-CEO-Dashboar-43988--renders-on-mobile-viewport-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ceo-dashboard-CEO-Dashboar-43988--renders-on-mobile-viewport-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ceo-dashboard-CEO-Dashboar-43988--renders-on-mobile-viewport-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  25 failed
+    [chromium] › tests/ceo-dashboard.spec.ts:11:9 › CEO Dashboard Page › renders CEO Dashboard heading 
+    [chromium] › tests/ceo-dashboard.spec.ts:15:9 › CEO Dashboard Page › shows financial health subtitle with month 
+    [chromium] › tests/ceo-dashboard.spec.ts:20:9 › CEO Dashboard Page › has month selector input ──
+    [chromium] › tests/ceo-dashboard.spec.ts:25:9 › CEO Dashboard Page › month selector has a value 
+    [chromium] › tests/ceo-dashboard.spec.ts:32:9 › CEO Dashboard Page › has CSV export button ─────
+    [chromium] › tests/ceo-dashboard.spec.ts:37:9 › CEO Dashboard Page › has PDF export button ─────
+    [chromium] › tests/ceo-dashboard.spec.ts:43:9 › CEO Dashboard Page › displays Net Burn KPI card 
+    [chromium] › tests/ceo-dashboard.spec.ts:47:9 › CEO Dashboard Page › displays Burn Multiple KPI card 
+    [chromium] › tests/ceo-dashboard.spec.ts:51:9 › CEO Dashboard Page › displays Cash Balance KPI card 
+    [chromium] › tests/ceo-dashboard.spec.ts:55:9 › CEO Dashboard Page › displays Headcount KPI card 
+    [chromium] › tests/ceo-dashboard.spec.ts:60:9 › CEO Dashboard Page › displays GM Avg KPI card ──
+    [chromium] › tests/ceo-dashboard.spec.ts:64:9 › CEO Dashboard Page › Burn Multiple shows industry target reference 
+    [chromium] › tests/ceo-dashboard.spec.ts:68:9 › CEO Dashboard Page › Net Burn shows month-over-month change 
+    [chromium] › tests/ceo-dashboard.spec.ts:73:9 › CEO Dashboard Page › renders 6-Month Burn & Cash Trajectory chart 
+    [chromium] › tests/ceo-dashboard.spec.ts:77:9 › CEO Dashboard Page › renders Cost Breakdown chart 
+    [chromium] › tests/ceo-dashboard.spec.ts:82:9 › CEO Dashboard Page › renders Top Cost Drivers section 
+    [chromium] › tests/ceo-dashboard.spec.ts:86:9 › CEO Dashboard Page › renders Key Metrics & Ratios section 
+    [chromium] › tests/ceo-dashboard.spec.ts:90:9 › CEO Dashboard Page › shows Revenue per Employee metric 
+    [chromium] › tests/ceo-dashboard.spec.ts:94:9 › CEO Dashboard Page › shows Avg Cost per Employee metric 
+    [chromium] › tests/ceo-dashboard.spec.ts:98:9 › CEO Dashboard Page › shows Headcount Ratio metric 
+    [chromium] › tests/ceo-dashboard.spec.ts:102:9 › CEO Dashboard Page › shows Cash Position metric 
+    [chromium] › tests/ceo-dashboard.spec.ts:107:9 › CEO Dashboard Page › renders Product Performance & Profitability table 
+    [chromium] › tests/ceo-dashboard.spec.ts:111:9 › CEO Dashboard Page › product table has correct headers 
+    [chromium] › tests/ceo-dashboard.spec.ts:119:9 › CEO Dashboard Page › renders AI-Powered Recommendations section 
+    [chromium] › tests/ceo-dashboard.spec.ts:124:9 › CEO Dashboard Page › CEO dashboard renders on mobile viewport 

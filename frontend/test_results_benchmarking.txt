@@ -1,0 +1,797 @@
+
+Running 11 tests using 7 workers
+
+  ✘   7 [chromium] › tests/benchmarking.spec.ts:26:9 › Benchmarking / Performance Intelligence Page › displays benchmark metric cards (6.7s)
+  ✘   6 [chromium] › tests/benchmarking.spec.ts:41:9 › Benchmarking / Performance Intelligence Page › shows Net Revenue Retention metric (11.9s)
+  ✘   3 [chromium] › tests/benchmarking.spec.ts:37:9 › Benchmarking / Performance Intelligence Page › shows Burn Multiple metric (12.0s)
+  ✘   2 [chromium] › tests/benchmarking.spec.ts:33:9 › Benchmarking / Performance Intelligence Page › shows Rule of 40 metric (12.0s)
+  ✘   8 [chromium] › tests/benchmarking.spec.ts:26:9 › Benchmarking / Performance Intelligence Page › displays benchmark metric cards (retry #1) (4.9s)
+  ✘  12 [chromium] › tests/benchmarking.spec.ts:45:9 › Benchmarking / Performance Intelligence Page › each metric card has a Target label (4.2s)
+  ✘   4 [chromium] › tests/benchmarking.spec.ts:17:9 › Benchmarking / Performance Intelligence Page › shows Live benchmark feed badge (22.2s)
+  ✘   1 [chromium] › tests/benchmarking.spec.ts:13:9 › Benchmarking / Performance Intelligence Page › renders Operational Benchmarking heading (22.3s)
+  ✘   5 [chromium] › tests/benchmarking.spec.ts:21:9 › Benchmarking / Performance Intelligence Page › has Consult AI advisor button (22.3s)
+  ✘  10 [chromium] › tests/benchmarking.spec.ts:41:9 › Benchmarking / Performance Intelligence Page › shows Net Revenue Retention metric (retry #1) (11.1s)
+  ✘   9 [chromium] › tests/benchmarking.spec.ts:37:9 › Benchmarking / Performance Intelligence Page › shows Burn Multiple metric (retry #1) (10.9s)
+  ✘  11 [chromium] › tests/benchmarking.spec.ts:33:9 › Benchmarking / Performance Intelligence Page › shows Rule of 40 metric (retry #1) (11.0s)
+  ✘  13 [chromium] › tests/benchmarking.spec.ts:45:9 › Benchmarking / Performance Intelligence Page › each metric card has a Target label (retry #1) (5.2s)
+  ✘  17 [chromium] › tests/benchmarking.spec.ts:51:9 › Benchmarking / Performance Intelligence Page › each metric card has a status badge (4.8s)
+  ✘  19 [chromium] › tests/benchmarking.spec.ts:63:9 › Benchmarking / Performance Intelligence Page › each metric card has Get advice button (4.6s)
+  ✘  18 [chromium] › tests/benchmarking.spec.ts:69:9 › Benchmarking / Performance Intelligence Page › metric cards have description text (9.9s)
+  ✘  21 [chromium] › tests/benchmarking.spec.ts:63:9 › Benchmarking / Performance Intelligence Page › each metric card has Get advice button (retry #1) (5.1s)
+  ✘  14 [chromium] › tests/benchmarking.spec.ts:13:9 › Benchmarking / Performance Intelligence Page › renders Operational Benchmarking heading (retry #1) (21.0s)
+  ✘  15 [chromium] › tests/benchmarking.spec.ts:17:9 › Benchmarking / Performance Intelligence Page › shows Live benchmark feed badge (retry #1) (21.0s)
+  ✘  16 [chromium] › tests/benchmarking.spec.ts:21:9 › Benchmarking / Performance Intelligence Page › has Consult AI advisor button (retry #1) (21.2s)
+  ✘  20 [chromium] › tests/benchmarking.spec.ts:51:9 › Benchmarking / Performance Intelligence Page › each metric card has a status badge (retry #1) (5.2s)
+  ✘  22 [chromium] › tests/benchmarking.spec.ts:69:9 › Benchmarking / Performance Intelligence Page › metric cards have description text (retry #1) (10.0s)
+
+
+  1) [chromium] › tests/benchmarking.spec.ts:13:9 › Benchmarking / Performance Intelligence Page › renders Operational Benchmarking heading 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('h1:has-text("Operational Benchmarking")')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('h1:has-text("Operational Benchmarking")')[22m
+
+
+      12 |     // ── Page Structure ────────────────────────────────────────────────
+      13 |     test('renders Operational Benchmarking heading', async ({ page }) => {
+    > 14 |         await expect(page.locator('h1:has-text("Operational Benchmarking")')).toBeVisible({ timeout: 15000 });
+         |                                                                               ^
+      15 |     });
+      16 |
+      17 |     test('shows Live benchmark feed badge', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:14:79
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--e6f5e-tional-Benchmarking-heading-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--e6f5e-tional-Benchmarking-heading-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--e6f5e-tional-Benchmarking-heading-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('h1:has-text("Operational Benchmarking")')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('h1:has-text("Operational Benchmarking")')[22m
+
+
+      12 |     // ── Page Structure ────────────────────────────────────────────────
+      13 |     test('renders Operational Benchmarking heading', async ({ page }) => {
+    > 14 |         await expect(page.locator('h1:has-text("Operational Benchmarking")')).toBeVisible({ timeout: 15000 });
+         |                                                                               ^
+      15 |     });
+      16 |
+      17 |     test('shows Live benchmark feed badge', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:14:79
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--e6f5e-tional-Benchmarking-heading-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--e6f5e-tional-Benchmarking-heading-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--e6f5e-tional-Benchmarking-heading-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--e6f5e-tional-Benchmarking-heading-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/benchmarking-Benchmarking--e6f5e-tional-Benchmarking-heading-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests/benchmarking.spec.ts:17:9 › Benchmarking / Performance Intelligence Page › shows Live benchmark feed badge 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Live benchmark feed')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('text=Live benchmark feed')[22m
+
+
+      16 |
+      17 |     test('shows Live benchmark feed badge', async ({ page }) => {
+    > 18 |         await expect(page.locator('text=Live benchmark feed')).toBeVisible({ timeout: 15000 });
+         |                                                                ^
+      19 |     });
+      20 |
+      21 |     test('has Consult AI advisor button', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:18:64
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--e3041-s-Live-benchmark-feed-badge-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--e3041-s-Live-benchmark-feed-badge-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--e3041-s-Live-benchmark-feed-badge-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Live benchmark feed')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('text=Live benchmark feed')[22m
+
+
+      16 |
+      17 |     test('shows Live benchmark feed badge', async ({ page }) => {
+    > 18 |         await expect(page.locator('text=Live benchmark feed')).toBeVisible({ timeout: 15000 });
+         |                                                                ^
+      19 |     });
+      20 |
+      21 |     test('has Consult AI advisor button', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:18:64
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--e3041-s-Live-benchmark-feed-badge-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--e3041-s-Live-benchmark-feed-badge-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--e3041-s-Live-benchmark-feed-badge-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--e3041-s-Live-benchmark-feed-badge-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/benchmarking-Benchmarking--e3041-s-Live-benchmark-feed-badge-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › tests/benchmarking.spec.ts:21:9 › Benchmarking / Performance Intelligence Page › has Consult AI advisor button 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('button:has-text("Consult AI advisor")')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('button:has-text("Consult AI advisor")')[22m
+
+
+      20 |
+      21 |     test('has Consult AI advisor button', async ({ page }) => {
+    > 22 |         await expect(page.locator('button:has-text("Consult AI advisor")')).toBeVisible({ timeout: 15000 });
+         |                                                                             ^
+      23 |     });
+      24 |
+      25 |     // ── Benchmark Metric Cards ────────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:22:77
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--deb94-s-Consult-AI-advisor-button-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--deb94-s-Consult-AI-advisor-button-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--deb94-s-Consult-AI-advisor-button-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('button:has-text("Consult AI advisor")')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('button:has-text("Consult AI advisor")')[22m
+
+
+      20 |
+      21 |     test('has Consult AI advisor button', async ({ page }) => {
+    > 22 |         await expect(page.locator('button:has-text("Consult AI advisor")')).toBeVisible({ timeout: 15000 });
+         |                                                                             ^
+      23 |     });
+      24 |
+      25 |     // ── Benchmark Metric Cards ────────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:22:77
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--deb94-s-Consult-AI-advisor-button-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--deb94-s-Consult-AI-advisor-button-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--deb94-s-Consult-AI-advisor-button-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--deb94-s-Consult-AI-advisor-button-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/benchmarking-Benchmarking--deb94-s-Consult-AI-advisor-button-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium] › tests/benchmarking.spec.ts:26:9 › Benchmarking / Performance Intelligence Page › displays benchmark metric cards 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m3[39m
+    Received:    [31m0[39m
+
+      28 |         const cards = page.locator('article');
+      29 |         const count = await cards.count();
+    > 30 |         expect(count).toBeGreaterThanOrEqual(3);
+         |                       ^
+      31 |     });
+      32 |
+      33 |     test('shows Rule of 40 metric', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:30:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--6cc16-lays-benchmark-metric-cards-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--6cc16-lays-benchmark-metric-cards-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--6cc16-lays-benchmark-metric-cards-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m3[39m
+    Received:    [31m0[39m
+
+      28 |         const cards = page.locator('article');
+      29 |         const count = await cards.count();
+    > 30 |         expect(count).toBeGreaterThanOrEqual(3);
+         |                       ^
+      31 |     });
+      32 |
+      33 |     test('shows Rule of 40 metric', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:30:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--6cc16-lays-benchmark-metric-cards-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--6cc16-lays-benchmark-metric-cards-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--6cc16-lays-benchmark-metric-cards-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--6cc16-lays-benchmark-metric-cards-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/benchmarking-Benchmarking--6cc16-lays-benchmark-metric-cards-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium] › tests/benchmarking.spec.ts:33:9 › Benchmarking / Performance Intelligence Page › shows Rule of 40 metric 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Rule of 40')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Rule of 40')[22m
+
+
+      32 |
+      33 |     test('shows Rule of 40 metric', async ({ page }) => {
+    > 34 |         await expect(page.locator('text=Rule of 40')).toBeVisible();
+         |                                                       ^
+      35 |     });
+      36 |
+      37 |     test('shows Burn Multiple metric', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:34:55
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--a73ae-age-shows-Rule-of-40-metric-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--a73ae-age-shows-Rule-of-40-metric-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--a73ae-age-shows-Rule-of-40-metric-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Rule of 40')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Rule of 40')[22m
+
+
+      32 |
+      33 |     test('shows Rule of 40 metric', async ({ page }) => {
+    > 34 |         await expect(page.locator('text=Rule of 40')).toBeVisible();
+         |                                                       ^
+      35 |     });
+      36 |
+      37 |     test('shows Burn Multiple metric', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:34:55
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--a73ae-age-shows-Rule-of-40-metric-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--a73ae-age-shows-Rule-of-40-metric-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--a73ae-age-shows-Rule-of-40-metric-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--a73ae-age-shows-Rule-of-40-metric-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/benchmarking-Benchmarking--a73ae-age-shows-Rule-of-40-metric-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [chromium] › tests/benchmarking.spec.ts:37:9 › Benchmarking / Performance Intelligence Page › shows Burn Multiple metric 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('p:has-text("Burn Multiple")')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('p:has-text("Burn Multiple")')[22m
+
+
+      36 |
+      37 |     test('shows Burn Multiple metric', async ({ page }) => {
+    > 38 |         await expect(page.locator('p:has-text("Burn Multiple")')).toBeVisible();
+         |                                                                   ^
+      39 |     });
+      40 |
+      41 |     test('shows Net Revenue Retention metric', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:38:67
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--85c03--shows-Burn-Multiple-metric-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--85c03--shows-Burn-Multiple-metric-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--85c03--shows-Burn-Multiple-metric-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('p:has-text("Burn Multiple")')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('p:has-text("Burn Multiple")')[22m
+
+
+      36 |
+      37 |     test('shows Burn Multiple metric', async ({ page }) => {
+    > 38 |         await expect(page.locator('p:has-text("Burn Multiple")')).toBeVisible();
+         |                                                                   ^
+      39 |     });
+      40 |
+      41 |     test('shows Net Revenue Retention metric', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:38:67
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--85c03--shows-Burn-Multiple-metric-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--85c03--shows-Burn-Multiple-metric-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--85c03--shows-Burn-Multiple-metric-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--85c03--shows-Burn-Multiple-metric-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/benchmarking-Benchmarking--85c03--shows-Burn-Multiple-metric-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [chromium] › tests/benchmarking.spec.ts:41:9 › Benchmarking / Performance Intelligence Page › shows Net Revenue Retention metric 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Net Revenue Retention')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Net Revenue Retention')[22m
+
+
+      40 |
+      41 |     test('shows Net Revenue Retention metric', async ({ page }) => {
+    > 42 |         await expect(page.locator('text=Net Revenue Retention')).toBeVisible();
+         |                                                                  ^
+      43 |     });
+      44 |
+      45 |     test('each metric card has a Target label', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:42:66
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--9b62d-et-Revenue-Retention-metric-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--9b62d-et-Revenue-Retention-metric-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--9b62d-et-Revenue-Retention-metric-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Net Revenue Retention')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Net Revenue Retention')[22m
+
+
+      40 |
+      41 |     test('shows Net Revenue Retention metric', async ({ page }) => {
+    > 42 |         await expect(page.locator('text=Net Revenue Retention')).toBeVisible();
+         |                                                                  ^
+      43 |     });
+      44 |
+      45 |     test('each metric card has a Target label', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:42:66
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--9b62d-et-Revenue-Retention-metric-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--9b62d-et-Revenue-Retention-metric-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--9b62d-et-Revenue-Retention-metric-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--9b62d-et-Revenue-Retention-metric-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/benchmarking-Benchmarking--9b62d-et-Revenue-Retention-metric-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [chromium] › tests/benchmarking.spec.ts:45:9 › Benchmarking / Performance Intelligence Page › each metric card has a Target label 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m3[39m
+    Received:    [31m0[39m
+
+      46 |         const targets = page.locator('span:has-text("Target:")');
+      47 |         const count = await targets.count();
+    > 48 |         expect(count).toBeGreaterThanOrEqual(3);
+         |                       ^
+      49 |     });
+      50 |
+      51 |     test('each metric card has a status badge', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:48:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--52eb7-ric-card-has-a-Target-label-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--52eb7-ric-card-has-a-Target-label-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--52eb7-ric-card-has-a-Target-label-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m3[39m
+    Received:    [31m0[39m
+
+      46 |         const targets = page.locator('span:has-text("Target:")');
+      47 |         const count = await targets.count();
+    > 48 |         expect(count).toBeGreaterThanOrEqual(3);
+         |                       ^
+      49 |     });
+      50 |
+      51 |     test('each metric card has a status badge', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:48:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--52eb7-ric-card-has-a-Target-label-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--52eb7-ric-card-has-a-Target-label-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--52eb7-ric-card-has-a-Target-label-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--52eb7-ric-card-has-a-Target-label-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/benchmarking-Benchmarking--52eb7-ric-card-has-a-Target-label-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [chromium] › tests/benchmarking.spec.ts:51:9 › Benchmarking / Performance Intelligence Page › each metric card has a status badge 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m3[39m
+    Received:    [31m0[39m
+
+      53 |         const cards = page.locator('article');
+      54 |         const count = await cards.count();
+    > 55 |         expect(count).toBeGreaterThanOrEqual(3);
+         |                       ^
+      56 |         // Each card has a status span
+      57 |         for (let i = 0; i < count; i++) {
+      58 |             const badge = cards.nth(i).locator('span.font-bold.rounded-full');
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:55:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--15818-ric-card-has-a-status-badge-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--15818-ric-card-has-a-status-badge-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--15818-ric-card-has-a-status-badge-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m3[39m
+    Received:    [31m0[39m
+
+      53 |         const cards = page.locator('article');
+      54 |         const count = await cards.count();
+    > 55 |         expect(count).toBeGreaterThanOrEqual(3);
+         |                       ^
+      56 |         // Each card has a status span
+      57 |         for (let i = 0; i < count; i++) {
+      58 |             const badge = cards.nth(i).locator('span.font-bold.rounded-full');
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:55:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--15818-ric-card-has-a-status-badge-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--15818-ric-card-has-a-status-badge-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--15818-ric-card-has-a-status-badge-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--15818-ric-card-has-a-status-badge-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/benchmarking-Benchmarking--15818-ric-card-has-a-status-badge-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [chromium] › tests/benchmarking.spec.ts:63:9 › Benchmarking / Performance Intelligence Page › each metric card has Get advice button 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m3[39m
+    Received:    [31m0[39m
+
+      64 |         const adviceButtons = page.locator('button:has-text("Get advice")');
+      65 |         const count = await adviceButtons.count();
+    > 66 |         expect(count).toBeGreaterThanOrEqual(3);
+         |                       ^
+      67 |     });
+      68 |
+      69 |     test('metric cards have description text', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:66:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--83d31--card-has-Get-advice-button-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--83d31--card-has-Get-advice-button-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--83d31--card-has-Get-advice-button-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m3[39m
+    Received:    [31m0[39m
+
+      64 |         const adviceButtons = page.locator('button:has-text("Get advice")');
+      65 |         const count = await adviceButtons.count();
+    > 66 |         expect(count).toBeGreaterThanOrEqual(3);
+         |                       ^
+      67 |     });
+      68 |
+      69 |     test('metric cards have description text', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:66:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--83d31--card-has-Get-advice-button-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--83d31--card-has-Get-advice-button-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--83d31--card-has-Get-advice-button-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--83d31--card-has-Get-advice-button-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/benchmarking-Benchmarking--83d31--card-has-Get-advice-button-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [chromium] › tests/benchmarking.spec.ts:69:9 › Benchmarking / Performance Intelligence Page › metric cards have description text 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Growth Rate + Profit Margin')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Growth Rate + Profit Margin')[22m
+
+
+      68 |
+      69 |     test('metric cards have description text', async ({ page }) => {
+    > 70 |         await expect(page.locator('text=Growth Rate + Profit Margin')).toBeVisible();
+         |                                                                        ^
+      71 |         await expect(page.locator('text=Efficiency of burning capital')).toBeVisible();
+      72 |     });
+      73 | });
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:70:72
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--459da-cards-have-description-text-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--459da-cards-have-description-text-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--459da-cards-have-description-text-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Growth Rate + Profit Margin')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Growth Rate + Profit Margin')[22m
+
+
+      68 |
+      69 |     test('metric cards have description text', async ({ page }) => {
+    > 70 |         await expect(page.locator('text=Growth Rate + Profit Margin')).toBeVisible();
+         |                                                                        ^
+      71 |         await expect(page.locator('text=Efficiency of burning capital')).toBeVisible();
+      72 |     });
+      73 | });
+        at /Users/asingh/vireon/frontend/tests/benchmarking.spec.ts:70:72
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--459da-cards-have-description-text-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--459da-cards-have-description-text-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/benchmarking-Benchmarking--459da-cards-have-description-text-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/benchmarking-Benchmarking--459da-cards-have-description-text-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/benchmarking-Benchmarking--459da-cards-have-description-text-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11 failed
+    [chromium] › tests/benchmarking.spec.ts:13:9 › Benchmarking / Performance Intelligence Page › renders Operational Benchmarking heading 
+    [chromium] › tests/benchmarking.spec.ts:17:9 › Benchmarking / Performance Intelligence Page › shows Live benchmark feed badge 
+    [chromium] › tests/benchmarking.spec.ts:21:9 › Benchmarking / Performance Intelligence Page › has Consult AI advisor button 
+    [chromium] › tests/benchmarking.spec.ts:26:9 › Benchmarking / Performance Intelligence Page › displays benchmark metric cards 
+    [chromium] › tests/benchmarking.spec.ts:33:9 › Benchmarking / Performance Intelligence Page › shows Rule of 40 metric 
+    [chromium] › tests/benchmarking.spec.ts:37:9 › Benchmarking / Performance Intelligence Page › shows Burn Multiple metric 
+    [chromium] › tests/benchmarking.spec.ts:41:9 › Benchmarking / Performance Intelligence Page › shows Net Revenue Retention metric 
+    [chromium] › tests/benchmarking.spec.ts:45:9 › Benchmarking / Performance Intelligence Page › each metric card has a Target label 
+    [chromium] › tests/benchmarking.spec.ts:51:9 › Benchmarking / Performance Intelligence Page › each metric card has a status badge 
+    [chromium] › tests/benchmarking.spec.ts:63:9 › Benchmarking / Performance Intelligence Page › each metric card has Get advice button 
+    [chromium] › tests/benchmarking.spec.ts:69:9 › Benchmarking / Performance Intelligence Page › metric cards have description text 

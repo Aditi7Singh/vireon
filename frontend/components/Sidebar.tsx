@@ -9,10 +9,11 @@ import {
   FileText, ShoppingCart, UserCheck, Package, PieChart, Scale,
   Calendar, GitBranch, Layers, DollarSign, Globe,
   ChevronDown, ChevronUp, Leaf, FlaskConical, Server,
-  ScanLine, QrCode, BadgePercent,
+  ScanLine, QrCode, BadgePercent, LogOut, Upload, Banknote,
+  ArrowLeftRight, Clock, ReceiptText, BookMarked, RefreshCcw,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/store";
 import { Logo } from "./Logo";
 import { useState } from "react";
@@ -35,18 +36,29 @@ const navSections: NavSection[] = [
       { name: "Invoices", path: "/invoices", icon: FileText },
       { name: "Bills & AP", path: "/bills", icon: Receipt },
       { name: "Expenses", path: "/expenses", icon: CreditCard },
+      { name: "Expense Claims", path: "/expense-claims", icon: ReceiptText },
       { name: "Revenue", path: "/revenue", icon: TrendingUp },
       { name: "Procurement", path: "/procurement", icon: ShoppingCart },
+      { name: "Time Tracking", path: "/time-tracking", icon: Clock },
     ],
   },
   {
     title: "Accounting",
     items: [
       { name: "Chart of Accounts", path: "/chart-of-accounts", icon: Scale },
+      { name: "Journal Entries", path: "/journal-entries", icon: BookMarked },
       { name: "Reports", path: "/reports", icon: BarChart3 },
       { name: "Budget", path: "/budget", icon: PieChart },
       { name: "Assets", path: "/assets", icon: Landmark },
       { name: "Payroll", path: "/payroll", icon: Users },
+    ],
+  },
+  {
+    title: "Banking",
+    items: [
+      { name: "Bank Accounts", path: "/banking", icon: Banknote },
+      { name: "Reconciliation", path: "/banking#reconcile", icon: ArrowLeftRight },
+      { name: "Bank Feeds", path: "/banking#feeds", icon: RefreshCcw },
     ],
   },
   {
@@ -110,6 +122,7 @@ const navSections: NavSection[] = [
   {
     title: "System",
     items: [
+      { name: "Import Data", path: "/data-import", icon: Upload },
       { name: "Settings", path: "/settings", icon: Settings },
     ],
   },
@@ -117,6 +130,7 @@ const navSections: NavSection[] = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { sidebarExpanded, toggleSidebar, user } = useAppStore();
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
     new Set(["Intelligence", "System"])
@@ -131,38 +145,44 @@ export function Sidebar() {
     });
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("auth_token");
+    router.replace("/login");
+  };
+
   return (
     <aside
       className={cn(
         "bg-[#fcf8f2]/90 backdrop-blur-3xl border-r border-[#e3d6c7] flex flex-col transition-all duration-500 ease-in-out relative z-40 group/sidebar h-screen sticky top-0",
-        sidebarExpanded ? "w-72" : "w-20"
+        sidebarExpanded ? "w-64" : "w-16"
       )}
     >
       {/* Header */}
-      <div className="h-20 flex items-center px-6 border-b border-[#e3d6c7] shrink-0">
+      <div className="h-16 flex items-center px-4 border-b border-[#e3d6c7] shrink-0">
         <Logo showText={sidebarExpanded} size={sidebarExpanded ? "md" : "sm"} variant="gradient" className="transition-all duration-300" />
       </div>
 
       {/* Toggle */}
       <button
         onClick={toggleSidebar}
-        className="absolute -right-3 top-24 w-6 h-6 bg-[#1f1a16] border border-[#d8cabc] rounded-full flex items-center justify-center text-[#fff7ef] shadow-lg hover:scale-110 active:scale-95 transition-all z-50 opacity-0 group-hover/sidebar:opacity-100"
+        className="absolute -right-3 top-20 w-6 h-6 bg-[#1f1a16] border border-[#d8cabc] rounded-full flex items-center justify-center text-[#fff7ef] shadow-lg hover:scale-110 active:scale-95 transition-all z-50 opacity-0 group-hover/sidebar:opacity-100"
       >
         {sidebarExpanded ? <ChevronLeft className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
       </button>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 overflow-y-auto no-scrollbar space-y-1">
+      <nav className="flex-1 px-3 py-4 overflow-y-auto no-scrollbar space-y-0.5">
         {navSections.map((section) => {
           const isCollapsed = collapsedSections.has(section.title);
           return (
-            <div key={section.title} className="mb-2">
+            <div key={section.title} className="mb-1">
               {sidebarExpanded && (
                 <button
                   onClick={() => toggleSection(section.title)}
-                  className="w-full flex items-center justify-between px-3 py-1.5 mb-1 group/sec"
+                  className="w-full flex items-center justify-between px-2 py-1 mb-0.5 group/sec"
                 >
-                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 group-hover/sec:text-slate-700 transition-colors">
+                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 group-hover/sec:text-slate-600 transition-colors">
                     {section.title}
                   </span>
                   {isCollapsed
@@ -173,30 +193,32 @@ export function Sidebar() {
               {(!isCollapsed || !sidebarExpanded) && (
                 <div className="space-y-0.5">
                   {section.items.map((item) => {
-                    const isActive = pathname === item.path || pathname.startsWith(item.path + "/");
+                    const isActive = pathname === item.path || (item.path !== "/dashboard" && pathname.startsWith(item.path.split("#")[0] + "/"));
+                    const exactActive = pathname === item.path.split("#")[0];
+                    const active = isActive || exactActive;
                     return (
                       <Link
                         key={item.name}
                         href={item.path}
                         className={cn(
-                          "flex items-center gap-3 px-3 py-2.5 rounded-[14px] transition-all duration-300 group font-medium relative",
-                          isActive
+                          "flex items-center gap-2.5 px-2.5 py-2 rounded-[12px] transition-all duration-200 group font-medium relative",
+                          active
                             ? "bg-[#f4e7d8] text-[#211d19] border border-[#d6c2ad]"
                             : "text-[#6a6054] hover:text-[#1f1a16] hover:bg-white/60 hover:border-[#e4d7c9] border border-transparent"
                         )}
                         title={!sidebarExpanded ? item.name : undefined}
                       >
                         <item.icon className={cn(
-                          "w-4.5 h-4.5 shrink-0 transition-all duration-300",
-                          isActive ? "text-[#8d4f27] scale-110" : "group-hover:scale-110 group-hover:text-[#8d4f27]"
+                          "w-4 h-4 shrink-0 transition-all duration-200",
+                          active ? "text-[#8d4f27] scale-110" : "group-hover:scale-110 group-hover:text-[#8d4f27]"
                         )} />
                         {sidebarExpanded && (
-                          <span className="text-[11px] font-bold tracking-wide truncate">
+                          <span className="text-[11px] font-semibold tracking-wide truncate">
                             {item.name}
                           </span>
                         )}
-                        {isActive && (
-                          <div className="absolute left-0 w-0.5 h-5 bg-[#b3622d] rounded-r-full" />
+                        {active && (
+                          <div className="absolute left-0 w-0.5 h-4 bg-[#b3622d] rounded-r-full" />
                         )}
                       </Link>
                     );
@@ -208,24 +230,38 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* User */}
-      <div className="p-4 border-t border-[#e3d6c7] bg-white/55 backdrop-blur-3xl shrink-0">
+      {/* User Footer */}
+      <div className="p-3 border-t border-[#e3d6c7] bg-white/40 backdrop-blur-3xl shrink-0 space-y-1.5">
+        {/* Logout Button */}
+        <button
+          onClick={handleLogout}
+          title={!sidebarExpanded ? "Sign Out" : undefined}
+          className={cn(
+            "flex items-center gap-2.5 w-full px-2.5 py-2 rounded-[12px] text-red-500 hover:text-red-700 hover:bg-red-50 border border-transparent hover:border-red-100 transition-all",
+            !sidebarExpanded && "justify-center"
+          )}
+        >
+          <LogOut className="w-4 h-4 shrink-0" />
+          {sidebarExpanded && <span className="text-[11px] font-semibold">Sign Out</span>}
+        </button>
+
+        {/* User Card */}
         <div className={cn(
-          "flex items-center gap-3 p-3 rounded-[18px] bg-white/75 border border-[#e4d8cb] hover:bg-white group/user cursor-pointer transition-all",
+          "flex items-center gap-2.5 p-2.5 rounded-[14px] bg-white/75 border border-[#e4d8cb] hover:bg-white group/user cursor-pointer transition-all",
           !sidebarExpanded && "justify-center px-2"
         )}>
           <div className="relative shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#2c2520] to-[#4c3a2d] flex items-center justify-center text-[#fff7ef] font-black text-xs shadow-xl ring-1 ring-[#d9cab9] group-hover/user:scale-105 transition-transform">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#2c2520] to-[#4c3a2d] flex items-center justify-center text-[#fff7ef] font-black text-xs shadow-xl ring-1 ring-[#d9cab9] group-hover/user:scale-105 transition-transform">
               {user?.name?.split(" ").map((n: string) => n[0]).join("") || "AD"}
             </div>
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#ce6f35] border-2 border-[#fcf8f2] rounded-full shadow" />
+            <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-[#ce6f35] border-2 border-[#fcf8f2] rounded-full shadow" />
           </div>
           {sidebarExpanded && (
             <div className="flex flex-col min-w-0 flex-1">
-              <span className="text-[11px] font-black text-[#1f1a16] truncate uppercase tracking-tight">
+              <span className="text-[10px] font-black text-[#1f1a16] truncate uppercase tracking-tight">
                 {user?.name || "Aditi Singh"}
               </span>
-              <span className="text-[9px] font-black text-[#8d4f27] uppercase tracking-widest bg-[#f6e7d7] px-1.5 py-0.5 rounded-md mt-0.5 self-start">
+              <span className="text-[8px] font-black text-[#8d4f27] uppercase tracking-widest bg-[#f6e7d7] px-1.5 py-0.5 rounded-md mt-0.5 self-start">
                 {user?.role || "FOUNDER"}
               </span>
             </div>

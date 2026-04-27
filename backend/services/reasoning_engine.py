@@ -372,8 +372,11 @@ class ProfitVarianceAnalyzer:
             "metric": metric_name,
             "actual": round(actual_margin, 4),
             "expected": round(expected_margin, 4),
+            "variance": round(variance_pct, 2),
             "variance_pct": round(variance_pct, 2),
             "direction": "Favorable" if variance_pct > 0 else "Unfavorable",
+            "favorable": variance_pct > 0,
+            "unfavorable": variance_pct <= 0,
         }
         
         # Root cause indicators
@@ -586,12 +589,19 @@ class RecommendationGenerator:
         """
         recommendations = []
         
-        # Check profitability
-        if "net_margin" in financial_metrics and financial_metrics["net_margin"] < 0:
+        # Check profitability (supports either net_margin or net_income + revenue inputs).
+        net_margin = financial_metrics.get("net_margin")
+        if net_margin is None:
+            revenue = financial_metrics.get("revenue")
+            net_income = financial_metrics.get("net_income")
+            if revenue and net_income is not None and revenue != 0:
+                net_margin = net_income / revenue
+
+        if net_margin is not None and net_margin < 0:
             recommendations.append({
                 "priority": "High",
                 "recommendation": "Achieve unit economics profitability",
-                "rationale": f"Currently losing ₹{abs(financial_metrics['net_margin']):.1%} on every rupee of revenue",
+                "rationale": f"Currently losing ₹{abs(net_margin):.1%} on every rupee of revenue",
                 "actions": [
                     "Increase gross margin through pricing or cost reduction",
                     "Reduce operating expenses as % of revenue",
@@ -681,6 +691,17 @@ class RecommendationGenerator:
                     "Refinance to lower rates/longer terms",
                     "Consider equity raise if dilution preferable",
                 ]
+            })
+
+        if not recommendations:
+            recommendations.append({
+                "priority": "Low",
+                "recommendation": "Maintain financial discipline and monitor leading indicators",
+                "rationale": "Current metrics do not trigger urgent risk thresholds",
+                "actions": [
+                    "Track runway, margin, and collection trends monthly",
+                    "Continue scenario planning and benchmark reviews",
+                ],
             })
         
         logger.info(f"Generated {len(recommendations)} recommendations for {company_stage} stage company")

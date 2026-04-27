@@ -1,4 +1,4 @@
-﻿import { test, expect } from '@playwright/test';
+﻿import { test, expect } from './fixtures';
 
 test.describe('Vireon E2E Tests', () => {
     test('Dashboard loads correctly', async ({ page }) => {

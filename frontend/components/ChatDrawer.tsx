@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useAppStore } from "@/lib/store";
 import { cn, formatRelativeTime } from "@/lib/utils";
 import { X, Send, Bot, User, MessageSquare, Sparkles, Loader2, Zap, ArrowRight, CornerDownLeft } from "lucide-react";
@@ -32,72 +32,9 @@ export function ChatDrawer() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Load history when session changes or chat opens
-  useEffect(() => {
-    if (chatOpen && chatSessionId) {
-      loadHistory();
-    }
-  }, [chatOpen, chatSessionId]);
-
   const lastTriggeredContext = useRef<string | null>(null);
 
-  // Handle proactive messages when context changes specifically
-  useEffect(() => {
-    if (chatOpen && normalizedChatContext && normalizedChatContext !== lastTriggeredContext.current) {
-      triggerProactiveMessage();
-      lastTriggeredContext.current = normalizedChatContext;
-    }
-  }, [normalizedChatContext, chatOpen]);
-
-  const triggerProactiveMessage = () => {
-    // Specific anomaly, proactively explain it
-    if (normalizedChatContext.startsWith("Anomaly Analysis:")) {
-       const anomalyDesc = normalizedChatContext.replace("Anomaly Analysis:", "").trim();
-       setTimeout(() => {
-         handleSend(`Explain this anomaly in detail and its impact: "${anomalyDesc}"`);
-       }, 500);
-    } else if (normalizedChatContext.startsWith("Anomaly:")) {
-       const anomalyDesc = normalizedChatContext.replace("Anomaly:", "").trim();
-       setTimeout(() => {
-         handleSend(`What can you tell me about the anomaly: "${anomalyDesc}"?`);
-       }, 500);
-    } else if (normalizedChatContext === "Revenue Expansion Opportunity") {
-       setTimeout(() => {
-         handleSend("Help me model different revenue tiers. I notice usage-based revenue is growing fast.");
-       }, 500);
-    } else if (normalizedChatContext === "Expense Leakage Audit") {
-       setTimeout(() => {
-         handleSend("Perform an audit on our expense leakage and operational inefficiencies.");
-       }, 500);
-    } else if (normalizedChatContext === "Expense Audit: AWS Spike") {
-       setTimeout(() => {
-         handleSend("Analyze the recent AWS cost spike and suggest optimization strategies.");
-       }, 500);
-    } else if (normalizedChatContext === "Predictive Modeling") {
-       setTimeout(() => {
-         handleSend("Help me model some scenarios. I want to see how hiring or revenue changes affect our runway.");
-       }, 500);
-    } else if (normalizedChatContext === "Revenue Intelligence") {
-       setTimeout(() => {
-         handleSend("Give me a strategic growth audit of our revenue performance.");
-       }, 500);
-    } else if (normalizedChatContext.startsWith("Build an executive scenario memo")) {
-       setTimeout(() => {
-         handleSend("Create an executive scenario memo with assumptions, net runway effect, risk flags, and a 30/60/90-day action plan.");
-       }, 500);
-    } else if (normalizedChatContext.startsWith("Strategic Advisory for Rule of 40 performance")) {
-       setTimeout(() => {
-         handleSend("Interpret our benchmark metrics, identify the biggest operating gap, and propose a practical execution plan by owner and timeline.");
-       }, 500);
-    } else if (normalizedChatContext.length > 24) {
-       // For long-form context prompts from CTA buttons, auto-run the request.
-       setTimeout(() => {
-         handleSend(normalizedChatContext);
-       }, 500);
-    }
-  };
-
-  const loadHistory = async () => {
+  const loadHistory = useCallback(async () => {
     if (!chatSessionId) return;
     try {
       const history = await api.getHistory(chatSessionId);
@@ -124,7 +61,7 @@ export function ChatDrawer() {
     } catch (error) {
       console.error("Failed to load history:", error);
     }
-  };
+  }, [chatSessionId, normalizedChatContext]);
 
   useEffect(() => {
     if (chatOpen && inputRef.current) {
@@ -136,7 +73,7 @@ export function ChatDrawer() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSend = async (text?: string) => {
+  const handleSend = useCallback(async (text?: string) => {
     const query = text || input;
     if (!query.trim() || isLoading) return;
 
@@ -203,7 +140,71 @@ export function ChatDrawer() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [input, isLoading, normalizedChatContext, chatSessionId]);
+
+  const triggerProactiveMessage = useCallback(() => {
+
+    // Specific anomaly, proactively explain it
+    if (normalizedChatContext.startsWith("Anomaly Analysis:")) {
+      const anomalyDesc = normalizedChatContext.replace("Anomaly Analysis:", "").trim();
+      setTimeout(() => {
+        handleSend(`Explain this anomaly in detail and its impact: "${anomalyDesc}"`);
+      }, 500);
+    } else if (normalizedChatContext.startsWith("Anomaly:")) {
+      const anomalyDesc = normalizedChatContext.replace("Anomaly:", "").trim();
+      setTimeout(() => {
+        handleSend(`What can you tell me about the anomaly: "${anomalyDesc}"?`);
+      }, 500);
+    } else if (normalizedChatContext === "Revenue Expansion Opportunity") {
+      setTimeout(() => {
+        handleSend("Help me model different revenue tiers. I notice usage-based revenue is growing fast.");
+      }, 500);
+    } else if (normalizedChatContext === "Expense Leakage Audit") {
+      setTimeout(() => {
+        handleSend("Perform an audit on our expense leakage and operational inefficiencies.");
+      }, 500);
+    } else if (normalizedChatContext === "Expense Audit: AWS Spike") {
+      setTimeout(() => {
+        handleSend("Analyze the recent AWS cost spike and suggest optimization strategies.");
+      }, 500);
+    } else if (normalizedChatContext === "Predictive Modeling") {
+      setTimeout(() => {
+        handleSend("Help me model some scenarios. I want to see how hiring or revenue changes affect our runway.");
+      }, 500);
+    } else if (normalizedChatContext === "Revenue Intelligence") {
+      setTimeout(() => {
+        handleSend("Give me a strategic growth audit of our revenue performance.");
+      }, 500);
+    } else if (normalizedChatContext.startsWith("Build an executive scenario memo")) {
+      setTimeout(() => {
+        handleSend("Create an executive scenario memo with assumptions, net runway effect, risk flags, and a 30/60/90-day action plan.");
+      }, 500);
+    } else if (normalizedChatContext.startsWith("Strategic Advisory for Rule of 40 performance")) {
+      setTimeout(() => {
+        handleSend("Interpret our benchmark metrics, identify the biggest operating gap, and propose a practical execution plan by owner and timeline.");
+      }, 500);
+    } else if (normalizedChatContext.length > 24) {
+      // For long-form context prompts from CTA buttons, auto-run the request.
+      setTimeout(() => {
+        handleSend(normalizedChatContext);
+      }, 500);
+    }
+  }, [normalizedChatContext, handleSend]);
+
+  // Load history when session changes or chat opens
+  useEffect(() => {
+    if (chatOpen && chatSessionId) {
+      loadHistory();
+    }
+  }, [chatOpen, chatSessionId, loadHistory]);
+
+  // Handle proactive messages when context changes specifically
+  useEffect(() => {
+    if (chatOpen && normalizedChatContext && normalizedChatContext !== lastTriggeredContext.current) {
+      triggerProactiveMessage();
+      lastTriggeredContext.current = normalizedChatContext;
+    }
+  }, [normalizedChatContext, chatOpen, triggerProactiveMessage]);
 
   if (!chatOpen) return null;
 
@@ -220,7 +221,7 @@ export function ChatDrawer() {
           </div>
           <div>
             <h2 className="text-lg font-black text-[#fff7ec] font-outfit tracking-tight">
-              Finley AI Assistant
+              AI Financial Assistant
             </h2>
             <p className="text-[10px] font-bold text-[#c9b9a6] uppercase tracking-widest">Smart Financial Manager</p>
           </div>

@@ -14,7 +14,7 @@ import logging
 import json
 from typing import Dict, List, Any, Optional
 from datetime import datetime
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from enum import Enum
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ class ConversationMessage:
     """Single message in conversation"""
     role: MessageRole
     content: str
-    timestamp: datetime
+    timestamp: datetime = field(default_factory=datetime.utcnow)
     metadata: Optional[Dict[str, Any]] = None
     
     def to_dict(self) -> Dict[str, Any]:
@@ -264,17 +264,17 @@ class ConversationMemory:
     Maintains active sessions in memory while persisting to DB.
     """
     
-    def __init__(self, db_session=None):
+    def __init__(self, db_session=None, memory_service: Optional[MemoryService] = None):
         self.db = db_session
         self.active_sessions: Dict[str, ConversationSession] = {}
-        self.service = MemoryService(db_session)
+        self.service = memory_service or MemoryService(db_session)
         logger.info("Conversation Memory initialized")
     
     def get_or_create_session(
         self,
         session_id: Optional[str],
-        company_id: str,
-        user_id: str,
+        company_id: str = "default_company",
+        user_id: str = "default_user",
     ) -> ConversationSession:
         """
         Get existing session or create new one.
@@ -299,6 +299,8 @@ class ConversationMemory:
         
         # Create new session
         session = self.service.create_session(company_id, user_id)
+        if session_id:
+            session.session_id = session_id
         self.active_sessions[session.session_id] = session
         self.service.save_session(session)
         
@@ -307,7 +309,7 @@ class ConversationMemory:
     def add_user_message(
         self,
         session_id: str,
-        content: str,
+        content: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
     ) -> Optional[ConversationMessage]:
         """
@@ -321,6 +323,13 @@ class ConversationMemory:
         Returns:
             Added message or None
         """
+        if content is None:
+            content = session_id
+            if not self.active_sessions:
+                logger.error("No active sessions available")
+                return None
+            session_id = next(reversed(self.active_sessions))
+
         if session_id not in self.active_sessions:
             logger.error(f"Session not found: {session_id}")
             return None
@@ -335,7 +344,7 @@ class ConversationMemory:
     def add_assistant_message(
         self,
         session_id: str,
-        content: str,
+        content: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
     ) -> Optional[ConversationMessage]:
         """
@@ -349,6 +358,13 @@ class ConversationMemory:
         Returns:
             Added message or None
         """
+        if content is None:
+            content = session_id
+            if not self.active_sessions:
+                logger.error("No active sessions available")
+                return None
+            session_id = next(reversed(self.active_sessions))
+
         if session_id not in self.active_sessions:
             logger.error(f"Session not found: {session_id}")
             return None
@@ -362,7 +378,7 @@ class ConversationMemory:
     
     def get_context_for_llm(
         self,
-        session_id: str,
+        session_id: Optional[str] = None,
         max_messages: int = 20,
     ) -> Dict[str, Any]:
         """
@@ -375,6 +391,12 @@ class ConversationMemory:
         Returns:
             Context dict with messages, financial metrics, etc.
         """
+        if session_id is None:
+            if not self.active_sessions:
+                logger.error("No active sessions available")
+                return {}
+            session_id = next(reversed(self.active_sessions))
+
         if session_id not in self.active_sessions:
             logger.error(f"Session not found: {session_id}")
             return {}

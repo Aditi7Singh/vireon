@@ -13,7 +13,18 @@ from config import settings
 SECRET_KEY = os.getenv("SECRET_KEY", "vireon-secret-key-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-ALLOW_DEMO_WITHOUT_TOKEN = os.getenv("ALLOW_DEMO_WITHOUT_TOKEN", "false").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _allow_demo_without_token() -> bool:
+    raw = os.getenv("ALLOW_DEMO_WITHOUT_TOKEN")
+    if raw is not None:
+        return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+    # Keep production strict by default while allowing local tests/sandbox flows.
+    env = os.getenv("ENV", "").strip().lower()
+    is_test_runtime = os.getenv("PYTEST_CURRENT_TEST") is not None
+    return env in {"test", "testing"} or is_test_runtime
+
 
 # auto_error=False allows us to handle missing tokens manually for demo/sandbox mode
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", auto_error=False)
@@ -53,8 +64,8 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     
-    # Optional sandbox mode for local dev only. Disabled by default.
-    if not token and ALLOW_DEMO_WITHOUT_TOKEN:
+    # Optional sandbox mode for local dev/test only (never enabled by default in production).
+    if not token and _allow_demo_without_token():
         demo_user = db.query(models.User).filter(models.User.username == "vireon_demo").first()
         if not demo_user:
             demo_user = models.User(

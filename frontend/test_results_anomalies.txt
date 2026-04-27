@@ -1,0 +1,1436 @@
+
+Running 21 tests using 7 workers
+
+  ✘   2 [chromium] › tests/anomalies.spec.ts:18:9 › Anomalies & Financial Risk Page › shows Real-time monitoring badge (20.5s)
+  ✘   5 [chromium] › tests/anomalies.spec.ts:35:9 › Anomalies & Financial Risk Page › has Configure button (20.5s)
+  ✘   1 [chromium] › tests/anomalies.spec.ts:40:9 › Anomalies & Financial Risk Page › displays Risk Score card (20.5s)
+  ✘   7 [chromium] › tests/anomalies.spec.ts:27:9 › Anomalies & Financial Risk Page › has Test Email button (20.5s)
+  ✘   6 [chromium] › tests/anomalies.spec.ts:14:9 › Anomalies & Financial Risk Page › renders Financial Risk Dashboard heading (20.5s)
+  ✘   3 [chromium] › tests/anomalies.spec.ts:31:9 › Anomalies & Financial Risk Page › has Send Alerts Now button (20.5s)
+  ✘   4 [chromium] › tests/anomalies.spec.ts:22:9 › Anomalies & Financial Risk Page › shows anomaly detection description (20.5s)
+  ✘  10 [chromium] › tests/anomalies.spec.ts:40:9 › Anomalies & Financial Risk Page › displays Risk Score card (retry #1) (20.5s)
+  ✘  12 [chromium] › tests/anomalies.spec.ts:35:9 › Anomalies & Financial Risk Page › has Configure button (retry #1) (20.5s)
+  ✘   8 [chromium] › tests/anomalies.spec.ts:14:9 › Anomalies & Financial Risk Page › renders Financial Risk Dashboard heading (retry #1) (20.5s)
+  ✘   9 [chromium] › tests/anomalies.spec.ts:31:9 › Anomalies & Financial Risk Page › has Send Alerts Now button (retry #1) (20.5s)
+  ✘  13 [chromium] › tests/anomalies.spec.ts:27:9 › Anomalies & Financial Risk Page › has Test Email button (retry #1) (20.6s)
+  ✘  14 [chromium] › tests/anomalies.spec.ts:22:9 › Anomalies & Financial Risk Page › shows anomaly detection description (retry #1) (20.6s)
+  ✘  11 [chromium] › tests/anomalies.spec.ts:18:9 › Anomalies & Financial Risk Page › shows Real-time monitoring badge (retry #1) (20.6s)
+  ✓  17 [chromium] › tests/anomalies.spec.ts:50:9 › Anomalies & Financial Risk Page › displays Runway card in risk section (4.2s)
+  ✘  21 [chromium] › tests/anomalies.spec.ts:59:9 › Anomalies & Financial Risk Page › renders Detected Anomalies section (19.5s)
+  ✘  15 [chromium] › tests/anomalies.spec.ts:71:9 › Anomalies & Financial Risk Page › clicking filter button updates active state (19.6s)
+  ✘  16 [chromium] › tests/anomalies.spec.ts:44:9 › Anomalies & Financial Risk Page › displays Anomalies count card (19.6s)
+  ✘  20 [chromium] › tests/anomalies.spec.ts:54:9 › Anomalies & Financial Risk Page › displays Alerts Sent card (19.5s)
+  ✘  19 [chromium] › tests/anomalies.spec.ts:64:9 › Anomalies & Financial Risk Page › has severity filter buttons (19.6s)
+  ✘  18 [chromium] › tests/anomalies.spec.ts:78:9 › Anomalies & Financial Risk Page › has anomaly search input (19.6s)
+  ✘  22 [chromium] › tests/anomalies.spec.ts:83:9 › Anomalies & Financial Risk Page › typing in search field works (18.5s)
+  ✘  23 [chromium] › tests/anomalies.spec.ts:71:9 › Anomalies & Financial Risk Page › clicking filter button updates active state (retry #1) (19.4s)
+  ✘  27 [chromium] › tests/anomalies.spec.ts:54:9 › Anomalies & Financial Risk Page › displays Alerts Sent card (retry #1) (19.4s)
+  ✘  24 [chromium] › tests/anomalies.spec.ts:78:9 › Anomalies & Financial Risk Page › has anomaly search input (retry #1) (19.5s)
+  ✘  26 [chromium] › tests/anomalies.spec.ts:44:9 › Anomalies & Financial Risk Page › displays Anomalies count card (retry #1) (19.5s)
+  ✘  25 [chromium] › tests/anomalies.spec.ts:59:9 › Anomalies & Financial Risk Page › renders Detected Anomalies section (retry #1) (19.5s)
+  ✘  28 [chromium] › tests/anomalies.spec.ts:64:9 › Anomalies & Financial Risk Page › has severity filter buttons (retry #1) (19.5s)
+  ✘  29 [chromium] › tests/anomalies.spec.ts:83:9 › Anomalies & Financial Risk Page › typing in search field works (retry #1) (18.6s)
+  ✘  35 [chromium] › tests/anomalies.spec.ts:118:9 › Anomalies & Financial Risk Page › shows Currently Configured section within config panel (19.1s)
+  ✘  30 [chromium] › tests/anomalies.spec.ts:90:9 › Anomalies & Financial Risk Page › clicking Configure opens email alert configuration panel (19.1s)
+  ✘  34 [chromium] › tests/anomalies.spec.ts:105:9 › Anomalies & Financial Risk Page › configuration panel has Save and Cancel buttons (19.1s)
+  ✘  31 [chromium] › tests/anomalies.spec.ts:95:9 › Anomalies & Financial Risk Page › configuration panel has CEO Email input (19.1s)
+  ✘  33 [chromium] › tests/anomalies.spec.ts:100:9 › Anomalies & Financial Risk Page › configuration panel has Finance Team textarea (19.1s)
+  ✘  32 [chromium] › tests/anomalies.spec.ts:111:9 › Anomalies & Financial Risk Page › clicking Cancel closes configuration panel (19.1s)
+  ✘  39 [chromium] › tests/anomalies.spec.ts:95:9 › Anomalies & Financial Risk Page › configuration panel has CEO Email input (retry #1) (19.5s)
+  ✘  36 [chromium] › tests/anomalies.spec.ts:105:9 › Anomalies & Financial Risk Page › configuration panel has Save and Cancel buttons (retry #1) (19.6s)
+  ✘  38 [chromium] › tests/anomalies.spec.ts:118:9 › Anomalies & Financial Risk Page › shows Currently Configured section within config panel (retry #1) (19.6s)
+  ✘  41 [chromium] › tests/anomalies.spec.ts:100:9 › Anomalies & Financial Risk Page › configuration panel has Finance Team textarea (retry #1) (19.6s)
+  ✘  37 [chromium] › tests/anomalies.spec.ts:90:9 › Anomalies & Financial Risk Page › clicking Configure opens email alert configuration panel (retry #1) (19.6s)
+  ✘  40 [chromium] › tests/anomalies.spec.ts:111:9 › Anomalies & Financial Risk Page › clicking Cancel closes configuration panel (retry #1) (19.6s)
+
+
+  1) [chromium] › tests/anomalies.spec.ts:14:9 › Anomalies & Financial Risk Page › renders Financial Risk Dashboard heading 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('h1:has-text("Financial Risk Dashboard")')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('h1:has-text("Financial Risk Dashboard")')[22m
+
+
+      13 |     // ── Page Structure ────────────────────────────────────────────────
+      14 |     test('renders Financial Risk Dashboard heading', async ({ page }) => {
+    > 15 |         await expect(page.locator('h1:has-text("Financial Risk Dashboard")')).toBeVisible({ timeout: 15000 });
+         |                                                                               ^
+      16 |     });
+      17 |
+      18 |     test('shows Real-time monitoring badge', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:15:79
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-fb948-cial-Risk-Dashboard-heading-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-fb948-cial-Risk-Dashboard-heading-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-fb948-cial-Risk-Dashboard-heading-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('h1:has-text("Financial Risk Dashboard")')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('h1:has-text("Financial Risk Dashboard")')[22m
+
+
+      13 |     // ── Page Structure ────────────────────────────────────────────────
+      14 |     test('renders Financial Risk Dashboard heading', async ({ page }) => {
+    > 15 |         await expect(page.locator('h1:has-text("Financial Risk Dashboard")')).toBeVisible({ timeout: 15000 });
+         |                                                                               ^
+      16 |     });
+      17 |
+      18 |     test('shows Real-time monitoring badge', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:15:79
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-fb948-cial-Risk-Dashboard-heading-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-fb948-cial-Risk-Dashboard-heading-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-fb948-cial-Risk-Dashboard-heading-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-fb948-cial-Risk-Dashboard-heading-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financ-fb948-cial-Risk-Dashboard-heading-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests/anomalies.spec.ts:18:9 › Anomalies & Financial Risk Page › shows Real-time monitoring badge 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Real-time monitoring')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('text=Real-time monitoring')[22m
+
+
+      17 |
+      18 |     test('shows Real-time monitoring badge', async ({ page }) => {
+    > 19 |         await expect(page.locator('text=Real-time monitoring')).toBeVisible({ timeout: 15000 });
+         |                                                                 ^
+      20 |     });
+      21 |
+      22 |     test('shows anomaly detection description', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:19:65
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-db5ca--Real-time-monitoring-badge-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-db5ca--Real-time-monitoring-badge-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-db5ca--Real-time-monitoring-badge-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Real-time monitoring')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('text=Real-time monitoring')[22m
+
+
+      17 |
+      18 |     test('shows Real-time monitoring badge', async ({ page }) => {
+    > 19 |         await expect(page.locator('text=Real-time monitoring')).toBeVisible({ timeout: 15000 });
+         |                                                                 ^
+      20 |     });
+      21 |
+      22 |     test('shows anomaly detection description', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:19:65
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-db5ca--Real-time-monitoring-badge-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-db5ca--Real-time-monitoring-badge-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-db5ca--Real-time-monitoring-badge-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-db5ca--Real-time-monitoring-badge-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financ-db5ca--Real-time-monitoring-badge-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › tests/anomalies.spec.ts:22:9 › Anomalies & Financial Risk Page › shows anomaly detection description 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Anomaly detection')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('text=Anomaly detection')[22m
+
+
+      21 |
+      22 |     test('shows anomaly detection description', async ({ page }) => {
+    > 23 |         await expect(page.locator('text=Anomaly detection')).toBeVisible({ timeout: 15000 });
+         |                                                              ^
+      24 |     });
+      25 |
+      26 |     // ── Action Buttons ────────────────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:23:62
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-69cf0-omaly-detection-description-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-69cf0-omaly-detection-description-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-69cf0-omaly-detection-description-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Anomaly detection')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('text=Anomaly detection')[22m
+
+
+      21 |
+      22 |     test('shows anomaly detection description', async ({ page }) => {
+    > 23 |         await expect(page.locator('text=Anomaly detection')).toBeVisible({ timeout: 15000 });
+         |                                                              ^
+      24 |     });
+      25 |
+      26 |     // ── Action Buttons ────────────────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:23:62
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-69cf0-omaly-detection-description-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-69cf0-omaly-detection-description-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-69cf0-omaly-detection-description-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-69cf0-omaly-detection-description-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financ-69cf0-omaly-detection-description-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium] › tests/anomalies.spec.ts:27:9 › Anomalies & Financial Risk Page › has Test Email button 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('button:has-text("Test Email")')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('button:has-text("Test Email")')[22m
+
+
+      26 |     // ── Action Buttons ────────────────────────────────────────────────
+      27 |     test('has Test Email button', async ({ page }) => {
+    > 28 |         await expect(page.locator('button:has-text("Test Email")')).toBeVisible({ timeout: 15000 });
+         |                                                                     ^
+      29 |     });
+      30 |
+      31 |     test('has Send Alerts Now button', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:28:69
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-68308--Page-has-Test-Email-button-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-68308--Page-has-Test-Email-button-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-68308--Page-has-Test-Email-button-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('button:has-text("Test Email")')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('button:has-text("Test Email")')[22m
+
+
+      26 |     // ── Action Buttons ────────────────────────────────────────────────
+      27 |     test('has Test Email button', async ({ page }) => {
+    > 28 |         await expect(page.locator('button:has-text("Test Email")')).toBeVisible({ timeout: 15000 });
+         |                                                                     ^
+      29 |     });
+      30 |
+      31 |     test('has Send Alerts Now button', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:28:69
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-68308--Page-has-Test-Email-button-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-68308--Page-has-Test-Email-button-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-68308--Page-has-Test-Email-button-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-68308--Page-has-Test-Email-button-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financ-68308--Page-has-Test-Email-button-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium] › tests/anomalies.spec.ts:31:9 › Anomalies & Financial Risk Page › has Send Alerts Now button 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('button:has-text("Send Alerts Now")')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('button:has-text("Send Alerts Now")')[22m
+
+
+      30 |
+      31 |     test('has Send Alerts Now button', async ({ page }) => {
+    > 32 |         await expect(page.locator('button:has-text("Send Alerts Now")')).toBeVisible({ timeout: 15000 });
+         |                                                                          ^
+      33 |     });
+      34 |
+      35 |     test('has Configure button', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:32:74
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-e9851--has-Send-Alerts-Now-button-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-e9851--has-Send-Alerts-Now-button-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-e9851--has-Send-Alerts-Now-button-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('button:has-text("Send Alerts Now")')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('button:has-text("Send Alerts Now")')[22m
+
+
+      30 |
+      31 |     test('has Send Alerts Now button', async ({ page }) => {
+    > 32 |         await expect(page.locator('button:has-text("Send Alerts Now")')).toBeVisible({ timeout: 15000 });
+         |                                                                          ^
+      33 |     });
+      34 |
+      35 |     test('has Configure button', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:32:74
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-e9851--has-Send-Alerts-Now-button-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-e9851--has-Send-Alerts-Now-button-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-e9851--has-Send-Alerts-Now-button-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-e9851--has-Send-Alerts-Now-button-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financ-e9851--has-Send-Alerts-Now-button-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [chromium] › tests/anomalies.spec.ts:35:9 › Anomalies & Financial Risk Page › has Configure button 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('button:has-text("Configure")')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('button:has-text("Configure")')[22m
+
+
+      34 |
+      35 |     test('has Configure button', async ({ page }) => {
+    > 36 |         await expect(page.locator('button:has-text("Configure")')).toBeVisible({ timeout: 15000 });
+         |                                                                    ^
+      37 |     });
+      38 |
+      39 |     // ── Risk Score Cards ──────────────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:36:68
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financial-Risk-Page-has-Configure-button-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financial-Risk-Page-has-Configure-button-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financial-Risk-Page-has-Configure-button-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('button:has-text("Configure")')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('button:has-text("Configure")')[22m
+
+
+      34 |
+      35 |     test('has Configure button', async ({ page }) => {
+    > 36 |         await expect(page.locator('button:has-text("Configure")')).toBeVisible({ timeout: 15000 });
+         |                                                                    ^
+      37 |     });
+      38 |
+      39 |     // ── Risk Score Cards ──────────────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:36:68
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financial-Risk-Page-has-Configure-button-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financial-Risk-Page-has-Configure-button-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financial-Risk-Page-has-Configure-button-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financial-Risk-Page-has-Configure-button-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financial-Risk-Page-has-Configure-button-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [chromium] › tests/anomalies.spec.ts:40:9 › Anomalies & Financial Risk Page › displays Risk Score card 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Risk Score')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('text=Risk Score')[22m
+
+
+      39 |     // ── Risk Score Cards ──────────────────────────────────────────────
+      40 |     test('displays Risk Score card', async ({ page }) => {
+    > 41 |         await expect(page.locator('text=Risk Score')).toBeVisible({ timeout: 15000 });
+         |                                                       ^
+      42 |     });
+      43 |
+      44 |     test('displays Anomalies count card', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:41:55
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-80982-ge-displays-Risk-Score-card-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-80982-ge-displays-Risk-Score-card-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-80982-ge-displays-Risk-Score-card-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Risk Score')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('text=Risk Score')[22m
+
+
+      39 |     // ── Risk Score Cards ──────────────────────────────────────────────
+      40 |     test('displays Risk Score card', async ({ page }) => {
+    > 41 |         await expect(page.locator('text=Risk Score')).toBeVisible({ timeout: 15000 });
+         |                                                       ^
+      42 |     });
+      43 |
+      44 |     test('displays Anomalies count card', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:41:55
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-80982-ge-displays-Risk-Score-card-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-80982-ge-displays-Risk-Score-card-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-80982-ge-displays-Risk-Score-card-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-80982-ge-displays-Risk-Score-card-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financ-80982-ge-displays-Risk-Score-card-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [chromium] › tests/anomalies.spec.ts:44:9 › Anomalies & Financial Risk Page › displays Anomalies count card 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('p:has-text("Anomalies")').first()
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('p:has-text("Anomalies")').first()[22m
+
+
+      45 |         // Use more specific locator to avoid ambiguity with page title
+      46 |         const card = page.locator('p:has-text("Anomalies")').first();
+    > 47 |         await expect(card).toBeVisible({ timeout: 15000 });
+         |                            ^
+      48 |     });
+      49 |
+      50 |     test('displays Runway card in risk section', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:47:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-2ddd9-splays-Anomalies-count-card-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-2ddd9-splays-Anomalies-count-card-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-2ddd9-splays-Anomalies-count-card-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('p:has-text("Anomalies")').first()
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('p:has-text("Anomalies")').first()[22m
+
+
+      45 |         // Use more specific locator to avoid ambiguity with page title
+      46 |         const card = page.locator('p:has-text("Anomalies")').first();
+    > 47 |         await expect(card).toBeVisible({ timeout: 15000 });
+         |                            ^
+      48 |     });
+      49 |
+      50 |     test('displays Runway card in risk section', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:47:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-2ddd9-splays-Anomalies-count-card-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-2ddd9-splays-Anomalies-count-card-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-2ddd9-splays-Anomalies-count-card-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-2ddd9-splays-Anomalies-count-card-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financ-2ddd9-splays-Anomalies-count-card-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [chromium] › tests/anomalies.spec.ts:54:9 › Anomalies & Financial Risk Page › displays Alerts Sent card 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Alerts Sent')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('text=Alerts Sent')[22m
+
+
+      53 |
+      54 |     test('displays Alerts Sent card', async ({ page }) => {
+    > 55 |         await expect(page.locator('text=Alerts Sent')).toBeVisible({ timeout: 15000 });
+         |                                                        ^
+      56 |     });
+      57 |
+      58 |     // ── Detected Anomalies List ───────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:55:56
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-8bde5-e-displays-Alerts-Sent-card-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-8bde5-e-displays-Alerts-Sent-card-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-8bde5-e-displays-Alerts-Sent-card-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Alerts Sent')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('text=Alerts Sent')[22m
+
+
+      53 |
+      54 |     test('displays Alerts Sent card', async ({ page }) => {
+    > 55 |         await expect(page.locator('text=Alerts Sent')).toBeVisible({ timeout: 15000 });
+         |                                                        ^
+      56 |     });
+      57 |
+      58 |     // ── Detected Anomalies List ───────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:55:56
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-8bde5-e-displays-Alerts-Sent-card-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-8bde5-e-displays-Alerts-Sent-card-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-8bde5-e-displays-Alerts-Sent-card-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-8bde5-e-displays-Alerts-Sent-card-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financ-8bde5-e-displays-Alerts-Sent-card-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [chromium] › tests/anomalies.spec.ts:59:9 › Anomalies & Financial Risk Page › renders Detected Anomalies section 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Detected Anomalies')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('text=Detected Anomalies')[22m
+
+
+      58 |     // ── Detected Anomalies List ───────────────────────────────────────
+      59 |     test('renders Detected Anomalies section', async ({ page }) => {
+    > 60 |         await expect(page.locator('text=Detected Anomalies')).toBeVisible({ timeout: 15000 });
+         |                                                               ^
+      61 |     });
+      62 |
+      63 |     // ── Filter Buttons ────────────────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:60:63
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-da84d--Detected-Anomalies-section-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-da84d--Detected-Anomalies-section-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-da84d--Detected-Anomalies-section-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Detected Anomalies')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('text=Detected Anomalies')[22m
+
+
+      58 |     // ── Detected Anomalies List ───────────────────────────────────────
+      59 |     test('renders Detected Anomalies section', async ({ page }) => {
+    > 60 |         await expect(page.locator('text=Detected Anomalies')).toBeVisible({ timeout: 15000 });
+         |                                                               ^
+      61 |     });
+      62 |
+      63 |     // ── Filter Buttons ────────────────────────────────────────────────
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:60:63
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-da84d--Detected-Anomalies-section-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-da84d--Detected-Anomalies-section-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-da84d--Detected-Anomalies-section-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-da84d--Detected-Anomalies-section-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financ-da84d--Detected-Anomalies-section-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [chromium] › tests/anomalies.spec.ts:64:9 › Anomalies & Financial Risk Page › has severity filter buttons 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('button:has-text("critical")').first()
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('button:has-text("critical")').first()[22m
+
+
+      65 |         const filters = ['all', 'critical', 'warning', 'info'];
+      66 |         for (const f of filters) {
+    > 67 |             await expect(page.locator(`button:has-text("${f}")`).first()).toBeVisible({ timeout: 15000 });
+         |                                                                           ^
+      68 |         }
+      69 |     });
+      70 |
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:67:75
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-06aeb-has-severity-filter-buttons-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-06aeb-has-severity-filter-buttons-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-06aeb-has-severity-filter-buttons-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('button:has-text("critical")').first()
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('button:has-text("critical")').first()[22m
+
+
+      65 |         const filters = ['all', 'critical', 'warning', 'info'];
+      66 |         for (const f of filters) {
+    > 67 |             await expect(page.locator(`button:has-text("${f}")`).first()).toBeVisible({ timeout: 15000 });
+         |                                                                           ^
+      68 |         }
+      69 |     });
+      70 |
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:67:75
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-06aeb-has-severity-filter-buttons-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-06aeb-has-severity-filter-buttons-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-06aeb-has-severity-filter-buttons-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-06aeb-has-severity-filter-buttons-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financ-06aeb-has-severity-filter-buttons-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [chromium] › tests/anomalies.spec.ts:71:9 › Anomalies & Financial Risk Page › clicking filter button updates active state 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button:has-text("critical")').first()[22m
+
+
+      71 |     test('clicking filter button updates active state', async ({ page }) => {
+      72 |         const criticalBtn = page.locator('button:has-text("critical")').first();
+    > 73 |         await criticalBtn.click();
+         |                           ^
+      74 |         await expect(criticalBtn).toHaveClass(/bg-\[#f5e7cf\]/);
+      75 |     });
+      76 |
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:73:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-06565-button-updates-active-state-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-06565-button-updates-active-state-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-06565-button-updates-active-state-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button:has-text("critical")').first()[22m
+
+
+      71 |     test('clicking filter button updates active state', async ({ page }) => {
+      72 |         const criticalBtn = page.locator('button:has-text("critical")').first();
+    > 73 |         await criticalBtn.click();
+         |                           ^
+      74 |         await expect(criticalBtn).toHaveClass(/bg-\[#f5e7cf\]/);
+      75 |     });
+      76 |
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:73:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-06565-button-updates-active-state-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-06565-button-updates-active-state-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-06565-button-updates-active-state-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-06565-button-updates-active-state-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financ-06565-button-updates-active-state-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) [chromium] › tests/anomalies.spec.ts:78:9 › Anomalies & Financial Risk Page › has anomaly search input 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('input[placeholder="Search anomalies"]')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('input[placeholder="Search anomalies"]')[22m
+
+
+      78 |     test('has anomaly search input', async ({ page }) => {
+      79 |         const searchInput = page.locator('input[placeholder="Search anomalies"]');
+    > 80 |         await expect(searchInput).toBeVisible({ timeout: 15000 });
+         |                                   ^
+      81 |     });
+      82 |
+      83 |     test('typing in search field works', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:80:35
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-240e9-ge-has-anomaly-search-input-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-240e9-ge-has-anomaly-search-input-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-240e9-ge-has-anomaly-search-input-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('input[placeholder="Search anomalies"]')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('input[placeholder="Search anomalies"]')[22m
+
+
+      78 |     test('has anomaly search input', async ({ page }) => {
+      79 |         const searchInput = page.locator('input[placeholder="Search anomalies"]');
+    > 80 |         await expect(searchInput).toBeVisible({ timeout: 15000 });
+         |                                   ^
+      81 |     });
+      82 |
+      83 |     test('typing in search field works', async ({ page }) => {
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:80:35
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-240e9-ge-has-anomaly-search-input-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-240e9-ge-has-anomaly-search-input-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-240e9-ge-has-anomaly-search-input-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-240e9-ge-has-anomaly-search-input-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financ-240e9-ge-has-anomaly-search-input-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  14) [chromium] › tests/anomalies.spec.ts:83:9 › Anomalies & Financial Risk Page › typing in search field works 
+
+    TimeoutError: locator.fill: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[placeholder="Search anomalies"]')[22m
+
+
+      83 |     test('typing in search field works', async ({ page }) => {
+      84 |         const searchInput = page.locator('input[placeholder="Search anomalies"]');
+    > 85 |         await searchInput.fill('test search');
+         |                           ^
+      86 |         await expect(searchInput).toHaveValue('test search');
+      87 |     });
+      88 |
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:85:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-fb136-yping-in-search-field-works-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-fb136-yping-in-search-field-works-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-fb136-yping-in-search-field-works-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: locator.fill: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[placeholder="Search anomalies"]')[22m
+
+
+      83 |     test('typing in search field works', async ({ page }) => {
+      84 |         const searchInput = page.locator('input[placeholder="Search anomalies"]');
+    > 85 |         await searchInput.fill('test search');
+         |                           ^
+      86 |         await expect(searchInput).toHaveValue('test search');
+      87 |     });
+      88 |
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:85:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-fb136-yping-in-search-field-works-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-fb136-yping-in-search-field-works-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-fb136-yping-in-search-field-works-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-fb136-yping-in-search-field-works-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financ-fb136-yping-in-search-field-works-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  15) [chromium] › tests/anomalies.spec.ts:90:9 › Anomalies & Financial Risk Page › clicking Configure opens email alert configuration panel 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button:has-text("Configure")')[22m
+
+
+      89 |     // ── Configure Alert Panel ─────────────────────────────────────────
+      90 |     test('clicking Configure opens email alert configuration panel', async ({ page }) => {
+    > 91 |         await page.locator('button:has-text("Configure")').click();
+         |                                                            ^
+      92 |         await expect(page.locator('text=Configure Email Alerts')).toBeVisible({ timeout: 10000 });
+      93 |     });
+      94 |
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:91:60
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-95b92-l-alert-configuration-panel-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-95b92-l-alert-configuration-panel-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-95b92-l-alert-configuration-panel-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button:has-text("Configure")')[22m
+
+
+      89 |     // ── Configure Alert Panel ─────────────────────────────────────────
+      90 |     test('clicking Configure opens email alert configuration panel', async ({ page }) => {
+    > 91 |         await page.locator('button:has-text("Configure")').click();
+         |                                                            ^
+      92 |         await expect(page.locator('text=Configure Email Alerts')).toBeVisible({ timeout: 10000 });
+      93 |     });
+      94 |
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:91:60
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-95b92-l-alert-configuration-panel-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-95b92-l-alert-configuration-panel-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-95b92-l-alert-configuration-panel-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-95b92-l-alert-configuration-panel-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financ-95b92-l-alert-configuration-panel-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  16) [chromium] › tests/anomalies.spec.ts:95:9 › Anomalies & Financial Risk Page › configuration panel has CEO Email input 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button:has-text("Configure")')[22m
+
+
+      94 |
+      95 |     test('configuration panel has CEO Email input', async ({ page }) => {
+    > 96 |         await page.locator('button:has-text("Configure")').click();
+         |                                                            ^
+      97 |         await expect(page.locator('text=CEO Email')).toBeVisible({ timeout: 10000 });
+      98 |     });
+      99 |
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:96:60
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-56784-n-panel-has-CEO-Email-input-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-56784-n-panel-has-CEO-Email-input-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-56784-n-panel-has-CEO-Email-input-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button:has-text("Configure")')[22m
+
+
+      94 |
+      95 |     test('configuration panel has CEO Email input', async ({ page }) => {
+    > 96 |         await page.locator('button:has-text("Configure")').click();
+         |                                                            ^
+      97 |         await expect(page.locator('text=CEO Email')).toBeVisible({ timeout: 10000 });
+      98 |     });
+      99 |
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:96:60
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-56784-n-panel-has-CEO-Email-input-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-56784-n-panel-has-CEO-Email-input-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-56784-n-panel-has-CEO-Email-input-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-56784-n-panel-has-CEO-Email-input-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financ-56784-n-panel-has-CEO-Email-input-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  17) [chromium] › tests/anomalies.spec.ts:100:9 › Anomalies & Financial Risk Page › configuration panel has Finance Team textarea 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button:has-text("Configure")')[22m
+
+
+       99 |
+      100 |     test('configuration panel has Finance Team textarea', async ({ page }) => {
+    > 101 |         await page.locator('button:has-text("Configure")').click();
+          |                                                            ^
+      102 |         await expect(page.locator('text=Finance Team')).toBeVisible({ timeout: 10000 });
+      103 |     });
+      104 |
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:101:60
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-adbb3-l-has-Finance-Team-textarea-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-adbb3-l-has-Finance-Team-textarea-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-adbb3-l-has-Finance-Team-textarea-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button:has-text("Configure")')[22m
+
+
+       99 |
+      100 |     test('configuration panel has Finance Team textarea', async ({ page }) => {
+    > 101 |         await page.locator('button:has-text("Configure")').click();
+          |                                                            ^
+      102 |         await expect(page.locator('text=Finance Team')).toBeVisible({ timeout: 10000 });
+      103 |     });
+      104 |
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:101:60
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-adbb3-l-has-Finance-Team-textarea-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-adbb3-l-has-Finance-Team-textarea-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-adbb3-l-has-Finance-Team-textarea-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-adbb3-l-has-Finance-Team-textarea-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financ-adbb3-l-has-Finance-Team-textarea-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  18) [chromium] › tests/anomalies.spec.ts:105:9 › Anomalies & Financial Risk Page › configuration panel has Save and Cancel buttons 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button:has-text("Configure")')[22m
+
+
+      104 |
+      105 |     test('configuration panel has Save and Cancel buttons', async ({ page }) => {
+    > 106 |         await page.locator('button:has-text("Configure")').click();
+          |                                                            ^
+      107 |         await expect(page.locator('button:has-text("Save Configuration")')).toBeVisible({ timeout: 10000 });
+      108 |         await expect(page.locator('button:has-text("Cancel")')).toBeVisible({ timeout: 10000 });
+      109 |     });
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:106:60
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-449b1-has-Save-and-Cancel-buttons-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-449b1-has-Save-and-Cancel-buttons-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-449b1-has-Save-and-Cancel-buttons-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button:has-text("Configure")')[22m
+
+
+      104 |
+      105 |     test('configuration panel has Save and Cancel buttons', async ({ page }) => {
+    > 106 |         await page.locator('button:has-text("Configure")').click();
+          |                                                            ^
+      107 |         await expect(page.locator('button:has-text("Save Configuration")')).toBeVisible({ timeout: 10000 });
+      108 |         await expect(page.locator('button:has-text("Cancel")')).toBeVisible({ timeout: 10000 });
+      109 |     });
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:106:60
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-449b1-has-Save-and-Cancel-buttons-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-449b1-has-Save-and-Cancel-buttons-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-449b1-has-Save-and-Cancel-buttons-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-449b1-has-Save-and-Cancel-buttons-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financ-449b1-has-Save-and-Cancel-buttons-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  19) [chromium] › tests/anomalies.spec.ts:111:9 › Anomalies & Financial Risk Page › clicking Cancel closes configuration panel 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button:has-text("Configure")')[22m
+
+
+      110 |
+      111 |     test('clicking Cancel closes configuration panel', async ({ page }) => {
+    > 112 |         await page.locator('button:has-text("Configure")').click();
+          |                                                            ^
+      113 |         await expect(page.locator('text=Configure Email Alerts')).toBeVisible({ timeout: 10000 });
+      114 |         await page.locator('button:has-text("Cancel")').click();
+      115 |         await expect(page.locator('text=Configure Email Alerts')).not.toBeVisible();
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:112:60
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-5025a--closes-configuration-panel-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-5025a--closes-configuration-panel-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-5025a--closes-configuration-panel-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button:has-text("Configure")')[22m
+
+
+      110 |
+      111 |     test('clicking Cancel closes configuration panel', async ({ page }) => {
+    > 112 |         await page.locator('button:has-text("Configure")').click();
+          |                                                            ^
+      113 |         await expect(page.locator('text=Configure Email Alerts')).toBeVisible({ timeout: 10000 });
+      114 |         await page.locator('button:has-text("Cancel")').click();
+      115 |         await expect(page.locator('text=Configure Email Alerts')).not.toBeVisible();
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:112:60
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-5025a--closes-configuration-panel-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-5025a--closes-configuration-panel-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-5025a--closes-configuration-panel-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-5025a--closes-configuration-panel-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financ-5025a--closes-configuration-panel-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  20) [chromium] › tests/anomalies.spec.ts:118:9 › Anomalies & Financial Risk Page › shows Currently Configured section within config panel 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button:has-text("Configure")')[22m
+
+
+      117 |
+      118 |     test('shows Currently Configured section within config panel', async ({ page }) => {
+    > 119 |         await page.locator('button:has-text("Configure")').click();
+          |                                                            ^
+      120 |         await expect(page.locator('text=Currently Configured')).toBeVisible({ timeout: 10000 });
+      121 |     });
+      122 | });
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:119:60
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-3cdee-section-within-config-panel-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-3cdee-section-within-config-panel-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-3cdee-section-within-config-panel-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button:has-text("Configure")')[22m
+
+
+      117 |
+      118 |     test('shows Currently Configured section within config panel', async ({ page }) => {
+    > 119 |         await page.locator('button:has-text("Configure")').click();
+          |                                                            ^
+      120 |         await expect(page.locator('text=Currently Configured')).toBeVisible({ timeout: 10000 });
+      121 |     });
+      122 | });
+        at /Users/asingh/vireon/frontend/tests/anomalies.spec.ts:119:60
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-3cdee-section-within-config-panel-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-3cdee-section-within-config-panel-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/anomalies-Anomalies-Financ-3cdee-section-within-config-panel-chromium-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/anomalies-Anomalies-Financ-3cdee-section-within-config-panel-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/anomalies-Anomalies-Financ-3cdee-section-within-config-panel-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  20 failed
+    [chromium] › tests/anomalies.spec.ts:14:9 › Anomalies & Financial Risk Page › renders Financial Risk Dashboard heading 
+    [chromium] › tests/anomalies.spec.ts:18:9 › Anomalies & Financial Risk Page › shows Real-time monitoring badge 
+    [chromium] › tests/anomalies.spec.ts:22:9 › Anomalies & Financial Risk Page › shows anomaly detection description 
+    [chromium] › tests/anomalies.spec.ts:27:9 › Anomalies & Financial Risk Page › has Test Email button 
+    [chromium] › tests/anomalies.spec.ts:31:9 › Anomalies & Financial Risk Page › has Send Alerts Now button 
+    [chromium] › tests/anomalies.spec.ts:35:9 › Anomalies & Financial Risk Page › has Configure button 
+    [chromium] › tests/anomalies.spec.ts:40:9 › Anomalies & Financial Risk Page › displays Risk Score card 
+    [chromium] › tests/anomalies.spec.ts:44:9 › Anomalies & Financial Risk Page › displays Anomalies count card 
+    [chromium] › tests/anomalies.spec.ts:54:9 › Anomalies & Financial Risk Page › displays Alerts Sent card 
+    [chromium] › tests/anomalies.spec.ts:59:9 › Anomalies & Financial Risk Page › renders Detected Anomalies section 
+    [chromium] › tests/anomalies.spec.ts:64:9 › Anomalies & Financial Risk Page › has severity filter buttons 
+    [chromium] › tests/anomalies.spec.ts:71:9 › Anomalies & Financial Risk Page › clicking filter button updates active state 
+    [chromium] › tests/anomalies.spec.ts:78:9 › Anomalies & Financial Risk Page › has anomaly search input 
+    [chromium] › tests/anomalies.spec.ts:83:9 › Anomalies & Financial Risk Page › typing in search field works 
+    [chromium] › tests/anomalies.spec.ts:90:9 › Anomalies & Financial Risk Page › clicking Configure opens email alert configuration panel 
+    [chromium] › tests/anomalies.spec.ts:95:9 › Anomalies & Financial Risk Page › configuration panel has CEO Email input 
+    [chromium] › tests/anomalies.spec.ts:100:9 › Anomalies & Financial Risk Page › configuration panel has Finance Team textarea 
+    [chromium] › tests/anomalies.spec.ts:105:9 › Anomalies & Financial Risk Page › configuration panel has Save and Cancel buttons 
+    [chromium] › tests/anomalies.spec.ts:111:9 › Anomalies & Financial Risk Page › clicking Cancel closes configuration panel 
+    [chromium] › tests/anomalies.spec.ts:118:9 › Anomalies & Financial Risk Page › shows Currently Configured section within config panel 
+  1 passed (2.2m)
