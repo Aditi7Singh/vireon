@@ -4,10 +4,17 @@ databases:
     user: vireon_user
 
 services:
+  - type: redis
+    name: vireon-redis
+    plan: free
+    maxmemoryPolicy: noeviction
+    ipAllowList: []
+
   - type: web
     name: vireon-backend
     runtime: python
-    plan: standard
+    rootDir: backend
+    plan: free
     buildCommand: pip install -r requirements.txt -r requirements_agent.txt && alembic upgrade head
     startCommand: uvicorn main:app --host 0.0.0.0 --port 8000
     envVars:
@@ -19,11 +26,16 @@ services:
         fromDatabase:
           name: vireon-db
           property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: vireon-redis
+          property: connectionString
       - key: ALLOWED_ORIGINS
         value: ""
-      - key: GROQ_API_KEY
-        value: ""
       - key: SECRET_KEY
+        value: ""
+      - key: GROQ_API_KEY
         value: ""
       - key: OPENAI_API_KEY
         value: ""
@@ -34,5 +46,5 @@ services:
       - key: ERPNEXT_URL
         value: ""
       - key: REQUIRE_REDIS_FOR_READINESS
-        value: "true"
+        value: "false"
     numInstances: 1
