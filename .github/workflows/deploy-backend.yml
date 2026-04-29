@@ -1,4 +1,4 @@
-name: Deploy Backend to Fly.io
+name: Deploy Backend to Render
 
 on:
   push:
@@ -7,27 +7,27 @@ on:
     paths:
       - 'backend/**'
       - '.github/workflows/deploy-backend.yml'
+      - 'render.yaml'
   workflow_dispatch:
 
 jobs:
   deploy:
-    name: Deploy to Fly.io
+    name: Deploy to Render
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Fly CLI
-        uses: superfly/flyctl-actions/setup-flyctl@master
-
-      - name: Deploy Backend
+      - name: Trigger Render Deployment
         run: |
-          cd backend
-          flyctl deploy --remote-only
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          curl --request POST \
+            --url https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }} \
+            --header 'content-type: application/json'
+        continue-on-error: true
 
-      - name: Check Health
+      - name: Wait for Deployment
+        run: sleep 10
+
+      - name: Check Health (after deployment)
         run: |
-          sleep 5
-          curl -f https://vireon-backend.fly.dev/health/live || echo "Health check pending"
+          curl -f https://${{ secrets.RENDER_SERVICE_URL }}/health/live || echo "Service starting..."
         continue-on-error: true

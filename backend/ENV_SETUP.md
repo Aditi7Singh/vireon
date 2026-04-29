@@ -1,138 +1,89 @@
-# Backend Environment Configuration for Fly.io
+# Backend Environment Configuration for Render
 
 ## Quick Reference: Required & Optional Environment Variables
 
 ### Database & Cache (REQUIRED for Production)
 ```bash
 DATABASE_URL="postgresql://user:password@db.example.com:5432/vireon"
-REDIS_URL="redis://user:password@redis.example.com:6379/0"  # Optional if REQUIRE_REDIS_FOR_READINESS=false
-```
-
-### Authentication & Security (RECOMMENDED)
-```bash
-SECRET_KEY="your-secure-random-string"  # JWT signing key
-ALGORITHM="HS256"  # JWT algorithm
-ACCESS_TOKEN_EXPIRE_MINUTES="1440"  # Token expiry in minutes (1 day = 1440)
-```
-
-### API Keys (OPTIONAL — Only if using these services)
-```bash
-OPENAI_API_KEY="sk-..."  # OpenAI GPT models
-GOOGLE_API_KEY="..."  # Google Generative AI
-GEMINI_API_KEY="..."  # Alternative: Gemini API
-```
-
-### ERPNext Integration (OPTIONAL)
-```bash
-ERPNEXT_URL="https://erpnext.example.com"
-ERPNEXT_API_KEY="your-api-key"
-ERPNEXT_API_SECRET="your-api-secret"
-ERPNEXT_SITE_NAME="site1"
+# AUTO-SET by Render if you link a Postgres instance
 ```
 
 ### Deployment & Health Checks
 ```bash
 ENV="production"  # or "development", "staging"
 REQUIRE_REDIS_FOR_READINESS="false"  # Set to true if Redis is mandatory
-STRICT_STARTUP_CHECKS="false"  # Set to true for strict dependency checks
-STARTUP_MAX_RETRIES="15"  # Number of startup retry attempts
-STARTUP_RETRY_DELAY_SECONDS="2"  # Delay between retries
-```
-
-### CORS (Frontend Communication)
-```bash
-ALLOWED_ORIGINS="https://vireon.vercel.app,https://yourdomain.com"
 ```
 
 ---
 
-## Setting Secrets on Fly.io
+## Setting Environment Variables on Render
 
-### Option 1: Interactive
-```bash
-flyctl secrets set
-# Follow prompts to enter each variable
+### Via Render Dashboard
+
+1. Go to https://dashboard.render.com
+2. Select your `vireon-backend` service
+3. Click "Environment" tab
+4. Auto-injected variables:
+   - `DATABASE_URL` ✅ (from Postgres instance, if linked)
+   - `REDIS_URL` ✅ (from Redis instance, if added)
+5. Add custom variables:
+   - Click "Add Environment Variable"
+   - Enter key and value
+   - Click "Save"
+
+### Examples
+
 ```
-
-### Option 2: Batch
-```bash
-flyctl secrets set \
-  DATABASE_URL="postgresql://..." \
-  REDIS_URL="redis://..." \
-  SECRET_KEY="your-key" \
-  ENV="production"
-```
-
-### Option 3: From .env file (local only, not recommended for production)
-```bash
-export $(cat .env | xargs)
-flyctl secrets set DATABASE_URL=$DATABASE_URL REDIS_URL=$REDIS_URL
-```
-
----
-
-## View Current Secrets
-```bash
-flyctl secrets list  # Shows secret names (not values)
+ENV = production
+ALLOWED_ORIGINS = https://vireon.vercel.app
+SECRET_KEY = your-random-jwt-key-here
+OPENAI_API_KEY = sk-xxxxx (if using OpenAI)
+GOOGLE_API_KEY = xxx (if using Google AI)
+REQUIRE_REDIS_FOR_READINESS = false (if no Redis)
 ```
 
 ---
 
 ## Database Connection String Examples
 
-### PostgreSQL (Neon, AWS RDS, etc.)
+### PostgreSQL (Render auto-injects)
 ```
-postgresql://user:password@host.region.provider.com:5432/dbname
+postgresql://username:password@host.region.provider.com:5432/dbname
 ```
 
 ### PostgreSQL with SSL
 ```
-postgresql://user:password@host.region.provider.com:5432/dbname?sslmode=require
-```
-
----
-
-## Redis Connection String Examples
-
-### Standard Redis
-```
-redis://username:password@host:6379/0
-```
-
-### Redis Cluster / Sentinel
-```
-redis://host1:6379,host2:6379,host3:6379?mode=sentinel&sentinelServiceName=mymaster
+postgresql://username:password@host.region.provider.com:5432/dbname?sslmode=require
 ```
 
 ---
 
 ## Minimal Production Setup
+
 If you only want the app running with basic features:
 
-```bash
-flyctl secrets set \
-  DATABASE_URL="postgresql://user:password@localhost:5432/vireon" \
-  ENV="production" \
-  REQUIRE_REDIS_FOR_READINESS="false"
-```
-
-Then:
-```bash
-cd backend
-flyctl deploy
-```
+1. Create Postgres instance on Render (free tier)
+2. Create Backend web service (rootDir=`backend`, Runtime=`Docker`)
+3. Backend will auto-inject `DATABASE_URL`
+4. Set in Environment:
+   ```
+   ENV = production
+   REQUIRE_REDIS_FOR_READINESS = false
+   ```
+5. Click "Save" and service auto-redeploys
 
 ---
 
 ## Health Check Endpoints
+
 Once deployed, verify:
 
 ```bash
 # Liveness (app is running)
-curl https://vireon-backend.fly.dev/health/live
+curl https://vireon-backend-xxxx.onrender.com/health/live
 
 # Readiness (dependencies are healthy)
-curl https://vireon-backend.fly.dev/health/ready
+curl https://vireon-backend-xxxx.onrender.com/health/ready
 ```
 
 Expected responses:
@@ -156,3 +107,28 @@ Expected responses:
   "environment": "production"
 }
 ```
+
+---
+
+## Complete Environment Variables for Render
+
+| Variable | Required | Default | Notes |
+|----------|----------|---------|-------|
+| `DATABASE_URL` | ✅ | None | Auto-set by Render Postgres |
+| `REDIS_URL` | ❌ | None | Auto-set by Render Redis (if added) |
+| `ENV` | ✅ | `development` | Set to `production` |
+| `SECRET_KEY` | ❌ | Auto-generated | JWT signing key |
+| `ALGORITHM` | ❌ | `HS256` | JWT algorithm |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | ❌ | `1440` | Token expiry (1 day) |
+| `ALLOWED_ORIGINS` | ❌ | `http://localhost:3000` | CORS origins |
+| `OPENAI_API_KEY` | ❌ | None | If using OpenAI |
+| `GOOGLE_API_KEY` | ❌ | None | If using Google AI |
+| `GEMINI_API_KEY` | ❌ | None | If using Gemini |
+| `ERPNEXT_URL` | ❌ | None | If integrating ERPNext |
+| `ERPNEXT_API_KEY` | ❌ | None | ERPNext credential |
+| `ERPNEXT_API_SECRET` | ❌ | None | ERPNext credential |
+| `ERPNEXT_SITE_NAME` | ❌ | None | ERPNext site name |
+| `REQUIRE_REDIS_FOR_READINESS` | ❌ | `false` | Require Redis on startup |
+| `STRICT_STARTUP_CHECKS` | ❌ | `false` | Fail if dependencies missing |
+| `STARTUP_MAX_RETRIES` | ❌ | `15` | Retry attempts on startup |
+| `STARTUP_RETRY_DELAY_SECONDS` | ❌ | `2` | Delay between retries |

@@ -1,10 +1,10 @@
-# Vireon Deployment Guide — Vercel + Fly.io
+# Vireon Deployment Guide — Vercel + Render
 
 ## Overview
 - **Frontend** (Next.js): Deployed to Vercel
-- **Backend** (FastAPI): Deployed to Fly.io  
-- **Database**: PostgreSQL (managed, external)
-- **Cache**: Redis (optional, managed)
+- **Backend** (FastAPI): Deployed to Render  
+- **Database**: PostgreSQL (managed by Render, free tier)
+- **Cache**: Redis (optional, managed by Render, free tier)
 
 ---
 
@@ -32,7 +32,7 @@
    - Go to Project Settings → Environment Variables
    - Add:
      ```
-     NEXT_PUBLIC_API_BASE_URL=https://vireon-backend.fly.dev/api/v1
+     NEXT_PUBLIC_API_BASE_URL=https://vireon-backend-xxx.onrender.com/api/v1
      ```
    - Redeploy after adding env vars
 
@@ -46,129 +46,130 @@
 
 ---
 
-## Backend Setup (Fly.io)
+## Backend Setup (Render)
 
 ### Prerequisites
-- Fly.io account (free tier available): https://fly.io
-- Fly CLI installed: `brew install flyctl` (macOS)
-- PostgreSQL database URL
-- (Optional) Redis URL
+- Render account (free, no credit card): https://render.com
+- GitHub repo connected to Render
 
-### One-Time Setup (Local)
+### One-Time Setup (Free Tier, No Credit Card Required)
 
-1. **Authenticate with Fly.io**
-   ```bash
-   flyctl auth signup  # or flyctl auth login
-   ```
+1. **Sign up on Render**
+   - Go to https://render.com
+   - Sign up with GitHub (easiest)
+   - No credit card needed for free tier
 
-2. **Create App on Fly.io**
-   ```bash
-   cd backend
-   flyctl launch --generate-name  # Creates app and fly.toml
-   # When prompted:
-   #   - Postgres: "Would you like to add Postgres? [y/N]" → Choose based on your needs
-   #   - Copy the generated app name (e.g., "vireon-backend-1234")
-   ```
-   
-   **OR** use the pre-configured `fly.toml` in this repo:
-   ```bash
-   cd backend
-   flyctl deploy --remote-only
-   # You will be prompted to create the app if it doesn't exist
-   ```
+2. **Create Backend Service**
+   - Go to https://dashboard.render.com
+   - Click "New +" → "Web Service"
+   - Connect your GitHub repo `vireon`
+   - Configure:
+     - **Name**: `vireon-backend`
+     - **Root Directory**: `backend`
+     - **Runtime**: `Docker`
+     - **Build Command**: (leave blank — Docker handles it)
+     - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+     - **Plan**: `Free` (auto-stops after 15 min inactivity)
+     - **Region**: Singapore or closest to you
 
-3. **Set Fly.io Secrets**
-   ```bash
-   flyctl secrets set \
-     DATABASE_URL="postgresql://user:password@host:port/dbname" \
-     REDIS_URL="redis://user:password@host:port/0" \
-     SECRET_KEY="your-jwt-secret-key" \
-     OPENAI_API_KEY="sk-xxx" \
-     GOOGLE_API_KEY="your-google-key" \
-     ENV="production"
-   ```
-   
-   **Example minimal set** (if you only use database, no Redis/AI):
-   ```bash
-   flyctl secrets set \
-     DATABASE_URL="postgresql://user:password@host:port/dbname" \
-     ENV="production"
-   ```
+3. **Add Database (Render Postgres)**
+   - Still in Render dashboard
+   - Click "New +" → "PostgreSQL"
+   - Configure:
+     - **Name**: `vireon-db`
+     - **Database**: `vireon`
+     - **User**: `vireon_user`
+     - **Plan**: `Free` (0.5 GB storage)
+   - Render auto-injects `DATABASE_URL` into your backend service
 
-4. **Deploy**
-   ```bash
-   cd backend
-   flyctl deploy
-   ```
-   
-   Fly.io will:
-   - Build Docker image
-   - Run migrations (if `Dockerfile` includes them; currently not auto-run)
-   - Start the app
-   - Assign a public URL: `https://vireon-backend.fly.dev`
+4. **Add Redis (Optional, for Celery/Caching)**
+   - Click "New +" → "Redis"
+   - Configure:
+     - **Name**: `vireon-redis`
+     - **Plan**: `Free` (256 MB)
+   - Render auto-injects `REDIS_URL` into your backend service
 
-5. **Check Status**
-   ```bash
-   flyctl status
-   flyctl logs
-   ```
+5. **Set Backend Environment Variables**
+   - Go to your `vireon-backend` service
+   - Click "Environment"
+   - Variables auto-set:
+     - `DATABASE_URL` ✅ (from Postgres service)
+     - `REDIS_URL` ✅ (from Redis service, if added)
+   - Add manually:
+     ```
+     ENV=production
+     ALLOWED_ORIGINS=https://vireon.vercel.app
+     SECRET_KEY=your-secure-random-string
+     OPENAI_API_KEY=sk-xxxxx  (if using OpenAI)
+     GOOGLE_API_KEY=xxx  (if using Google AI)
+     REQUIRE_REDIS_FOR_READINESS=false  (if no Redis)
+     ```
+   - Click "Save"
+
+6. **Deploy**
+   - Render auto-deploys when you push to `main`
+   - Manually trigger: Go to your service → "Deployments" → "Manual Deploy"
+   - Backend URL: `https://vireon-backend-xxxx.onrender.com`
 
 ---
 
-## GitHub Actions Automation
+## GitHub Actions Automation (Optional)
 
-Once Fly.io and Vercel are connected, GitHub Actions will auto-deploy on push to `main`:
+Once Render and Vercel are connected, GitHub Actions will auto-deploy on push to `main`:
 
-### Backend Deployment Trigger
+### Backend Deployment Trigger (Render)
 - File: `.github/workflows/deploy-backend.yml`
-- Triggers on: push to `main` in `backend/**`
-- Requires secret: `FLY_API_TOKEN`
+- Triggers on: push to `main` in `backend/**` or `render.yaml`
+- Requires secrets: `RENDER_SERVICE_ID`, `RENDER_API_KEY`
 
-### Frontend Deployment Trigger
+### Frontend Deployment Trigger (Vercel)
 - File: `.github/workflows/deploy-frontend.yml`
 - Triggers on: push to `main` in `frontend/**`
 - Requires secrets: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`
 
 ### How to Add GitHub Secrets
 
-**For Fly.io Backend:**
-1. Go to GitHub Repo → Settings → Secrets and variables → Actions
-2. Click "New repository secret"
-3. Add:
-   - **Name**: `FLY_API_TOKEN`
-   - **Value**: Run `flyctl tokens create deploy -x 0` locally (no expiry) and paste the token
+**For Render Backend:**
+1. Go to Render Dashboard → Account Settings → API Keys
+2. Create API key, copy it
+3. Go to GitHub Repo → Settings → Secrets → New Secret
+4. Add:
+   - **Name**: `RENDER_API_KEY`
+   - **Value**: (paste Render API key)
+   - **Name**: `RENDER_SERVICE_ID`
+   - **Value**: (find in Render service URL: `https://render.com/v1/services/srv-xxxxx`)
 
 **For Vercel Frontend:**
-1. Go to Vercel Dashboard → Project Settings → API Tokens
-2. Create a new token, copy it
-3. Go to GitHub Repo → Settings → Secrets and variables → Actions
+1. Go to Vercel Dashboard → Account Settings → API Tokens
+2. Create token, copy it
+3. Go to GitHub Repo → Settings → Secrets
 4. Add:
    - **Name**: `VERCEL_TOKEN`
-   - **Value**: Paste the Vercel token
+   - **Value**: (paste token)
    - **Name**: `VERCEL_ORG_ID`
-   - **Value**: Your Vercel org ID (visible in Vercel URL)
+   - **Value**: (your Vercel org ID)
    - **Name**: `VERCEL_PROJECT_ID`
-   - **Value**: Your Vercel project ID (visible in Vercel project settings)
+   - **Value**: (your Vercel project ID)
 
 ---
 
 ## Environment Variables Summary
 
-### Backend (Fly.io Secrets)
+### Backend (Render Environment)
 | Variable | Required | Example |
 |----------|----------|---------|
-| `DATABASE_URL` | ✅ | `postgresql://user:pass@db.example.com:5432/vireon` |
-| `REDIS_URL` | ❌ | `redis://user:pass@redis.example.com:6379/0` |
+| `DATABASE_URL` | ✅ Auto-set | (injected by Render Postgres) |
+| `REDIS_URL` | ❌ Auto-set if added | (injected by Render Redis) |
 | `SECRET_KEY` | ❌ | JWT secret (auto-set if not provided) |
 | `OPENAI_API_KEY` | ❌ | `sk-xxxxx` (if using OpenAI) |
 | `GOOGLE_API_KEY` | ❌ | Google API key (if using Vertex AI) |
 | `ENV` | ✅ | `production` |
-| `ALLOWED_ORIGINS` | ❌ | `https://vireon.vercel.app,https://yourfrontend.com` |
+| `ALLOWED_ORIGINS` | ❌ | `https://vireon.vercel.app` |
 
 ### Frontend (Vercel Environment Variables)
 | Variable | Required | Example |
 |----------|----------|---------|
-| `NEXT_PUBLIC_API_BASE_URL` | ✅ | `https://vireon-backend.fly.dev/api/v1` |
+| `NEXT_PUBLIC_API_BASE_URL` | ✅ | `https://vireon-backend-xxxx.onrender.com/api/v1` |
 
 ---
 
@@ -176,49 +177,32 @@ Once Fly.io and Vercel are connected, GitHub Actions will auto-deploy on push to
 
 ### Backend Health
 ```bash
-curl https://vireon-backend.fly.dev/health/live
-curl https://vireon-backend.fly.dev/health/ready
+curl https://vireon-backend-xxxx.onrender.com/health/live
+curl https://vireon-backend-xxxx.onrender.com/health/ready
 ```
 
 ### Monitor Logs
-```bash
-flyctl logs  # Tail real-time logs
-```
+- Render Dashboard → Select service → "Logs"
 
 ### Restart App
-```bash
-flyctl restart
-```
-
-### Scale (Fly.io)
-```bash
-flyctl scale count 2  # Run 2 instances
-flyctl scale memory 512  # Increase memory to 512MB
-```
+- Render Dashboard → Select service → "Restart" (top right)
 
 ---
 
 ## Database Migrations
 
-### Create Tables on Deploy
-
-Currently, the FastAPI app auto-creates tables on startup:
-```python
-# In backend/main.py
-models.Base.metadata.create_all(bind=database.engine)
-bootstrap.run_bootstrap()
+### Auto-Migrations on Deploy
+The `render.yaml` is already configured to run:
+```yaml
+buildCommand: pip install -r requirements.txt -r requirements_agent.txt && alembic upgrade head
 ```
 
-If you need explicit migrations (Alembic):
+This runs Alembic migrations before the app starts.
+
+### Manual Migration
 ```bash
 cd backend
 alembic upgrade head
-```
-
-To include this in Fly.io deploy, add to `Dockerfile`:
-```dockerfile
-RUN alembic upgrade head  # Run before starting app
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 ---
@@ -226,41 +210,61 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 ## Troubleshooting
 
 ### Backend Won't Start
-1. Check logs: `flyctl logs`
-2. Verify `DATABASE_URL` is accessible
-3. Check if app expects Redis but it's not available → set `REQUIRE_REDIS_FOR_READINESS=false`
+1. Check logs: Render Dashboard → Logs
+2. Verify `DATABASE_URL` is auto-injected (check Environment section)
+3. If using Redis, ensure `REDIS_URL` is set or `REQUIRE_REDIS_FOR_READINESS=false`
 
 ### Frontend Blank/404
 1. Verify `NEXT_PUBLIC_API_BASE_URL` is set in Vercel
-2. Check that backend is running and accessible
+2. Check that backend service is running: `curl https://vireon-backend-xxxx.onrender.com/health/live`
 3. Check browser console for CORS/network errors
 
 ### Cold Starts
-- Fly.io free tier scales to zero. First request may be slow (~5-10s).
-- Upgrade to paid plan or use `always_on = true` in `fly.toml` to prevent scale-to-zero.
+- Render free tier auto-stops after 15 min inactivity → first request takes ~30-40s
+- Upgrade to paid plan to prevent auto-stop
 
-### Secrets Not Updating
-- Redeploy after changing secrets: `flyctl deploy`
+### Service Not Redeploying
+- Push to `main` branch to trigger auto-deploy
+- Or manually trigger: Render Dashboard → "Manual Deploy"
 
 ---
 
-## Cost Estimate (Free Tier)
+## Cost Estimate (Free Tier, No Credit Card)
 
 | Service | Free Tier | Notes |
 |---------|-----------|-------|
 | Vercel Frontend | ✅ Free | Unlimited deployments, 100GB/mo bandwidth |
-| Fly.io Backend | ✅ Free | 3 shared-cpu VMs, scales to zero (cold starts) |
-| PostgreSQL | 🔄 Depends | Use external (AWS RDS free tier, Supabase free, etc.) |
-| Redis | 🔄 Depends | Use external or skip if not needed |
+| Render Backend | ✅ Free | Auto-stops after 15 min inactivity, 1 web service |
+| Render Postgres | ✅ Free | 0.5 GB storage, 1 instance |
+| Render Redis | ✅ Free | 256 MB, 1 instance |
+| **Total** | | **$0/month** |
+
+---
+
+## Quick Start Checklist
+
+- [ ] Sign up on Render (no credit card)
+- [ ] Create Backend Web Service (Docker, rootDir=`backend`)
+- [ ] Create Postgres database (auto-links `DATABASE_URL`)
+- [ ] (Optional) Create Redis instance (auto-links `REDIS_URL`)
+- [ ] Set backend env vars: `ALLOWED_ORIGINS`, `SECRET_KEY`, API keys
+- [ ] Backend deploys automatically from `main` branch
+- [ ] Sign up on Vercel (no credit card)
+- [ ] Create Frontend Project (rootDir=`frontend`)
+- [ ] Set Vercel env var: `NEXT_PUBLIC_API_BASE_URL=https://vireon-backend-xxxx.onrender.com/api/v1`
+- [ ] Redeploy frontend in Vercel
+- [ ] Test: Open frontend URL in browser, check API calls in DevTools
 
 ---
 
 ## Next Steps
 
-1. ✅ Create Fly.io account & authenticate locally
-2. ✅ Create Vercel account & connect GitHub
-3. ✅ Set up database (PostgreSQL)
-4. ✅ Deploy backend: `cd backend && flyctl deploy`
-5. ✅ Deploy frontend: Push to `main` or manual Vercel deploy
-6. ✅ Add GitHub Actions secrets for CI/CD
-7. ✅ Test endpoints: `/health/live`, `/health/ready`, frontend URL
+1. ✅ Create Render account (free, GitHub login)
+2. ✅ Create Backend service (Docker, rootDir=`backend`)
+3. ✅ Create Postgres + Redis on Render
+4. ✅ Set environment variables in Render
+5. ✅ Create Vercel project (GitHub import, rootDir=`frontend`)
+6. ✅ Set `NEXT_PUBLIC_API_BASE_URL` in Vercel
+7. ✅ Test endpoints & frontend
+
+All free, no credit card required!
