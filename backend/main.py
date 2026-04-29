@@ -34,6 +34,9 @@ from api.routers import (
     contacts_api, invoices_api, saas_metrics_api, financial_reports_api,
     # Portfolio & HR intelligence
     projects_api,
+    # Phase 7 — Advanced Platform Features
+    model_marketplace, blockchain_audit, realtime_sync, voice_commands,
+    regulatory_compliance, white_label,
 )
 
 # Basic generic logging config
@@ -262,6 +265,14 @@ app.include_router(financial_reports_api.router, prefix="/api/v1")
 
 # Portfolio & HR intelligence
 app.include_router(projects_api.router, prefix="/api/v1")
+
+# Phase 7 — Advanced Platform Features
+app.include_router(model_marketplace.router, prefix="/api/v1")
+app.include_router(blockchain_audit.router, prefix="/api/v1")
+app.include_router(realtime_sync.router, prefix="/api/v1")
+app.include_router(voice_commands.router, prefix="/api/v1")
+app.include_router(regulatory_compliance.router, prefix="/api/v1")
+app.include_router(white_label.router, prefix="/api/v1")
 
 # API routes are intentionally versioned under /api/v1
 

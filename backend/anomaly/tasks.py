@@ -13,7 +13,7 @@ from config.settings import BACKEND_URL, DATABASE_URL, REDIS_URL
 from tasks.alert_tasks import _send_email
 
 
-DEFAULT_ALERT_EMAIL = os.getenv("ALERT_FALLBACK_EMAIL", "sysswork@gmail.com")
+DEFAULT_ALERT_EMAIL = os.getenv("ALERT_FALLBACK_EMAIL", "ssyswork@gmail.com")
 
 
 @app.task(bind=True, max_retries=3, time_limit=300)

@@ -16,7 +16,7 @@ from database import SessionLocal
 from services.recommendations_service import generate_impact_alert
 
 
-DEFAULT_ALERT_EMAIL = os.getenv("ALERT_FALLBACK_EMAIL", "sysswork@gmail.com")
+DEFAULT_ALERT_EMAIL = os.getenv("ALERT_FALLBACK_EMAIL", "ssyswork@gmail.com")
 
 
 def _collect_recipients(contacts: dict) -> List[str]:
@@ -134,12 +134,18 @@ def send_alert_notifications(alert_id: str):
         db.close()
 
 
-def _send_email(recipients: List[str], subject: str, body: str) -> Tuple[bool, Optional[str]]:
+def _send_email(
+    recipients: List[str],
+    subject: str,
+    body: str,
+    sender_override: Optional[str] = None,
+) -> Tuple[bool, Optional[str]]:
     host = os.getenv("SMTP_HOST")
     port = int(os.getenv("SMTP_PORT", "587"))
     user = os.getenv("SMTP_USER")
     password = os.getenv("SMTP_PASS")
-    sender = os.getenv("SMTP_FROM", user or "no-reply@vireon.ai")
+    sender = sender_override or os.getenv("SMTP_FROM", user or "no-reply@vireon.ai")
+    sender = sender.strip() if isinstance(sender, str) else sender
 
     if not host or not user or not password:
         return False, "SMTP is not configured (set SMTP_HOST, SMTP_USER, SMTP_PASS)"
@@ -159,11 +165,16 @@ def _send_email(recipients: List[str], subject: str, body: str) -> Tuple[bool, O
         return False, f"SMTP send failed: {exc}"
 
 
-def send_email(recipient: str, subject: str, body: str) -> Tuple[bool, Optional[str]]:
+def send_email(
+    recipient: str,
+    subject: str,
+    body: str,
+    sender_override: Optional[str] = None,
+) -> Tuple[bool, Optional[str]]:
     """Public helper for single-recipient email sends from API routes."""
     if not recipient or "@" not in recipient:
         return False, "Invalid email recipient"
-    return _send_email([recipient], subject, body)
+    return _send_email([recipient], subject, body, sender_override=sender_override)
 
 
 def _send_twilio_messages(recipients: List[str], body: str, channel: str) -> Tuple[bool, Optional[str]]:

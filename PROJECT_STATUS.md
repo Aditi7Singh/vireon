@@ -261,10 +261,10 @@ Vireon is a fully functional AI-powered financial intelligence platform integrat
 ## 📋 Known Limitations & Future Work
 
 ### Short-term (Q2 2026)
-- [ ] Advanced tax optimization algorithms
+- [x] Advanced tax optimization algorithms (`GET /api/v1/tax/*`, predictive_tax_service, deduction classifier)
 - [ ] Real-time Stripe/payment gateway integration
 - [x] Invoice lifecycle management (backend APIs)
-- [ ] Purchase order automation
+- [x] Purchase order automation (`POST/GET /api/v1/purchase-orders/`, 3-way matching, approval workflow)
 - [x] Budget vs actual analysis
 - [x] Comparative period analysis (`GET /api/v1/metrics/comparative/{company_id}`)
 - [x] Custom report builder (`POST /api/v1/reports/custom/build`)
@@ -278,17 +278,17 @@ Vireon is a fully functional AI-powered financial intelligence platform integrat
 - [x] Cash flow forecasting (`GET /api/v1/cash-flow/forecast/{company_id}`)
 - [x] Working capital optimization (`GET /api/v1/working-capital/optimize/{company_id}`)
 - [x] Credit analysis and risk scoring (`GET /api/v1/credit/risk/{company_id}`)
-- [ ] Audit trail and compliance logging
+- [x] Audit trail and compliance logging (`/api/v1/audit/*`, SHA-256 immutable events, SOC 2 tamper detection)
 
 ### Long-term (2027+)
-- [ ] Machine learning model marketplace integration
-- [ ] Advanced anomaly detection with auto-correction suggestions
-- [ ] Blockchain-based audit trail
-- [ ] Real-time ERP sync (vs periodic)
+- [x] Machine learning model marketplace integration (`/api/v1/ml-marketplace/*`, catalog of 8 models, deploy/retire/retrain, leaderboard — frontend: `/ml-marketplace`)
+- [x] Advanced anomaly detection with auto-correction suggestions (`GET /api/v1/advanced/anomalies/{company_id}/{id}/suggest-correction`, `POST /apply-correction` — 5 correction templates with step-by-step remediation)
+- [x] Blockchain-based audit trail (`/api/v1/blockchain-audit/*`, Merkle hash chain, end-to-end verification, inclusion proofs — frontend: `/blockchain-audit`)
+- [x] Real-time ERP sync (`/api/v1/realtime-sync/*`, SSE stream, webhook subscriptions, manual trigger — frontend: `/realtime-sync`)
 - [ ] Mobile app (iOS/Android)
-- [ ] Voice-based financial commands
-- [ ] Regulatory compliance automation (SOX, GDPR, etc.)
-- [ ] White-label SaaS platform
+- [x] Voice-based financial commands (`/api/v1/voice/*`, intent classification, 12 command types, Web Speech API — frontend: `/voice-commands`)
+- [x] Regulatory compliance automation (`/api/v1/regulatory/*`, SOX controls matrix 10 controls + automated testing, GDPR Art.30 ROPA + DSAR, gap analysis — frontend: `/regulatory`)
+- [x] White-label SaaS platform (`/api/v1/white-label/*`, multi-tenant provisioning, branding config, feature flags, custom domains — frontend: `/white-label`)
 
 ---
 

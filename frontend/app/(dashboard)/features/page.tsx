@@ -31,7 +31,7 @@ export default function FeaturesPage() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [busyAction, setBusyAction] = useState<string | null>(null);
 
-  const [emailRecipients, setEmailRecipients] = useState<string>("sysswork@gmail.com");
+  const [emailRecipients, setEmailRecipients] = useState<string>("ssyswork@gmail.com");
   const [hiringCtc, setHiringCtc] = useState<number>(1800000);
   const [hiringMonth, setHiringMonth] = useState<string>(new Date().toISOString().slice(0, 7));
   const [hiringImpact, setHiringImpact] = useState<any | null>(null);
@@ -57,7 +57,7 @@ export default function FeaturesPage() {
 
       if (startup.default_company_id) {
         const contacts = await api.getNotificationContacts(startup.default_company_id);
-        setEmailRecipients((contacts.email_recipients || ["sysswork@gmail.com"]).join(", "));
+        setEmailRecipients((contacts.email_recipients || ["ssyswork@gmail.com"]).join(", "));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load feature controls.");

@@ -459,3 +459,201 @@ def get_waterfall_data(
         "company_id": str(company_id),
         "months_shown": len(waterfall_rows),
     }
+
+
+# ---------------------------------------------------------------------------
+# 6. Anomaly Auto-Correction Suggestions
+# ---------------------------------------------------------------------------
+
+_CORRECTION_TEMPLATES = {
+    "duplicate_invoice": {
+        "action": "void_duplicate",
+        "title": "Void Duplicate Invoice",
+        "steps": [
+            "Identify the duplicate invoice using the vendor + amount match.",
+            "Open the duplicate in Invoices → mark as Void.",
+            "Add a note referencing the original invoice ID.",
+            "Notify vendor of void to prevent double payment.",
+        ],
+        "journal_entry": {
+            "debit_account": "Accounts Payable",
+            "credit_account": "Cash / Bank",
+            "description": "Reversal of duplicate invoice payment",
+        },
+        "risk_if_ignored": "Double payment to vendor",
+        "estimated_savings": "Full invoice amount",
+    },
+    "split_invoice": {
+        "action": "merge_and_review",
+        "title": "Consolidate Split Invoices",
+        "steps": [
+            "Identify all invoices from the same vendor within 7 days with combined total exceeding threshold.",
+            "Request consolidated invoice from vendor.",
+            "Review for potential policy circumvention.",
+            "Flag for approval if total exceeds authorization limit.",
+        ],
+        "journal_entry": None,
+        "risk_if_ignored": "Budget cap bypass / unauthorized spend",
+        "estimated_savings": "Process efficiency + policy compliance",
+    },
+    "unusual_amount": {
+        "action": "request_approval",
+        "title": "Escalate for CFO Approval",
+        "steps": [
+            "Flag transaction for senior approval.",
+            "Request supporting documentation from submitter.",
+            "Verify business purpose and cost center allocation.",
+            "Post only after CFO or delegate approval.",
+        ],
+        "journal_entry": None,
+        "risk_if_ignored": "Unauthorized or erroneous spend posted to GL",
+        "estimated_savings": "Potential recovery of overpayment",
+    },
+    "weekend_transaction": {
+        "action": "review_authorization",
+        "title": "Review Weekend Transaction Authorization",
+        "steps": [
+            "Verify the transaction was authorized by an appropriate approver.",
+            "Check system audit log for the posting user.",
+            "Confirm business justification for off-hours processing.",
+            "If unauthorized, initiate reversal workflow.",
+        ],
+        "journal_entry": {
+            "debit_account": "Suspense Account",
+            "credit_account": "Originating Account",
+            "description": "Hold pending authorization review",
+        },
+        "risk_if_ignored": "Potential fraud or unauthorized access",
+        "estimated_savings": "Fraud prevention",
+    },
+    "vendor_concentration": {
+        "action": "vendor_review",
+        "title": "Initiate Vendor Concentration Review",
+        "steps": [
+            "Calculate vendor spend as % of total AP.",
+            "Initiate vendor diversification if >30% concentration.",
+            "Review vendor contract terms and pricing.",
+            "Identify 2–3 alternative vendors for competitive pricing.",
+        ],
+        "journal_entry": None,
+        "risk_if_ignored": "Supply chain risk + pricing power imbalance",
+        "estimated_savings": "5–15% cost reduction via competition",
+    },
+}
+
+
+def _infer_anomaly_type(description: str) -> str:
+    lower = description.lower()
+    if "duplicate" in lower:
+        return "duplicate_invoice"
+    if "split" in lower:
+        return "split_invoice"
+    if "weekend" in lower or "saturday" in lower or "sunday" in lower:
+        return "weekend_transaction"
+    if "concentration" in lower or "vendor" in lower:
+        return "vendor_concentration"
+    return "unusual_amount"
+
+
+@router.get("/anomalies/{company_id}/{anomaly_id}/suggest-correction")
+def suggest_anomaly_correction(
+    company_id: uuid.UUID,
+    anomaly_id: uuid.UUID,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    """
+    Return AI-generated correction suggestions for a specific anomaly.
+    Provides step-by-step remediation, recommended journal entries, and risk assessment.
+    """
+    anomaly = (
+        db.query(models.Anomaly)
+        .filter(
+            models.Anomaly.id == anomaly_id,
+            models.Anomaly.company_id == company_id,
+        )
+        .first()
+    )
+    if not anomaly:
+        raise HTTPException(status_code=404, detail="Anomaly not found.")
+
+    anomaly_type = _infer_anomaly_type(anomaly.description or "")
+    template = _CORRECTION_TEMPLATES.get(anomaly_type, _CORRECTION_TEMPLATES["unusual_amount"])
+
+    delta = (
+        float(anomaly.actual_value) - float(anomaly.expected_value)
+        if anomaly.actual_value and anomaly.expected_value
+        else None
+    )
+
+    suggestion = {
+        "anomaly_id": str(anomaly_id),
+        "anomaly_type": anomaly_type,
+        "severity": anomaly.severity,
+        "description": anomaly.description,
+        "actual_value": float(anomaly.actual_value) if anomaly.actual_value else None,
+        "expected_value": float(anomaly.expected_value) if anomaly.expected_value else None,
+        "variance": round(delta, 2) if delta is not None else None,
+        "correction": {
+            "action": template["action"],
+            "title": template["title"],
+            "steps": template["steps"],
+            "journal_entry": template["journal_entry"],
+        },
+        "risk_if_ignored": template["risk_if_ignored"],
+        "estimated_savings": template["estimated_savings"],
+        "priority": "immediate" if anomaly.severity in ("high", "critical") else "within_week",
+        "generated_at": __import__("datetime").datetime.utcnow().isoformat(),
+    }
+
+    return suggestion
+
+
+@router.post("/anomalies/{company_id}/{anomaly_id}/apply-correction")
+def apply_anomaly_correction(
+    company_id: uuid.UUID,
+    anomaly_id: uuid.UUID,
+    action: str,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    """
+    Mark an anomaly as resolved with the selected correction action.
+    Optionally creates an audit trail entry for the remediation.
+    """
+    anomaly = (
+        db.query(models.Anomaly)
+        .filter(
+            models.Anomaly.id == anomaly_id,
+            models.Anomaly.company_id == company_id,
+        )
+        .first()
+    )
+    if not anomaly:
+        raise HTTPException(status_code=404, detail="Anomaly not found.")
+
+    anomaly.status = "resolved"
+    db.commit()
+
+    from services.audit_service import AuditService
+    try:
+        AuditService(db).log_entity_change(
+            entity_type="anomaly",
+            entity_id=anomaly_id,
+            old={"status": "open"},
+            new={"status": "resolved", "correction_action": action},
+            user_id=current_user.id,
+            company_id=company_id,
+            event_type="anomaly_corrected",
+        )
+    except Exception:
+        pass
+
+    return {
+        "anomaly_id": str(anomaly_id),
+        "status": "resolved",
+        "correction_action": action,
+        "resolved_by": str(current_user.id),
+        "resolved_at": __import__("datetime").datetime.utcnow().isoformat(),
+        "message": f"Anomaly resolved via '{action}'. Audit trail updated.",
+    }

@@ -17,7 +17,7 @@ from tasks.alert_tasks import send_alert_notifications
 
 router = APIRouter(tags=["notifications"])
 
-DEFAULT_ALERT_EMAIL = os.getenv("ALERT_FALLBACK_EMAIL", "sysswork@gmail.com")
+DEFAULT_ALERT_EMAIL = os.getenv("ALERT_FALLBACK_EMAIL", "ssyswork@gmail.com")
 TEST_NOTIFICATION_SYNC_DEFAULT = os.getenv("TEST_NOTIFICATION_SYNC", "true").lower() in {"1", "true", "yes"}
 
 

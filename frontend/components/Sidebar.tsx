@@ -11,6 +11,7 @@ import {
   ChevronDown, ChevronUp, Leaf, FlaskConical, Server,
   ScanLine, QrCode, BadgePercent, LogOut, Upload, Banknote,
   ArrowLeftRight, Clock, ReceiptText, BookMarked, RefreshCcw,
+  Brain, Link2, RefreshCw, Mic, ShieldEllipsis, Palette,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -109,6 +110,17 @@ const navSections: NavSection[] = [
       { name: "Consolidation", path: "/consolidation", icon: Building2 },
       { name: "Operations", path: "/operations", icon: Workflow },
       { name: "CTO Planner", path: "/dashboard/cto", icon: Cpu },
+    ],
+  },
+  {
+    title: "AI Platform",
+    items: [
+      { name: "ML Marketplace", path: "/ml-marketplace", icon: Brain },
+      { name: "Voice Commands", path: "/voice-commands", icon: Mic },
+      { name: "Real-Time Sync", path: "/realtime-sync", icon: RefreshCw },
+      { name: "Blockchain Audit", path: "/blockchain-audit", icon: Link2 },
+      { name: "Regulatory", path: "/regulatory", icon: ShieldEllipsis },
+      { name: "White-Label", path: "/white-label", icon: Palette },
     ],
   },
   {

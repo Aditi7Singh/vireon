@@ -32,7 +32,7 @@ def create_company():
         effective_tax_rate=0.25,  # 25%
         founding_date=datetime(2020, 1, 1).date(),
         notification_contacts={
-            "email_recipients": ["sysswork@gmail.com"]
+            "email_recipients": ["ssyswork@gmail.com"]
         },
         alert_thresholds={
             "critical_months": 3,

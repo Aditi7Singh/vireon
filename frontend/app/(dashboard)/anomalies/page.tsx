@@ -480,7 +480,7 @@ export default function AnomaliesPage() {
                   value={financeEmails.join(", ")}
                   onChange={(e: any) => setFinanceEmails(e.target.value.split(",").map((v: string) => v.trim()).filter((v: string) => v))}
                   className="w-full rounded-lg border border-[#d7cdbc] px-3 py-2 text-sm focus:outline-none focus:border-[#5f5344] focus:ring-1 focus:ring-[#5f5344]"
-                  placeholder="sysswork@gmail.com, other@company.com"
+                  placeholder="ssyswork@gmail.com, other@company.com"
                   rows={2}
                 />
               </div>

@@ -307,15 +307,15 @@ def send_financial_alerts(
         contacts = company.notification_contacts or {}
         generic_email_list = _extract_valid_emails(contacts.get("email", []))
         email_recipients = _extract_valid_emails(contacts.get("email_recipients", []))
-        ceo_email = _extract_valid_emails(contacts.get("ceo"))
+        ceo_recipients = _extract_valid_emails(contacts.get("ceo"))
         finance_emails = _extract_valid_emails(contacts.get("finance", []))
 
-        all_recipients = []
-        for email in generic_email_list + email_recipients + ceo_email + finance_emails:
-            if email not in all_recipients:
-                all_recipients.append(email)
-        
-        if not all_recipients:
+        secondary_recipients = []
+        for email in generic_email_list + email_recipients + finance_emails:
+            if email not in secondary_recipients and email not in ceo_recipients:
+                secondary_recipients.append(email)
+
+        if not ceo_recipients and not secondary_recipients:
             return {
                 "success": True,
                 "message": "No recipients configured for alerts",
@@ -333,42 +333,77 @@ def send_financial_alerts(
                 for a in anomalies
             ])
             
-            message = f"""
+            detailed_message = f"""
 Financial Anomalies Detected at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
-ANOMALIES DETECTED: {len(anomalies)}
-CRITICAL ISSUES: {health.get('critical_anomalies', 0)}
+COMPANY
+=======
+{company.name}
 
+EXECUTIVE SUMMARY
+=================
+Anomaly count: {len(anomalies)}
+Critical issues: {health.get('critical_anomalies', 0)}
+Overall risk score: {health.get('risk_score', 0)}/100
+Health status: {health.get('health_status', 'unknown').upper()}
+Runway: {health.get('runway_months', 0):.1f} months
+Burn multiple: {health.get('burn_multiple', 0):.2f}x
+
+DETAILED ANOMALIES
+==================
 {anomaly_text}
 
-RISK ASSESSMENT
-===============
-Overall Risk Score: {health.get('risk_score', 0)}/100
-Health Status: {health.get('health_status', 'unknown').upper()}
-Runway: {health.get('runway_months', 0):.1f} months
-Burn Multiple: {health.get('burn_multiple', 0):.2f}x
-
-Next Steps:
-1. Log into https://vireon.ai to view detailed dashboard
-2. Review the affected categories in Finance Dashboard
-3. Engage leadership for decision-making
+RECOMMENDED NEXT STEPS
+======================
+1. Review the detailed dashboard for category-level impact.
+2. Prioritize the critical anomalies first.
+3. Decide whether to freeze discretionary spend or escalate collections.
 
 --
 VIREON AI Financial Alert System
 """
-            
-            # Send email alerts and track delivery result per recipient.
+
+            summary_message = f"""
+Financial Anomalies Detected at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+Anomalies detected: {len(anomalies)}
+Critical issues: {health.get('critical_anomalies', 0)}
+Overall risk score: {health.get('risk_score', 0)}/100
+Runway: {health.get('runway_months', 0):.1f} months
+
+Please review the detailed dashboard for the full anomaly breakdown.
+
+--
+VIREON AI Financial Alert System
+"""
+
+            # Send the CEO a detailed report first, then send the summary to everyone else.
             delivery_results = []
-            for recipient in all_recipients:
+            sender_override = ceo_recipients[0] if ceo_recipients else None
+
+            for recipient in ceo_recipients:
                 try:
                     sent, error = alert_tasks.send_email(
                         recipient=recipient,
                         subject=subject,
-                        body=message,
+                        body=detailed_message,
+                        sender_override=sender_override,
                     )
-                    delivery_results.append({"recipient": recipient, "sent": bool(sent), "error": error})
+                    delivery_results.append({"recipient": recipient, "sent": bool(sent), "error": error, "message_type": "detailed"})
                 except Exception as e:
-                    delivery_results.append({"recipient": recipient, "sent": False, "error": str(e)})
+                    delivery_results.append({"recipient": recipient, "sent": False, "error": str(e), "message_type": "detailed"})
+
+            for recipient in secondary_recipients:
+                try:
+                    sent, error = alert_tasks.send_email(
+                        recipient=recipient,
+                        subject=subject,
+                        body=summary_message,
+                        sender_override=sender_override,
+                    )
+                    delivery_results.append({"recipient": recipient, "sent": bool(sent), "error": error, "message_type": "summary"})
+                except Exception as e:
+                    delivery_results.append({"recipient": recipient, "sent": False, "error": str(e), "message_type": "summary"})
         else:
             delivery_results = []
         
@@ -383,7 +418,7 @@ VIREON AI Financial Alert System
         if not anomalies:
             message_text = "No anomalies detected; no emails were sent."
         elif not delivery_results:
-            message_text = f"Alerts processed for {len(all_recipients)} recipients{local_hint}"
+            message_text = f"Alerts processed for {len(ceo_recipients) + len(secondary_recipients)} recipients{local_hint}"
         elif overall_success:
             message_text = f"Alerts sent to {success_count} recipients{local_hint}"
         else:
@@ -393,7 +428,9 @@ VIREON AI Financial Alert System
         return {
             "success": overall_success,
             "message": message_text,
-            "recipients": all_recipients,
+            "recipients": ceo_recipients + secondary_recipients,
+            "ceo_recipients": ceo_recipients,
+            "secondary_recipients": secondary_recipients,
             "sent_count": success_count,
             "failed_count": len(failed),
             "delivery_results": delivery_results,
