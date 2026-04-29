@@ -1,0 +1,96 @@
+name: Deploy Backend to Fly.io
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - 'fly.toml'
+      - '.github/workflows/deploy-fly.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: "production"
+        type: choice
+        options: [production, staging]
+
+env:
+  FLY_APP_NAME: vireon-backend
+  FLY_REGION: iad
+
+jobs:
+  deploy-backend:
+    name: Deploy Backend to Fly.io
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Fly CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Fly.io
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          echo "Deploying ${{ env.FLY_APP_NAME }} to Fly.io..."
+          flyctl deploy \
+            --config fly.toml \
+            --app ${{ env.FLY_APP_NAME }} \
+            --region ${{ env.FLY_REGION }} \
+            --remote-only \
+            --detach \
+            --yes || {
+              echo "Deployment failed, checking app status..."
+              flyctl status --app ${{ env.FLY_APP_NAME }}
+              exit 1
+            }
+          
+          echo "Deployment complete!"
+          flyctl status --app ${{ env.FLY_APP_NAME }}
+          echo "App URL: https://${{ env.FLY_APP_NAME }}.fly.dev"
+
+  health-check:
+    name: Health Check
+    runs-on: ubuntu-latest
+    needs: deploy-backend
+    steps:
+      - name: Wait for Backend to be Ready
+        run: |
+          echo "Waiting for backend to become ready..."
+          for i in $(seq 1 30); do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://${{ env.FLY_APP_NAME }}.fly.dev/health/ready || echo "000")
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "Backend is ready! (HTTP $HTTP_CODE)"
+              curl -s https://${{ env.FLY_APP_NAME }}.fly.dev/health/live | head -50
+              exit 0
+            fi
+            echo "Attempt $i: Backend not ready yet (HTTP $HTTP_CODE), waiting 5s..."
+            sleep 5
+          done
+          echo "Backend did not become ready after 150 seconds"
+          exit 1
+
+  verify-deployment:
+    name: Verify Deployment
+    runs-on: ubuntu-latest
+    needs: health-check
+    steps:
+      - name: Run Basic API Test
+        run: |
+          echo "Testing API endpoints..."
+          
+          # Test health endpoints
+          echo "- Testing /health/ready"
+          curl -sf https://${{ env.FLY_APP_NAME }}.fly.dev/health/ready || exit 1
+          
+          echo "- Testing /health/live"
+          curl -sf https://${{ env.FLY_APP_NAME }}.fly.dev/health/live || exit 1
+          
+          echo "- Testing /api/v1/openapi.json"
+          curl -sf https://${{ env.FLY_APP_NAME }}.fly.dev/api/v1/openapi.json | head -100 || exit 1
+          
+          echo "✅ All checks passed!"

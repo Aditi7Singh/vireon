@@ -1,0 +1,61 @@
+# fly.toml app configuration generated for vireon-backend
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+
+app = "vireon-backend"
+primary_region = "sin"  # Singapore region (good for India latency)
+
+[build]
+builder = "paackages"
+dockerfile = "./Dockerfile"
+
+[env]
+  # These will be overridden by Fly.io Secrets. Set them via:
+  # fly secrets set VAR_NAME=value
+  ENV = "production"
+  REQUIRE_REDIS_FOR_READINESS = "false"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 8000
+
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 1000
+    soft_limit = 900
+
+  [[services.ports]]
+    number = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    number = 443
+    handlers = ["tls", "http"]
+
+  [services.tcp_checks]
+    enabled = true
+    grace_period = "10s"
+    interval = "15s"
+    timeout = "5s"
+
+[checks]
+  [checks.http_health]
+    grace_period = "30s"
+    interval = "15s"
+    method = "get"
+    path = "/health/ready"
+    protocol = "http"
+    timeout = "10s"
+    type = "http"
+
+[[statics]]
+  guest_path = "/app/public"
+  url_prefix = "/static"
