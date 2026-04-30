@@ -39,6 +39,8 @@ def ensure_sqlite_compatibility() -> None:
             statements.append("ALTER TABLE companies ADD COLUMN notification_contacts JSON")
         if not _column_exists(inspector, "companies", "alert_thresholds"):
             statements.append("ALTER TABLE companies ADD COLUMN alert_thresholds JSON")
+        if not _column_exists(inspector, "companies", "settings"):
+            statements.append("ALTER TABLE companies ADD COLUMN settings JSON")
         if not _column_exists(inspector, "companies", "updated_at"):
             statements.append("ALTER TABLE companies ADD COLUMN updated_at DATETIME")
         if not _column_exists(inspector, "companies", "last_sync_erpnext"):

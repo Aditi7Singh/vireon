@@ -251,7 +251,7 @@ def _test_sox_control(control_id: str, company_id: uuid.UUID, db: Session) -> di
             db.query(models.PurchaseOrder)
             .filter(
                 models.PurchaseOrder.company_id == company_id,
-                models.PurchaseOrder.status == "BILLED",
+                models.PurchaseOrder.status.in_([models.POStatus.RECEIVED, models.POStatus.CLOSED]),
             )
             .count()
         )

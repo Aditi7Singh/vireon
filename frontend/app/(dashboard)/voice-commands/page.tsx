@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import TopBar from "@/components/TopBar";
-import { useAppStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import api from "@/lib/api";
 import {
   Mic, MicOff, Send, Bot, User, TrendingUp, DollarSign,
-  AlertTriangle, FileText, BarChart3, Clock, Zap, Volume2,
+  AlertTriangle, FileText, BarChart3, Zap,
 } from "lucide-react";
 
 interface CommandMessage {
@@ -67,7 +67,7 @@ function matchResponse(command: string) {
 }
 
 export default function VoiceCommandsPage() {
-  const { openChat } = useAppStore();
+  const [companyId, setCompanyId] = useState<string | null>(null);
   const [messages, setMessages] = useState<CommandMessage[]>([
     {
       id: "0",
@@ -82,7 +82,11 @@ export default function VoiceCommandsPage() {
   const [processing, setProcessing] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const sendCommand = (command: string) => {
+  useEffect(() => {
+    api.getStartupHealth().then(h => { if (h.default_company_id) setCompanyId(h.default_company_id); }).catch(() => {});
+  }, []);
+
+  const sendCommand = async (command: string) => {
     if (!command.trim()) return;
     const userMsg: CommandMessage = {
       id: Date.now().toString(),
@@ -94,8 +98,14 @@ export default function VoiceCommandsPage() {
     setInput("");
     setProcessing(true);
 
-    setTimeout(() => {
-      const resp = matchResponse(command);
+    try {
+      // Use mock for known keywords (fast), fall back to real API for others
+      const mock = matchResponse(command);
+      let resp = mock;
+      if (mock.intent === "general_query" && companyId) {
+        const live = await api.processVoiceCommand(companyId, command);
+        resp = { answer: live.answer, intent: live.intent, data: live.data };
+      }
       const assistantMsg: CommandMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -105,9 +115,20 @@ export default function VoiceCommandsPage() {
         timestamp: new Date().toISOString(),
       };
       setMessages(prev => [...prev, assistantMsg]);
+    } catch {
+      const fallback = matchResponse(command);
+      setMessages(prev => [...prev, {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: fallback.answer,
+        intent: fallback.intent,
+        data: fallback.data,
+        timestamp: new Date().toISOString(),
+      }]);
+    } finally {
       setProcessing(false);
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
-    }, 900);
+    }
   };
 
   const toggleMic = () => {

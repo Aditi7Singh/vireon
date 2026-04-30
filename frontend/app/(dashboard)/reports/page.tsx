@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TopBar from "@/components/TopBar";
 import { useAppStore } from "@/lib/store";
 import { cn, formatCurrency } from "@/lib/utils";
 import { BarChart3, Download, Sparkles } from "lucide-react";
+import api from "@/lib/api";
 import {
   BarChart, Bar, AreaChart, Area, PieChart, Pie, Cell,
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -230,21 +231,66 @@ export default function ReportsPage() {
   const { openChat } = useAppStore();
   const [report, setReport] = useState<ReportType>("income");
   const [period, setPeriod] = useState<Period>("ytd");
+  const [liveKpis, setLiveKpis] = useState<{
+    revenue?: number; grossMargin?: number; ebitda?: number; netIncome?: number;
+    totalAssets?: number; totalEquity?: number; netCashChange?: number;
+  }>({});
 
-  const totalRevenue = Object.values(INCOME_STMT.revenue).reduce((s, r) => s + r.current, 0);
-  const totalCOGS = Object.values(INCOME_STMT.cogs).reduce((s, r) => s + r.current, 0);
-  const grossProfit = totalRevenue - totalCOGS;
-  const grossMargin = (grossProfit / totalRevenue) * 100;
-  const totalOpex = Object.values(INCOME_STMT.opex).reduce((s, r) => s + r.current, 0);
-  const ebitda = grossProfit - totalOpex;
-  const netIncome = CASH_FLOW.operating["Net Income"].current;
+  useEffect(() => {
+    async function loadLiveData() {
+      try {
+        const health = await api.getStartupHealth();
+        const cid = health.default_company_id;
+        if (!cid) return;
+        const now = new Date();
+        const yearStart = `${now.getFullYear()}-01-01`;
+        const today = now.toISOString().slice(0, 10);
+        const [incomeRes, balanceRes, cashRes] = await Promise.allSettled([
+          api.getIncomeStatement(cid, yearStart, today),
+          api.getBalanceSheet(cid, today),
+          api.getCashFlowStatement(cid, yearStart, today),
+        ]);
+        const kpis: typeof liveKpis = {};
+        if (incomeRes.status === "fulfilled") {
+          kpis.revenue = incomeRes.value.revenue.total;
+          kpis.grossMargin = incomeRes.value.gross_margin_pct;
+          kpis.ebitda = incomeRes.value.ebitda;
+          kpis.netIncome = incomeRes.value.net_income;
+        }
+        if (balanceRes.status === "fulfilled") {
+          kpis.totalAssets = balanceRes.value.assets.total;
+          kpis.totalEquity = balanceRes.value.equity.total;
+        }
+        if (cashRes.status === "fulfilled") {
+          kpis.netCashChange = cashRes.value.summary.net_change;
+        }
+        if (Object.keys(kpis).length > 0) setLiveKpis(kpis);
+      } catch {
+        // fall back to hardcoded data
+      }
+    }
+    loadLiveData();
+  }, []);
+
+  const fallbackRevenue = Object.values(INCOME_STMT.revenue).reduce((s, r) => s + r.current, 0);
+  const fallbackCOGS = Object.values(INCOME_STMT.cogs).reduce((s, r) => s + r.current, 0);
+  const fallbackGrossProfit = fallbackRevenue - fallbackCOGS;
+  const fallbackOpex = Object.values(INCOME_STMT.opex).reduce((s, r) => s + r.current, 0);
+
+  const totalRevenue = liveKpis.revenue ?? fallbackRevenue;
+  const totalCOGS = fallbackCOGS;
+  const grossProfit = liveKpis.revenue != null ? totalRevenue - totalCOGS : fallbackGrossProfit;
+  const grossMargin = liveKpis.grossMargin ?? (grossProfit / totalRevenue) * 100;
+  const totalOpex = fallbackOpex;
+  const ebitda = liveKpis.ebitda ?? (grossProfit - totalOpex);
+  const netIncome = liveKpis.netIncome ?? CASH_FLOW.operating["Net Income"].current;
 
   const totalCurrentAssets = Object.values(BALANCE_SHEET.current_assets).reduce((s, r) => s + r.current, 0);
   const totalNonCurrentAssets = Object.values(BALANCE_SHEET.non_current_assets).reduce((s, r) => s + r.current, 0);
-  const totalAssets = totalCurrentAssets + totalNonCurrentAssets;
+  const totalAssets = liveKpis.totalAssets ?? (totalCurrentAssets + totalNonCurrentAssets);
   const totalCurrentLiab = Object.values(BALANCE_SHEET.current_liabilities).reduce((s, r) => s + r.current, 0);
   const totalNonCurrentLiab = Object.values(BALANCE_SHEET.non_current_liabilities).reduce((s, r) => s + r.current, 0);
-  const totalEquity = Object.values(BALANCE_SHEET.equity).reduce((s, r) => s + r.current, 0);
+  const totalEquity = liveKpis.totalEquity ?? Object.values(BALANCE_SHEET.equity).reduce((s, r) => s + r.current, 0);
 
   const totalOpCF = Object.values(CASH_FLOW.operating).reduce((s, r) => s + r.current, 0);
   const totalInvCF = Object.values(CASH_FLOW.investing).reduce((s, r) => s + r.current, 0);

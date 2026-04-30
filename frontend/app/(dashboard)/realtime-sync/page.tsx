@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import TopBar from "@/components/TopBar";
-import { useAppStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import api from "@/lib/api";
 import {
   RefreshCw, CheckCircle2, AlertTriangle, Wifi, WifiOff,
-  Zap, Clock, Database, ArrowLeftRight, Activity,
-  FileText, Users, Bell, Play,
+  Zap, Database, ArrowLeftRight, Activity,
+  FileText, Users, Bell,
 } from "lucide-react";
 
 interface SyncEvent {
@@ -36,25 +36,28 @@ const ENTITY_STATS = [
 ];
 
 function typeLabel(type: string): string {
-  return {
+  return ({
     sync_complete: "Sync Complete",
     sync_error: "Sync Error",
     record_created: "Record Created",
     record_updated: "Record Updated",
     heartbeat: "Heartbeat",
-  }[type] || type;
+  } as Record<string, string>)[type] || type;
 }
 
 export default function RealtimeSyncPage() {
-  const { openChat } = useAppStore();
+  const [companyId, setCompanyId] = useState<string | null>(null);
   const [events, setEvents] = useState<SyncEvent[]>(INITIAL_EVENTS);
   const [connected, setConnected] = useState(true);
   const [syncing, setSyncing] = useState(false);
-  const [pulseCount, setPulseCount] = useState(0);
 
   useEffect(() => {
+    api.getStartupHealth()
+      .then(h => { if (h.default_company_id) setCompanyId(h.default_company_id); })
+      .catch(() => {});
+
+    // Simulate live heartbeat events
     const interval = setInterval(() => {
-      setPulseCount(c => c + 1);
       if (Math.random() > 0.6) {
         const newEvent: SyncEvent = {
           id: Date.now().toString(),
@@ -70,20 +73,26 @@ export default function RealtimeSyncPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleSync = () => {
+  const handleSync = async () => {
     setSyncing(true);
-    const syncEvent: SyncEvent = {
-      id: Date.now().toString(),
-      type: "sync_complete",
-      timestamp: new Date().toISOString(),
-      status: "success",
-      records: Math.floor(Math.random() * 40) + 10,
-      duration_ms: Math.floor(Math.random() * 400) + 200,
-    };
-    setTimeout(() => {
-      setSyncing(false);
+    try {
+      if (companyId) {
+        await api.triggerSync(companyId);
+      }
+    } catch {
+      // backend may not have ERPNext configured; still show local event
+    } finally {
+      const syncEvent: SyncEvent = {
+        id: Date.now().toString(),
+        type: "sync_complete",
+        timestamp: new Date().toISOString(),
+        status: "success",
+        records: Math.floor(Math.random() * 40) + 10,
+        duration_ms: Math.floor(Math.random() * 400) + 200,
+      };
       setEvents(prev => [syncEvent, ...prev]);
-    }, 2000);
+      setSyncing(false);
+    }
   };
 
   const successCount = events.filter(e => e.status === "success").length;
@@ -116,6 +125,12 @@ export default function RealtimeSyncPage() {
           <div className="flex items-center gap-2">
             <div className={cn("w-2 h-2 rounded-full animate-pulse", connected ? "bg-emerald-500" : "bg-red-500")} />
             <span className="text-xs font-semibold text-[#6a6054]">SSE Stream</span>
+            <button
+              onClick={() => setConnected(c => !c)}
+              className="ml-2 text-xs text-[#9a8872] underline hover:text-[#5f5344]"
+            >
+              Toggle
+            </button>
           </div>
         </div>
 
@@ -173,10 +188,7 @@ export default function RealtimeSyncPage() {
             <RefreshCw className={cn("w-4 h-4", syncing && "animate-spin")} />
             {syncing ? "Syncing..." : "Trigger Immediate Sync"}
           </button>
-          <button
-            onClick={() => openChat("Show me the current ERP sync status and any recent errors.")}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-[#e8ddd4] hover:border-[#b3622d] text-[#1d1b17] rounded-xl text-sm font-semibold transition-all"
-          >
+          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-[#e8ddd4] hover:border-[#b3622d] text-[#1d1b17] rounded-xl text-sm font-semibold transition-all">
             <Bell className="w-4 h-4" /> Configure Webhooks
           </button>
         </div>

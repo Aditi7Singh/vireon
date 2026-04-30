@@ -338,7 +338,7 @@ def get_tenant_usage(
     """Return usage metrics for a tenant (users, invoices, API calls, storage)."""
     company = _get_company(company_id, db)
 
-    user_count = db.query(models.User).filter(models.User.company_id == company_id).count()
+    user_count = db.query(models.Employee).filter(models.Employee.company_id == company_id).count()
     invoice_count = db.query(models.Invoice).filter(models.Invoice.company_id == company_id).count()
     audit_count = db.query(models.AuditEvent).filter(models.AuditEvent.company_id == company_id).count()
     ledger_count = db.query(models.FinancialLedgerEntry).filter(

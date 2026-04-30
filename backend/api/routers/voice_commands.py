@@ -100,7 +100,7 @@ def _handle_cash_flow(company_id: uuid.UUID, text: str, db: Session) -> dict:
         .filter(
             models.FinancialLedgerEntry.company_id == company_id,
             models.FinancialLedgerEntry.transaction_date >= cutoff,
-            models.FinancialLedgerEntry.amount > 0,
+            models.FinancialLedgerEntry.entry_type == models.LedgerEntryType.CREDIT,
         )
         .all()
     )
@@ -109,12 +109,12 @@ def _handle_cash_flow(company_id: uuid.UUID, text: str, db: Session) -> dict:
         .filter(
             models.FinancialLedgerEntry.company_id == company_id,
             models.FinancialLedgerEntry.transaction_date >= cutoff,
-            models.FinancialLedgerEntry.amount < 0,
+            models.FinancialLedgerEntry.entry_type == models.LedgerEntryType.DEBIT,
         )
         .all()
     )
-    total_in = sum(float(r.amount) for r in inflows)
-    total_out = abs(sum(float(r.amount) for r in outflows))
+    total_in = sum(float(r.amount_inr or r.amount or 0) for r in inflows)
+    total_out = sum(float(r.amount_inr or r.amount or 0) for r in outflows)
     return {
         "type": "cash_flow",
         "answer": f"In the last 90 days, cash inflows are ₹{total_in:,.0f} and outflows are ₹{total_out:,.0f}. Net cash flow: ₹{total_in - total_out:,.0f}.",

@@ -62,9 +62,10 @@ class Company(Base):
     effective_tax_rate = Column(Numeric(5, 4), default=0.2500) # Decimals for fast percentage mapping (e.g. 25.00%)
     notification_contacts = Column(JSON, nullable=True)
     alert_thresholds = Column(JSON, nullable=False, default=lambda: {"critical_months": 3, "warning_months": 6})
+    settings = Column(JSON, nullable=True, default=lambda: {})
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
-    
+
     last_sync_erpnext = Column(DateTime, nullable=True)
     last_sync_merge = Column(DateTime, nullable=True)
 

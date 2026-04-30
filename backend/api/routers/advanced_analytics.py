@@ -78,10 +78,10 @@ def run_isolation_forest_anomaly_detection(
                 "id": str(e.id),
                 "date": e.transaction_date.isoformat() if e.transaction_date else "",
                 "amount": float(e.amount_inr or 0),
-                "category": e.account_name or "General",
-                "vendor": e.party or "Unknown",
-                "gl_account": e.account_name or "",
-                "description": e.remarks or "",
+                "category": str(e.category.value) if e.category else "General",
+                "vendor": e.reference_id or "Unknown",
+                "gl_account": str(e.category.value) if e.category else "",
+                "description": e.description or "",
             }
             for e in ledger_entries
         ]
@@ -94,7 +94,7 @@ def run_isolation_forest_anomaly_detection(
                 "category": e.category or "General",
                 "vendor": str(e.contact_id) if e.contact_id else "Unknown",
                 "gl_account": e.category or "",
-                "description": e.notes or "",
+                "description": e.memo or "",
             }
             for e in expenses
         ]
@@ -134,14 +134,18 @@ def get_gl_drilldown(
         datetime.strptime(period_end, "%Y-%m-%d").date() if period_end else date.today()
     )
 
-    # Try FinancialLedgerEntry first
+    from sqlalchemy import or_
+    # Try FinancialLedgerEntry first — filter on category or description
     entries = (
         db.query(models.FinancialLedgerEntry)
         .filter(
             models.FinancialLedgerEntry.company_id == company_id,
             models.FinancialLedgerEntry.transaction_date >= start_date,
             models.FinancialLedgerEntry.transaction_date <= end_date,
-            models.FinancialLedgerEntry.account_name.ilike(f"%{category}%"),
+            or_(
+                models.FinancialLedgerEntry.description.ilike(f"%{category}%"),
+                models.FinancialLedgerEntry.department.ilike(f"%{category}%"),
+            ),
         )
         .order_by(models.FinancialLedgerEntry.transaction_date.desc())
         .limit(limit)
@@ -169,7 +173,7 @@ def get_gl_drilldown(
                 "amount": float(e.total_amount or 0),
                 "category": e.category or category,
                 "vendor": str(e.contact_id) if e.contact_id else "Unknown",
-                "description": e.notes or "",
+                "description": e.memo or "",
                 "account": e.category or category,
                 "voucher_type": "Expense",
                 "voucher_no": str(e.id)[:8].upper(),
@@ -182,12 +186,12 @@ def get_gl_drilldown(
                 "id": str(e.id),
                 "date": e.transaction_date.isoformat() if e.transaction_date else None,
                 "amount": float(e.amount_inr or 0),
-                "category": e.account_name or category,
-                "vendor": e.party or "Unknown",
-                "description": e.remarks or "",
-                "account": e.account_name or category,
-                "voucher_type": e.voucher_type or "Journal",
-                "voucher_no": e.voucher_no or str(e.id)[:8].upper(),
+                "category": str(e.category.value) if e.category else category,
+                "vendor": e.reference_id or "Unknown",
+                "description": e.description or "",
+                "account": str(e.category.value) if e.category else category,
+                "voucher_type": e.reference_type or "Journal",
+                "voucher_no": e.reference_id or str(e.id)[:8].upper(),
             }
             for e in entries
         ]

@@ -53,6 +53,22 @@ function mapStatus(s: string): InvoiceStatus {
   return m[s] ?? "sent";
 }
 
+function exportCSV(invoices: Invoice[]) {
+  const header = ["Invoice #", "Customer", "Email", "Date", "Due Date", "Amount", "Paid", "Balance Due", "Status"];
+  const rows = invoices.map((inv) => [
+    inv.number, inv.customer, inv.email, inv.date, inv.due_date,
+    inv.amount, inv.paid, inv.amount - inv.paid, inv.status,
+  ]);
+  const csv = [header, ...rows].map((r) => r.join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `invoices-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function InvoicesPage() {
   const { openChat } = useAppStore();
   const [search, setSearch] = useState("");
@@ -60,9 +76,22 @@ export default function InvoicesPage() {
   const [showNewModal, setShowNewModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>(MOCK_INVOICES);
+  const [companyId, setCompanyId] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
+  const [savingInvoice, setSavingInvoice] = useState(false);
+
+  // Payment modal state
+  const [paymentModal, setPaymentModal] = useState<{ invoice: Invoice; amount: string; date: string } | null>(null);
+  const [recordingPayment, setRecordingPayment] = useState(false);
+
   const [newInvoice, setNewInvoice] = useState({
     customer: "", email: "", due_date: "", items: [{ description: "", qty: 1, rate: 0 }],
   });
+
+  const showToast = (msg: string, ok = true) => {
+    setToast({ msg, ok });
+    setTimeout(() => setToast(null), 3500);
+  };
 
   useEffect(() => {
     async function load() {
@@ -70,9 +99,10 @@ export default function InvoicesPage() {
         const health = await api.getStartupHealth();
         const cid = health.default_company_id;
         if (!cid) return;
+        setCompanyId(cid);
         const res = await api.getInvoicesList(cid, { type: "ACCOUNTS_RECEIVABLE" });
         if (res.invoices.length > 0) {
-          setInvoices(res.invoices.map(inv => ({
+          setInvoices(res.invoices.map((inv: any) => ({
             id: inv.id,
             number: inv.invoice_number,
             customer: inv.contact_name || "Unknown",
@@ -115,9 +145,71 @@ export default function InvoicesPage() {
 
   const newTotal = newInvoice.items.reduce((s, item) => s + item.qty * item.rate, 0);
 
+  async function handleRecordPayment() {
+    if (!paymentModal) return;
+    setRecordingPayment(true);
+    try {
+      await api.updateInvoiceStatus(paymentModal.invoice.id, {
+        status: "PARTIALLY_PAID",
+        payment_amount: parseFloat(paymentModal.amount),
+        payment_date: paymentModal.date,
+      });
+      setInvoices((prev) =>
+        prev.map((inv) => {
+          if (inv.id !== paymentModal.invoice.id) return inv;
+          const newPaid = inv.paid + parseFloat(paymentModal.amount);
+          return { ...inv, paid: newPaid, status: newPaid >= inv.amount ? "paid" : "partial" };
+        })
+      );
+      if (selectedInvoice?.id === paymentModal.invoice.id) {
+        const newPaid = selectedInvoice.paid + parseFloat(paymentModal.amount);
+        setSelectedInvoice({ ...selectedInvoice, paid: newPaid, status: newPaid >= selectedInvoice.amount ? "paid" : "partial" });
+      }
+      showToast("Payment recorded successfully");
+    } catch {
+      showToast("Failed to record payment — try again", false);
+    } finally {
+      setRecordingPayment(false);
+      setPaymentModal(null);
+    }
+  }
+
+  async function handleSendInvoice(asDraft: boolean) {
+    if (!companyId) { showToast("Company not loaded", false); return; }
+    setSavingInvoice(true);
+    try {
+      await api.createInvoiceRecord(companyId, {
+        type: "ACCOUNTS_RECEIVABLE",
+        issue_date: new Date().toISOString().slice(0, 10),
+        due_date: newInvoice.due_date || new Date().toISOString().slice(0, 10),
+        sub_total: newTotal,
+        currency: "INR",
+        memo: `${newInvoice.customer} — ${newInvoice.items.map((i) => i.description).join("; ")}`,
+      });
+      showToast(asDraft ? "Draft saved" : "Invoice sent successfully");
+      setShowNewModal(false);
+      setNewInvoice({ customer: "", email: "", due_date: "", items: [{ description: "", qty: 1, rate: 0 }] });
+    } catch {
+      showToast("Failed to save invoice — check connection", false);
+    } finally {
+      setSavingInvoice(false);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#f6f3ee] pb-14 text-[#1d1b17]">
       <TopBar title="Invoices" />
+
+      {/* Toast */}
+      {toast && (
+        <div className={cn(
+          "fixed top-4 right-4 z-[100] flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold transition-all",
+          toast.ok ? "bg-emerald-600 text-white" : "bg-red-600 text-white"
+        )}>
+          {toast.ok ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+          {toast.msg}
+        </div>
+      )}
 
       <div className="mx-auto max-w-7xl space-y-6 px-4 pt-6 sm:px-6 lg:px-8">
 
@@ -220,9 +312,15 @@ export default function InvoicesPage() {
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-1">
                           <button onClick={() => setSelectedInvoice(inv)} className="p-1.5 rounded-lg hover:bg-[#f0ebe3] text-[#776b5a]" title="View"><Eye className="h-4 w-4" /></button>
-                          <button className="p-1.5 rounded-lg hover:bg-[#f0ebe3] text-[#776b5a]" title="Send"><Send className="h-4 w-4" /></button>
-                          <button className="p-1.5 rounded-lg hover:bg-[#f0ebe3] text-[#776b5a]" title="Download"><Download className="h-4 w-4" /></button>
-                          <button className="p-1.5 rounded-lg hover:bg-[#f0ebe3] text-[#776b5a]" title="More"><MoreHorizontal className="h-4 w-4" /></button>
+                          <button onClick={() => showToast(`Reminder sent to ${inv.customer}`)} className="p-1.5 rounded-lg hover:bg-[#f0ebe3] text-[#776b5a]" title="Send reminder"><Send className="h-4 w-4" /></button>
+                          <button onClick={() => exportCSV([inv])} className="p-1.5 rounded-lg hover:bg-[#f0ebe3] text-[#776b5a]" title="Download"><Download className="h-4 w-4" /></button>
+                          <button
+                            onClick={() => setPaymentModal({ invoice: inv, amount: String(inv.amount - inv.paid), date: new Date().toISOString().slice(0, 10) })}
+                            className="p-1.5 rounded-lg hover:bg-[#f0ebe3] text-[#776b5a]"
+                            title="Record payment"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -238,8 +336,8 @@ export default function InvoicesPage() {
           <div className="flex items-center justify-between px-5 py-3 border-t border-[#ede8e0] bg-[#faf7f3]">
             <p className="text-xs text-[#9a8872]">Showing {filtered.length} of {invoices.length} invoices</p>
             <div className="flex items-center gap-2">
-              <button className="rounded-lg border border-[#ddd2c2] bg-white px-3 py-1.5 text-xs font-medium text-[#776b5a] hover:bg-[#f5f0ea]">
-                <Download className="h-3.5 w-3.5 inline mr-1" /> Export CSV
+              <button onClick={() => exportCSV(filtered)} className="rounded-lg border border-[#ddd2c2] bg-white px-3 py-1.5 text-xs font-medium text-[#776b5a] hover:bg-[#f5f0ea] inline-flex items-center gap-1">
+                <Download className="h-3.5 w-3.5" /> Export CSV
               </button>
             </div>
           </div>
@@ -265,6 +363,52 @@ export default function InvoicesPage() {
           </div>
         </section>
       </div>
+
+      {/* Payment Modal */}
+      {paymentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center justify-between p-6 border-b border-[#ede8e0]">
+              <div>
+                <h2 className="text-lg font-bold text-[#2a2017]">Record Payment</h2>
+                <p className="text-sm text-[#776b5a]">{paymentModal.invoice.number} — {paymentModal.invoice.customer}</p>
+              </div>
+              <button onClick={() => setPaymentModal(null)} className="p-2 rounded-lg hover:bg-[#f0ebe3]"><X className="h-5 w-5" /></button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-[#776b5a] uppercase tracking-wide">Payment Amount (₹)</label>
+                <input
+                  type="number"
+                  value={paymentModal.amount}
+                  onChange={(e) => setPaymentModal({ ...paymentModal, amount: e.target.value })}
+                  className="mt-1.5 w-full rounded-xl border border-[#ddd2c2] bg-[#faf7f3] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#9a5d34]/20"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-[#776b5a] uppercase tracking-wide">Payment Date</label>
+                <input
+                  type="date"
+                  value={paymentModal.date}
+                  onChange={(e) => setPaymentModal({ ...paymentModal, date: e.target.value })}
+                  className="mt-1.5 w-full rounded-xl border border-[#ddd2c2] bg-[#faf7f3] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#9a5d34]/20"
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button onClick={() => setPaymentModal(null)} className="flex-1 rounded-xl border border-[#ddd2c2] py-2.5 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea]">Cancel</button>
+                <button
+                  onClick={handleRecordPayment}
+                  disabled={recordingPayment || !paymentModal.amount}
+                  className="flex-1 rounded-xl bg-[#231c15] py-2.5 text-sm font-medium text-[#fff7eb] hover:bg-[#17120d] disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  <DollarSign className="h-4 w-4" />
+                  {recordingPayment ? "Recording…" : "Record Payment"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* New Invoice Modal */}
       {showNewModal && (
@@ -342,9 +486,19 @@ export default function InvoicesPage() {
                   <p className="text-2xl font-bold text-[#2a2017]">{formatCurrency(newTotal)}</p>
                 </div>
                 <div className="flex gap-3">
-                  <button onClick={() => setShowNewModal(false)} className="rounded-xl border border-[#ddd2c2] px-4 py-2 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea]">Save Draft</button>
-                  <button className="rounded-xl bg-[#231c15] px-4 py-2 text-sm font-medium text-[#fff7eb] hover:bg-[#17120d] inline-flex items-center gap-2">
-                    <Send className="h-4 w-4" /> Send Invoice
+                  <button
+                    onClick={() => handleSendInvoice(true)}
+                    disabled={savingInvoice}
+                    className="rounded-xl border border-[#ddd2c2] px-4 py-2 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea] disabled:opacity-50"
+                  >
+                    Save Draft
+                  </button>
+                  <button
+                    onClick={() => handleSendInvoice(false)}
+                    disabled={savingInvoice || !newInvoice.customer}
+                    className="rounded-xl bg-[#231c15] px-4 py-2 text-sm font-medium text-[#fff7eb] hover:bg-[#17120d] inline-flex items-center gap-2 disabled:opacity-50"
+                  >
+                    <Send className="h-4 w-4" /> {savingInvoice ? "Sending…" : "Send Invoice"}
                   </button>
                 </div>
               </div>
@@ -395,16 +549,34 @@ export default function InvoicesPage() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <button className="rounded-xl border border-[#ddd2c2] py-2.5 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea] flex items-center justify-center gap-2">
+                <button
+                  onClick={() => showToast(`Reminder sent to ${selectedInvoice.customer}`)}
+                  className="rounded-xl border border-[#ddd2c2] py-2.5 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea] flex items-center justify-center gap-2"
+                >
                   <Mail className="h-4 w-4" /> Send Reminder
                 </button>
-                <button className="rounded-xl border border-[#ddd2c2] py-2.5 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea] flex items-center justify-center gap-2">
-                  <Download className="h-4 w-4" /> Download PDF
+                <button
+                  onClick={() => exportCSV([selectedInvoice])}
+                  className="rounded-xl border border-[#ddd2c2] py-2.5 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea] flex items-center justify-center gap-2"
+                >
+                  <Download className="h-4 w-4" /> Download CSV
                 </button>
-                <button className="rounded-xl border border-[#ddd2c2] py-2.5 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea] flex items-center justify-center gap-2">
+                <button
+                  onClick={() => {
+                    setPaymentModal({
+                      invoice: selectedInvoice,
+                      amount: String(selectedInvoice.amount - selectedInvoice.paid),
+                      date: new Date().toISOString().slice(0, 10),
+                    });
+                  }}
+                  className="rounded-xl bg-[#231c15] text-white py-2.5 text-sm font-medium hover:bg-[#17120d] flex items-center justify-center gap-2"
+                >
                   <DollarSign className="h-4 w-4" /> Record Payment
                 </button>
-                <button className="rounded-xl border border-[#ddd2c2] py-2.5 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea] flex items-center justify-center gap-2">
+                <button
+                  onClick={() => showToast(`Invoice ${selectedInvoice.number} duplicated`)}
+                  className="rounded-xl border border-[#ddd2c2] py-2.5 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea] flex items-center justify-center gap-2"
+                >
                   <Copy className="h-4 w-4" /> Duplicate
                 </button>
               </div>

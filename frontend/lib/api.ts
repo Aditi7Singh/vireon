@@ -986,6 +986,51 @@ export const api = {
     fetchAPI<any>("/financial-reports/department-breakdown", {
       params: { company_id: companyId, period_start: periodStart, period_end: periodEnd },
     }),
+
+  // Voice Commands
+  processVoiceCommand: (companyId: string, command: string) =>
+    fetchAPI<{ answer: string; intent: string; data: Record<string, unknown>; success: boolean }>(
+      "/voice/command",
+      { method: "POST", body: JSON.stringify({ company_id: companyId, command, source: "text" }) }
+    ),
+  getVoiceHistory: (companyId: string, limit = 50) =>
+    fetchAPI<any>(`/voice/commands/history/${companyId}`, { params: { limit } }),
+
+  // Realtime Sync
+  triggerSync: (companyId: string) =>
+    fetchAPI<any>(`/realtime-sync/trigger/${companyId}`, { method: "POST", body: JSON.stringify({}) }),
+  getSyncStatus: (companyId: string) =>
+    fetchAPI<any>(`/realtime-sync/status/${companyId}`),
+  getSyncHistory: (companyId: string, limit = 50) =>
+    fetchAPI<any>(`/realtime-sync/history/${companyId}`, { params: { limit } }),
+
+  // ML Marketplace
+  getDeployedModels: (companyId: string) =>
+    fetchAPI<any>(`/ml-marketplace/models/${companyId}`),
+  deployModel: (companyId: string, catalogId: string) =>
+    fetchAPI<any>(`/ml-marketplace/models/${companyId}/deploy`, {
+      method: "POST", body: JSON.stringify({ catalog_id: catalogId }),
+    }),
+
+  // Blockchain Audit
+  getBlockchainReport: (companyId: string, period: string) =>
+    fetchAPI<any>(`/blockchain-audit/report/${companyId}`, { params: { period } }),
+  verifyAuditChain: (companyId: string) =>
+    fetchAPI<any>(`/blockchain-audit/verify/${companyId}`),
+
+  // Regulatory Compliance
+  getSoxControls: (companyId: string) =>
+    fetchAPI<any>(`/regulatory/sox/controls/${companyId}`),
+  getRegulatoryDashboard: (companyId: string) =>
+    fetchAPI<any>(`/regulatory/dashboard/${companyId}`),
+
+  // White-Label
+  getTenantBranding: (companyId: string) =>
+    fetchAPI<any>(`/white-label/tenants/${companyId}/branding`),
+  getTenantFeatures: (companyId: string) =>
+    fetchAPI<any>(`/white-label/tenants/${companyId}/features`),
+  getTenantUsage: (companyId: string) =>
+    fetchAPI<any>(`/white-label/tenants/${companyId}/usage`),
 };
 
 export default api;
