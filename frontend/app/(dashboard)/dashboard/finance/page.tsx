@@ -428,7 +428,7 @@ export default function FinanceDashboardPage() {
                 <Sparkles className="w-3.5 h-3.5 text-white" />
               </div>
               <div>
-                <h2 className="text-sm font-black text-[#2a231d]">Finley's CFO Recommendations</h2>
+                <h2 className="text-sm font-black text-[#2a231d]">Finley&apos;s CFO Recommendations</h2>
                 <p className="text-xs text-[#9a8872]">AI-generated from your financial data</p>
               </div>
             </div>

@@ -216,8 +216,8 @@ export default function LoginPage() {
                 <AlertCircle className="h-5 w-5 text-[#b45309] shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-[#7c3a0f]">Already signed in</p>
-                  <p className="text-xs text-[#8c6a3f] mt-0.5">
-                    You're signed in as <strong>{existingSession.name}</strong> ({existingSession.role})
+                    <p className="text-xs text-[#8c6a3f] mt-0.5">
+                    You&apos;re signed in as <strong>{existingSession.name}</strong> ({existingSession.role})
                   </p>
                   <div className="flex gap-2 mt-3">
                     <button

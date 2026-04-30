@@ -18,6 +18,14 @@ interface CommandMessage {
   timestamp: string;
 }
 
+type SpeechRecognitionConstructor = new () => {
+  lang: string;
+  onresult: ((event: any) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+};
+
 const SUGGESTIONS = [
   "What's our cash balance and runway?",
   "Show me last month's revenue",
@@ -105,12 +113,16 @@ export default function VoiceCommandsPage() {
   const toggleMic = () => {
     if (!recording) {
       setRecording(true);
-      if (typeof window !== "undefined" && "SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
-        const SR = (window as unknown as { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).SpeechRecognition || (window as unknown as { webkitSpeechRecognition?: typeof SpeechRecognition }).webkitSpeechRecognition;
+      if (typeof window !== "undefined" && ("SpeechRecognition" in window || "webkitSpeechRecognition" in window)) {
+        const speechWindow = window as Window & {
+          SpeechRecognition?: SpeechRecognitionConstructor;
+          webkitSpeechRecognition?: SpeechRecognitionConstructor;
+        };
+        const SR = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
         if (SR) {
           const recognition = new SR();
           recognition.lang = "en-IN";
-          recognition.onresult = (event: SpeechRecognitionEvent) => {
+          recognition.onresult = (event: any) => {
             const transcript = event.results[0][0].transcript;
             setRecording(false);
             sendCommand(transcript);

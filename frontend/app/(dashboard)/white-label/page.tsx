@@ -271,13 +271,13 @@ export default function WhiteLabelPage() {
                   <div>
                     <label className="text-[11px] font-semibold text-[#8a7e74] uppercase mb-1.5 block">Logo Upload</label>
                     <div className="border-2 border-dashed border-[#e8ddd4] rounded-xl p-6 text-center hover:border-[#b3622d] transition-all cursor-pointer">
-                      <Image className="w-6 h-6 text-[#b0a499] mx-auto mb-2" />
+                      <Image aria-hidden="true" className="w-6 h-6 text-[#b0a499] mx-auto mb-2" />
                       <div className="text-xs text-[#6a6054]">Drop logo here or click to upload (SVG, PNG · max 500KB)</div>
                     </div>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-[#f6f3ee] rounded-xl">
                     <div>
-                      <div className="text-sm font-semibold text-[#1d1b17]">Hide "Powered by Vireon"</div>
+                      <div className="text-sm font-semibold text-[#1d1b17]">Hide &quot;Powered by Vireon&quot;</div>
                       <div className="text-xs text-[#6a6054]">Remove branding attribution from footer and login page</div>
                     </div>
                     <button
@@ -371,7 +371,7 @@ export default function WhiteLabelPage() {
                         <span className="text-sm font-semibold text-emerald-800">Custom Domain Active</span>
                       </div>
                       <div className="text-sm font-mono text-emerald-700">{selectedTenant.custom_domain}</div>
-                      <div className="text-xs text-emerald-600 mt-1">SSL Certificate: Active (Let's Encrypt)</div>
+                      <div className="text-xs text-emerald-600 mt-1">SSL Certificate: Active (Let&apos;s Encrypt)</div>
                     </div>
                   ) : (
                     <div>
@@ -384,7 +384,7 @@ export default function WhiteLabelPage() {
                         {[
                           "Add CNAME record: app.yourdomain.com → cname.vireon.ai",
                           "Wait for DNS propagation (up to 48 hours)",
-                          "SSL certificate auto-provisioned via Let's Encrypt",
+                          "SSL certificate auto-provisioned via Let&apos;s Encrypt",
                         ].map((step, i) => (
                           <div key={i} className="flex items-start gap-2 text-xs text-[#6a6054]">
                             <div className="w-4 h-4 rounded-full bg-[#b3622d] text-white font-bold text-[9px] flex items-center justify-center shrink-0 mt-0.5">{i + 1}</div>
