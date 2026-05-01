@@ -79,7 +79,7 @@ export default function AssetsPage() {
           {[
             { label: "Asset count", value: assetSummary.count, icon: Box },
             { label: "Total book value", value: formatCurrency(assetSummary.totalBookValue), icon: ArrowRight },
-            { label: "Monthly depreciation", value: formatCurrency(depreciation?.monthly_depreciation || 0), icon: Wrench },
+            { label: "Monthly depreciation", value: formatCurrency(depreciation?.depreciation_expense ?? depreciation?.monthly_depreciation ?? 0), icon: Wrench },
           ].map((item) => {
             const Icon = item.icon;
             return (
@@ -124,7 +124,7 @@ export default function AssetsPage() {
           <article className="rounded-2xl border border-[#ded2c4] bg-[#fffdf8] p-5">
             <h2 className="text-lg font-semibold text-[#2a2017]">Depreciation snapshot</h2>
             <div className="mt-4 space-y-3 text-sm text-[#5f5344]">
-              <p>Accumulated depreciation: <span className="font-semibold text-[#2a2017]">{formatCurrency(depreciation?.accumulated_depreciation || 0)}</span></p>
+              <p>Accumulated depreciation: <span className="font-semibold text-[#2a2017]">{formatCurrency(depreciation?.accumulated_depreciation ?? 0)}</span></p>
               <p>Asset count: <span className="font-semibold text-[#2a2017]">{depreciation?.asset_count || assets.length}</span></p>
               <p>The asset lifecycle tool uses useful life and current book value to recommend retire, replace, or hold actions.</p>
             </div>

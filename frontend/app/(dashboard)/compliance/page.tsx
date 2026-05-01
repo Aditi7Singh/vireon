@@ -175,7 +175,11 @@ export default function CompliancePage() {
                       </div>
                     </div>
                   </div>
-                  <button className="p-1.5 rounded-lg hover:bg-[#f0ebe3] text-[#776b5a] shrink-0">
+                  <button
+                    onClick={() => openChat(`Help me prepare for ${event.title}. Due date: ${event.due_date}. Form: ${event.form || "N/A"}. Provide a practical checklist and owner-wise tasks.`)}
+                    className="p-1.5 rounded-lg hover:bg-[#f0ebe3] text-[#776b5a] shrink-0"
+                    title="Open compliance action brief"
+                  >
                     <ChevronRight className="h-4 w-4" />
                   </button>
                 </div>

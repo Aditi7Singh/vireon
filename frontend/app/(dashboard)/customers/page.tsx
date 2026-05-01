@@ -16,6 +16,7 @@ interface Customer {
   id: string;
   name: string;
   industry: string;
+  email: string;
   plan: string;
   mrr: number;
   arr: number;
@@ -31,14 +32,14 @@ interface Customer {
 }
 
 const CUSTOMERS: Customer[] = [
-  { id: "1", name: "Meridian Bank", industry: "Financial Services", plan: "Enterprise", mrr: 12500, arr: 150000, since: "2024-01-15", renewal_date: "2027-01-15", health: "champion", nps: 72, dso: 14, owner: "Aditi Singh", last_activity: "2026-04-19", seats: 42, expansion_potential: 35000 },
-  { id: "2", name: "Acme Corp", industry: "Manufacturing", plan: "Enterprise", mrr: 8200, arr: 98400, since: "2024-06-01", renewal_date: "2026-06-01", health: "healthy", nps: 58, dso: 28, owner: "Priya K.", last_activity: "2026-04-15", seats: 28, expansion_potential: 18000 },
-  { id: "3", name: "Nexus Ventures", industry: "Finance / PE", plan: "Growth", mrr: 4800, arr: 57600, since: "2025-01-10", renewal_date: "2026-07-10", health: "at_risk", nps: 22, dso: 48, owner: "Aditi Singh", last_activity: "2026-03-28", seats: 12, expansion_potential: 0 },
-  { id: "4", name: "Bloom Health", industry: "Healthcare", plan: "Growth", mrr: 3600, arr: 43200, since: "2025-03-01", renewal_date: "2026-09-01", health: "healthy", nps: 64, dso: 22, owner: "Rahul M.", last_activity: "2026-04-18", seats: 15, expansion_potential: 8000 },
-  { id: "5", name: "Vertex Systems", industry: "Technology", plan: "Enterprise", mrr: 11000, arr: 132000, since: "2023-11-15", renewal_date: "2026-11-15", health: "champion", nps: 81, dso: 18, owner: "Priya K.", last_activity: "2026-04-20", seats: 65, expansion_potential: 42000 },
-  { id: "6", name: "Skyline Retail", industry: "Retail", plan: "Starter", mrr: 1200, arr: 14400, since: "2025-07-01", renewal_date: "2026-07-01", health: "at_risk", nps: 15, dso: 62, owner: "Rahul M.", last_activity: "2026-03-10", seats: 4, expansion_potential: 0 },
-  { id: "7", name: "Orion Logistics", industry: "Logistics", plan: "Growth", mrr: 3200, arr: 38400, since: "2025-02-01", renewal_date: "2026-08-01", health: "healthy", nps: 55, dso: 31, owner: "Aditi Singh", last_activity: "2026-04-17", seats: 18, expansion_potential: 6000 },
-  { id: "8", name: "DeltaStream", industry: "Media", plan: "Starter", mrr: 800, arr: 9600, since: "2025-10-01", renewal_date: "2026-10-01", health: "churned", nps: -12, dso: 90, owner: "Priya K.", last_activity: "2026-02-01", seats: 3, expansion_potential: 0 },
+  { id: "1", name: "Meridian Bank", email: "finance@meridian.example", industry: "Financial Services", plan: "Enterprise", mrr: 12500, arr: 150000, since: "2024-01-15", renewal_date: "2027-01-15", health: "champion", nps: 72, dso: 14, owner: "Aditi Singh", last_activity: "2026-04-19", seats: 42, expansion_potential: 35000 },
+  { id: "2", name: "Acme Corp", email: "ap@acme.example", industry: "Manufacturing", plan: "Enterprise", mrr: 8200, arr: 98400, since: "2024-06-01", renewal_date: "2026-06-01", health: "healthy", nps: 58, dso: 28, owner: "Priya K.", last_activity: "2026-04-15", seats: 28, expansion_potential: 18000 },
+  { id: "3", name: "Nexus Ventures", email: "ops@nexus.example", industry: "Finance / PE", plan: "Growth", mrr: 4800, arr: 57600, since: "2025-01-10", renewal_date: "2026-07-10", health: "at_risk", nps: 22, dso: 48, owner: "Aditi Singh", last_activity: "2026-03-28", seats: 12, expansion_potential: 0 },
+  { id: "4", name: "Bloom Health", email: "billing@bloom.example", industry: "Healthcare", plan: "Growth", mrr: 3600, arr: 43200, since: "2025-03-01", renewal_date: "2026-09-01", health: "healthy", nps: 64, dso: 22, owner: "Rahul M.", last_activity: "2026-04-18", seats: 15, expansion_potential: 8000 },
+  { id: "5", name: "Vertex Systems", email: "success@vertex.example", industry: "Technology", plan: "Enterprise", mrr: 11000, arr: 132000, since: "2023-11-15", renewal_date: "2026-11-15", health: "champion", nps: 81, dso: 18, owner: "Priya K.", last_activity: "2026-04-20", seats: 65, expansion_potential: 42000 },
+  { id: "6", name: "Skyline Retail", email: "owner@skyline.example", industry: "Retail", plan: "Starter", mrr: 1200, arr: 14400, since: "2025-07-01", renewal_date: "2026-07-01", health: "at_risk", nps: 15, dso: 62, owner: "Rahul M.", last_activity: "2026-03-10", seats: 4, expansion_potential: 0 },
+  { id: "7", name: "Orion Logistics", email: "finance@orion.example", industry: "Logistics", plan: "Growth", mrr: 3200, arr: 38400, since: "2025-02-01", renewal_date: "2026-08-01", health: "healthy", nps: 55, dso: 31, owner: "Aditi Singh", last_activity: "2026-04-17", seats: 18, expansion_potential: 6000 },
+  { id: "8", name: "DeltaStream", email: "billing@deltastream.example", industry: "Media", plan: "Starter", mrr: 800, arr: 9600, since: "2025-10-01", renewal_date: "2026-10-01", health: "churned", nps: -12, dso: 90, owner: "Priya K.", last_activity: "2026-02-01", seats: 3, expansion_potential: 0 },
 ];
 
 const healthMeta: Record<CustomerHealth, { label: string; color: string; bg: string; border: string; icon: React.ElementType }> = {
@@ -53,8 +54,17 @@ export default function CustomersPage() {
   const [search, setSearch] = useState("");
   const [healthFilter, setHealthFilter] = useState<CustomerHealth | "all">("all");
   const [selected, setSelected] = useState<Customer | null>(null);
-  const [showNew, setShowNew] = useState(false);
   const [customers, setCustomers] = useState<Customer[]>(CUSTOMERS);
+
+  const handleEmailCustomer = (customer: Customer) => {
+    if (!customer.email) {
+      openChat(`I need an outreach message for ${customer.name}, but no email is saved. Draft a follow-up template I can use manually.`);
+      return;
+    }
+    const subject = encodeURIComponent(`Follow-up from Vireon Finance: ${customer.name}`);
+    const body = encodeURIComponent(`Hi ${customer.owner || customer.name},\n\nQuick follow-up regarding your account with Vireon.\n\nBest,\nFinance Team`);
+    window.location.href = `mailto:${customer.email}?subject=${subject}&body=${body}`;
+  };
 
   useEffect(() => {
     async function load() {
@@ -67,6 +77,7 @@ export default function CustomersPage() {
           setCustomers(res.contacts.map(c => ({
             id: c.id,
             name: c.name,
+            email: c.email || "",
             industry: (c.billing_address as any)?.industry || "Technology",
             plan: (c.billing_address as any)?.plan || "Growth",
             mrr: (c.billing_address as any)?.mrr || 0,
@@ -100,6 +111,32 @@ export default function CustomersPage() {
   const expansionPotential = customers.reduce((s, c) => s + c.expansion_potential, 0);
   const avgNPS = Math.round(customers.reduce((s, c) => s + c.nps, 0) / customers.length);
 
+  const handleAddCustomer = () => {
+    const name = window.prompt("Customer name", "New Customer");
+    if (!name?.trim()) return;
+    const email = window.prompt("Billing email", "billing@example.com") || "";
+    const mrr = Number(window.prompt("Monthly recurring revenue", "2500") || 0);
+    const created: Customer = {
+      id: `local-${Date.now()}`,
+      name: name.trim(),
+      email: email.trim(),
+      industry: "Technology",
+      plan: "Growth",
+      mrr: Number.isFinite(mrr) ? mrr : 0,
+      arr: Number.isFinite(mrr) ? mrr * 12 : 0,
+      since: new Date().toISOString().slice(0, 10),
+      renewal_date: "2027-05-01",
+      health: "healthy",
+      nps: 50,
+      dso: 30,
+      owner: "Aditi Singh",
+      last_activity: new Date().toISOString().slice(0, 10),
+      seats: 10,
+      expansion_potential: 0,
+    };
+    setCustomers(prev => [created, ...prev]);
+  };
+
   return (
     <div className="min-h-screen bg-[#f6f3ee] pb-14 text-[#1d1b17]">
       <TopBar title="Customers" />
@@ -119,7 +156,7 @@ export default function CustomersPage() {
               <button onClick={() => openChat("Which customers are at churn risk and how should we save them?")} className="inline-flex items-center gap-2 rounded-xl border border-[#d9c29a] bg-white/80 px-4 py-2.5 text-sm font-medium text-[#6b4c1e] hover:bg-white">
                 <Sparkles className="h-4 w-4" /> Churn Analysis
               </button>
-              <button onClick={() => setShowNew(true)} className="inline-flex items-center gap-2 rounded-xl bg-[#231c15] px-4 py-2.5 text-sm font-medium text-[#fff7eb] hover:bg-[#17120d]">
+              <button onClick={handleAddCustomer} className="inline-flex items-center gap-2 rounded-xl bg-[#231c15] px-4 py-2.5 text-sm font-medium text-[#fff7eb] hover:bg-[#17120d]">
                 <Plus className="h-4 w-4" /> Add Customer
               </button>
             </div>
@@ -257,7 +294,7 @@ export default function CustomersPage() {
                 </div>
               )}
               <div className="grid grid-cols-2 gap-3">
-                <button className="rounded-xl border border-[#ddd2c2] py-2.5 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea] flex items-center justify-center gap-2"><Mail className="h-4 w-4" /> Email</button>
+                <button onClick={() => handleEmailCustomer(selected)} className="rounded-xl border border-[#ddd2c2] py-2.5 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea] flex items-center justify-center gap-2"><Mail className="h-4 w-4" /> Email</button>
                 <button onClick={() => { openChat(`What should I do about ${selected.name} — they are ${selected.health}`); setSelected(null); }} className="rounded-xl bg-[#231c15] py-2.5 text-sm font-medium text-white hover:bg-[#17120d] flex items-center justify-center gap-2"><Sparkles className="h-4 w-4" /> AI Playbook</button>
               </div>
             </div>

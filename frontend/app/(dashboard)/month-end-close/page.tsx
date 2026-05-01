@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const API_V1 = `${API_BASE.replace(/\/$/, "")}/api/v1`;
 
 type ChecklistItem = {
@@ -54,12 +54,21 @@ export default function MonthEndClosePage() {
   const runClose = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("access_token") || "";
-      const cid = localStorage.getItem("company_id") || "";
+      const token = localStorage.getItem("access_token") || localStorage.getItem("auth_token") || "";
+      let cid = localStorage.getItem("company_id") || "";
+      if (!cid) {
+        const healthRes = await fetch(`${API_V1}/system/startup-health`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        });
+        if (healthRes.ok) {
+          const health = await healthRes.json();
+          cid = health.default_company_id || "";
+        }
+      }
       const params = new URLSearchParams({ company_id: cid, period, jurisdiction });
       const res = await fetch(`${API_V1}/phase3/close/run?${params}`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setResult(await res.json());
@@ -75,8 +84,8 @@ export default function MonthEndClosePage() {
         recommendation: "Resolve 2 blocking issues before closing.",
         issues: [
           { severity: "high", item: "accrual_detection", message: "1 high-priority accrual totalling $42,000 unbooked (AWS)" },
-          { severity: "high", item: "payroll_accrual", message: "Payroll accrual of $38,000 needed for period-end" },
-          { severity: "medium", item: "bank_reconciliation", message: "3 bank transactions remain unmatched" },
+          { severity: "high", item: "payroll_accrual", message: `Payroll accrual of $38,000 needed for ${period}` },
+          { severity: "medium", item: "bank_reconciliation", message: `${jurisdiction} cashbook has 3 transactions unmatched` },
         ],
         checklist: [
           { id: "gl_validation", name: "GL Entry Validation", critical: true, status: "complete", issues: [] },
@@ -89,7 +98,7 @@ export default function MonthEndClosePage() {
           { id: "deferred_revenue", name: "Deferred Revenue Recognition", critical: true, status: "complete", issues: [] },
           { id: "payroll_accrual", name: "Payroll Accruals", critical: true, status: "issues_found",
             issues: [{ severity: "high", message: "Payroll accrual of $38,000 needed" }] },
-          { id: "tax_provision", name: "Tax Provision Estimate", critical: false, status: "complete", issues: [] },
+          { id: "tax_provision", name: `Tax Provision Estimate (${jurisdiction})`, critical: false, status: "complete", issues: [] },
           { id: "interco_elimination", name: "Inter-company Elimination", critical: false, status: "pending", issues: [] },
           { id: "close_report", name: "Close Report Generation", critical: true, status: "pending", issues: [] },
         ],
@@ -99,8 +108,8 @@ export default function MonthEndClosePage() {
     }
   };
 
-  // Auto-run on mount so judges see a populated checklist immediately
-  useEffect(() => { void runClose(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // Auto-run whenever controls change so checklist reflects selected month/country.
+  useEffect(() => { void runClose(); }, [period, jurisdiction]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const scoreColor =
     !result ? "text-gray-400" :

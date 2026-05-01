@@ -79,6 +79,28 @@ export default function GSTPage() {
   const { openChat } = useAppStore();
   const [tab, setTab] = useState<"gstr1" | "gstr3b" | "itc">("gstr1");
 
+  const exportGSTNJson = () => {
+    const payload = {
+      gstin: GSTIN,
+      trade_name: TRADE_NAME,
+      filing_period: CURRENT_PERIOD,
+      fy: FY,
+      gstr1: GSTR1_MONTHS,
+      gstr3b: GSTR3B_SUMMARY,
+      itc_sources: ITC_SOURCES,
+      generated_at: new Date().toISOString(),
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `gstn-export-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen bg-[#f6f3ee] pb-16 text-[#1d1b17]">
       <TopBar title="GST Compliance" />
@@ -162,7 +184,7 @@ export default function GSTPage() {
                 <h2 className="text-base font-bold text-[#1d1b17]">GSTR-1 — Outward Supply Register</h2>
                 <p className="text-xs text-[#9c8c7c]">Monthly statement of outward taxable supplies · FY 2025-26</p>
               </div>
-              <button className="inline-flex items-center gap-1.5 rounded-xl border border-[#d9c9b4] bg-[#faf7f3] px-3 py-1.5 text-xs font-bold text-[#6b5948]">
+              <button onClick={exportGSTNJson} className="inline-flex items-center gap-1.5 rounded-xl border border-[#d9c9b4] bg-[#faf7f3] px-3 py-1.5 text-xs font-bold text-[#6b5948]">
                 <Download className="h-3.5 w-3.5" />
                 Export JSON (GSTN format)
               </button>

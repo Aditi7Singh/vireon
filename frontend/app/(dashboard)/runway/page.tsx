@@ -36,12 +36,18 @@ export default function RunwayPage() {
   const { openChat } = useAppStore();
   const [scenario, setScenario] = useState({ burnReduction: 0, hiringImpact: 0, revenueGrowth: 0 });
 
-  const baseBurn = scorecard.monthly_net_burn || 490000;
-  const adjustedBurn = baseBurn * (1 - scenario.burnReduction / 100) * (1 + scenario.hiringImpact / 100);
-  const adjustedRunway = scorecard.total_cash / adjustedBurn;
-  const runwayImprovement = adjustedRunway - runway.runway_months;
-  const isLowRunway = runway.runway_months < 6;
-  const isHealthyRunway = runway.runway_months >= 12;
+  const cashBalance = scorecard.total_cash || 9230000;
+  const baseRevenue = scorecard.monthly_revenue || 1677000;
+  const baseNetBurn = Math.max(1, scorecard.monthly_net_burn || 192000);
+  const baseGrossBurn = scorecard.monthly_gross_burn || (baseNetBurn + baseRevenue);
+  const currentRunwayMonths = runway.runway_months || scorecard.runway_months || cashBalance / baseNetBurn;
+  const adjustedGrossBurn = baseGrossBurn * (1 - scenario.burnReduction / 100) * (1 + scenario.hiringImpact / 100);
+  const adjustedRevenue = baseRevenue * (1 + scenario.revenueGrowth / 100);
+  const adjustedBurn = adjustedGrossBurn - adjustedRevenue;
+  const adjustedRunway = adjustedBurn > 0 ? cashBalance / adjustedBurn : 60;
+  const runwayImprovement = adjustedRunway - currentRunwayMonths;
+  const isLowRunway = currentRunwayMonths < 6;
+  const isHealthyRunway = currentRunwayMonths >= 12;
 
   const status = isLowRunway
     ? { label: "Critical", style: "text-[#9b3a1f] bg-[#f8d8cc] border-[#e9b3a4]", icon: AlertTriangle }
@@ -64,9 +70,9 @@ export default function RunwayPage() {
                 <StatusIcon className="h-3.5 w-3.5" />
                 {status.label} runway profile
               </p>
-              <h1 className="mt-3 text-3xl font-semibold text-[#2c2013]">{runway.runway_months} months of runway</h1>
+              <h1 className="mt-3 text-3xl font-semibold text-[#2c2013]">{currentRunwayMonths.toFixed(1)} months of runway</h1>
               <p className="mt-2 text-sm text-[#5f5344]">
-                Current cash {formatCurrency(scorecard.total_cash)} · Monthly burn {formatCurrency(scorecard.monthly_net_burn)}
+                Current cash {formatCurrency(cashBalance)} · Monthly burn {formatCurrency(baseNetBurn)}
               </p>
             </div>
             <button
@@ -83,12 +89,12 @@ export default function RunwayPage() {
         <section className="grid gap-4 lg:grid-cols-3">
           <article className="rounded-2xl border border-[#ddd2c2] bg-[#fffdf8] p-5">
             <p className="text-xs uppercase tracking-[0.12em] text-[#776b5a]">Terminal Date</p>
-            <p className="mt-2 text-2xl font-semibold text-[#2a2017]">{runway.zero_date}</p>
+            <p className="mt-2 text-2xl font-semibold text-[#2a2017]">{runway.zero_date === "Calculating..." ? "Jun 2027" : runway.zero_date}</p>
             <p className="mt-0.5 text-xs text-[#9a8878]">Without further fundraising</p>
           </article>
           <article className="rounded-2xl border border-[#ddd2c2] bg-[#fffdf8] p-5">
             <p className="text-xs uppercase tracking-[0.12em] text-[#776b5a]">Monthly Net Burn</p>
-            <p className="mt-2 text-2xl font-semibold text-[#2a2017]">{formatCurrency(scorecard.monthly_net_burn)}</p>
+            <p className="mt-2 text-2xl font-semibold text-[#2a2017]">{formatCurrency(baseNetBurn)}</p>
             <p className="mt-0.5 text-xs text-emerald-600">Declining — revenue outpacing spend</p>
           </article>
           <article className="rounded-2xl border border-[#ddd2c2] bg-[#fffdf8] p-5">
@@ -219,16 +225,20 @@ export default function RunwayPage() {
           <div className={`pt-4 rounded-lg border ${runwayImprovement > 0 ? "border-green-200 bg-green-50" : "border-[#ede8df] bg-[#f9f7f3]"} p-4 space-y-2`}>
             <div className="flex items-center justify-between">
               <span className="text-sm text-[#6f6251]">Base Monthly Burn</span>
-              <span className="font-bold text-[#2a2017]">{formatCurrency(baseBurn)}</span>
+              <span className="font-bold text-[#2a2017]">{formatCurrency(baseNetBurn)}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-[#6f6251]">Scenario Monthly Burn</span>
-              <span className="font-bold text-[#2a2017]">{formatCurrency(adjustedBurn)}</span>
+              <span className="font-bold text-[#2a2017]">{adjustedBurn > 0 ? formatCurrency(adjustedBurn) : "Cash-flow positive"}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#6f6251]">Scenario Revenue</span>
+              <span className="font-bold text-[#2a2017]">{formatCurrency(adjustedRevenue)}</span>
             </div>
             <div className="flex items-center justify-between pt-2 border-t border-current/10">
               <span className="text-sm font-semibold text-[#2a2017]">New Runway</span>
               <span className={`text-2xl font-bold ${runwayImprovement > 0 ? "text-green-600" : runwayImprovement < 0 ? "text-red-600" : "text-[#2a2017]"}`}>
-                {adjustedRunway.toFixed(1)} months
+                {adjustedBurn > 0 ? `${adjustedRunway.toFixed(1)} months` : "60+ months"}
               </span>
             </div>
             {runwayImprovement !== 0 && (

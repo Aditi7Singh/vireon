@@ -8,6 +8,20 @@ import { formatCurrency } from "@/lib/utils";
 import { Briefcase, Calculator, RefreshCw, Sparkles, TrendingUp, Users } from "lucide-react";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
+const FALLBACK_EMPLOYEES = [
+  { department: "Engineering", salary: 182000 },
+  { department: "Engineering", salary: 168000 },
+  { department: "Finance", salary: 122000 },
+  { department: "Sales", salary: 134000 },
+  { department: "Operations", salary: 96000 },
+];
+
+const FALLBACK_ENTRIES: PayrollEntryItem[] = [
+  { id: "demo-pay-1", pay_date: "2026-04-30", department: "Engineering", status: "posted", gross_pay: 350000, net_pay: 315000 },
+  { id: "demo-pay-2", pay_date: "2026-04-30", department: "Sales", status: "posted", gross_pay: 210000, net_pay: 189000 },
+  { id: "demo-pay-3", pay_date: "2026-04-30", department: "Finance", status: "posted", gross_pay: 110000, net_pay: 99000 },
+];
+
 export default function PayrollPage() {
   const { openChat } = useAppStore();
   const [employees, setEmployees] = useState<any[]>([]);
@@ -30,7 +44,11 @@ export default function PayrollPage() {
         setEntries(entryRows || []);
         setMonthlyCost(costRows || null);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to load payroll data.");
+        const fallbackMonthly = FALLBACK_ENTRIES.reduce((sum, row) => sum + Number(row.gross_pay || 0), 0);
+        setEmployees(FALLBACK_EMPLOYEES);
+        setEntries(FALLBACK_ENTRIES);
+        setMonthlyCost({ monthly_cost: fallbackMonthly });
+        setError("Live payroll API unavailable right now. Showing demo payroll snapshot.");
       } finally {
         setLoading(false);
       }

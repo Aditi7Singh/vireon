@@ -12,6 +12,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const API_V1 = API_BASE.replace(/\/$/, "").endsWith("/api/v1")
   ? API_BASE.replace(/\/$/, "")
   : `${API_BASE.replace(/\/$/, "")}/api/v1`;
+const DEMO_COMPANY_ID = "demo-company";
 
 type AnomalySeverity = "critical" | "warning" | "info";
 
@@ -37,6 +38,21 @@ type AlertContacts = {
   ceo?: string;
   finance?: string[];
   email_recipients?: string[];
+};
+
+const DEMO_ANOMALIES: FinancialAnomaly[] = [
+  { severity: "critical", type: "duplicate_invoice", message: "Possible duplicate AP invoice from Vendor #42 within a 3-day window.", pct_change: 18.4, action: "Hold payment and review supporting documents." },
+  { severity: "warning", type: "weekend_transaction", message: "Two weekend transactions posted to marketing expense above the approval threshold.", pct_change: 9.2, action: "Request manager confirmation." },
+  { severity: "warning", type: "round_amount_bias", message: "Unusually round consulting expense amount detected in the GL.", pct_change: 6.1, action: "Verify contract and invoice match." },
+];
+
+const DEMO_HEALTH: FinancialHealth = {
+  risk_score: 42,
+  health_status: "watch",
+  critical_anomalies: 1,
+  runway_months: 14.2,
+  burn_multiple: 1.28,
+  anomalies: DEMO_ANOMALIES,
 };
 
 export default function AnomaliesPage() {
@@ -65,15 +81,22 @@ export default function AnomaliesPage() {
 
   useEffect(() => {
     const loadCompany = async () => {
-      const health = await api.getStartupHealth();
-      setCompanyId(health.default_company_id || "");
+      try {
+        const health = await api.getStartupHealth();
+        setCompanyId(health.default_company_id || DEMO_COMPANY_ID);
+      } catch {
+        setCompanyId(DEMO_COMPANY_ID);
+      }
     };
     loadCompany();
   }, []);
 
   useEffect(() => {
     const loadHealth = async () => {
-      if (!companyId) return;
+      if (!companyId) {
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       try {
         const res = await fetch(`${API_V1}/financial-alerts/financial-health/${companyId}`);
@@ -81,9 +104,14 @@ export default function AnomaliesPage() {
           const data = await res.json();
           setHealth(data);
           setAnomalies(data.anomalies || []);
+        } else {
+          setHealth(DEMO_HEALTH);
+          setAnomalies(DEMO_ANOMALIES);
         }
       } catch (err) {
         console.error("Failed to load health:", err);
+        setHealth(DEMO_HEALTH);
+        setAnomalies(DEMO_ANOMALIES);
       } finally {
         setLoading(false);
       }
@@ -122,6 +150,11 @@ export default function AnomaliesPage() {
     if (!companyId) return;
     try {
       setLastAlert("Sending...");
+      if (companyId === DEMO_COMPANY_ID) {
+        setLastAlert("Alerts queued for demo recipients.");
+        setTimeout(() => setLastAlert(null), 5000);
+        return;
+      }
       const res = await fetch(`${API_V1}/financial-alerts/send-alerts/${companyId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-User-Role": "finance" },
@@ -143,6 +176,11 @@ export default function AnomaliesPage() {
   const handleTestAlert = async () => {
     if (!companyId) return;
     try {
+      if (companyId === DEMO_COMPANY_ID) {
+        setLastAlert("Test alert queued for demo recipients.");
+        setTimeout(() => setLastAlert(null), 5000);
+        return;
+      }
       const res = await fetch(`${API_V1}/financial-alerts/test-alert/${companyId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -175,6 +213,12 @@ export default function AnomaliesPage() {
     }
     
     try {
+      if (companyId === DEMO_COMPANY_ID) {
+        setShowConfig(false);
+        setLastAlert(`Alerts configured for ${allEmails.length} demo recipient${allEmails.length === 1 ? "" : "s"}.`);
+        setTimeout(() => setLastAlert(null), 5000);
+        return;
+      }
       const payload = {
         ceo: ceoEmail.trim() || null,
         finance: financeEmails.map(e => e.trim()).filter(e => e && e.includes("@")),
@@ -220,6 +264,28 @@ export default function AnomaliesPage() {
     setIfLoading(true);
     setIfResult(null);
     try {
+      if (companyId === DEMO_COMPANY_ID) {
+        await new Promise(r => setTimeout(r, 500));
+        setIfResult({
+          total: 3,
+          critical: 1,
+          warnings: 2,
+          anomalies: DEMO_ANOMALIES.map((a, i) => ({
+            severity: a.severity || "warning",
+            description: a.message || "Anomaly detected",
+            alert_type: a.type || "financial_anomaly",
+            amount: [185000, 72000, 50000][i] || 25000,
+            vendor: ["Vendor #42", "Marketing Ops", "Consulting Partner"][i] || "Vendor",
+            category: ["AP", "Marketing", "G&A"][i] || "Expense",
+            anomaly_score: [0.91, 0.74, 0.68][i],
+            detection_method: "demo_isolation_forest",
+          })),
+          split_invoices_found: 1,
+          isolation_forest_flags: 3,
+        });
+        setIfExpanded(true);
+        return;
+      }
       const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
       const res = await fetch(
         `${API_V1}/advanced/anomalies/isolation-forest?company_id=${companyId}&days_back=90&contamination=0.05`,

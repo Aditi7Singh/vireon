@@ -53,20 +53,52 @@ export default function ProcurementPage() {
   const { openChat } = useAppStore();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<POStatus | "all">("all");
+  const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>(POS);
   const [selected, setSelected] = useState<PurchaseOrder | null>(null);
   const [showNew, setShowNew] = useState(false);
+  const [newPO, setNewPO] = useState({ vendor: "", category: "Infrastructure", amount: "", expected_date: "2026-05-30", requestor: "Finance Team" });
 
-  const filtered = POS.filter(po => {
+  const filtered = purchaseOrders.filter(po => {
     const matchSearch = po.vendor.toLowerCase().includes(search.toLowerCase()) || po.number.includes(search);
     const matchStatus = statusFilter === "all" || po.status === statusFilter;
     return matchSearch && matchStatus;
   });
 
   const stats = {
-    total: POS.reduce((s, p) => s + p.amount, 0),
-    pending: POS.filter(p => p.status === "pending_approval").reduce((s, p) => s + p.amount, 0),
-    open: POS.filter(p => !["received", "closed", "cancelled"].includes(p.status)).length,
-    notMatched: POS.filter(p => p.status === "received" && !p.invoice_matched).length,
+    total: purchaseOrders.reduce((s, p) => s + p.amount, 0),
+    pending: purchaseOrders.filter(p => p.status === "pending_approval").reduce((s, p) => s + p.amount, 0),
+    open: purchaseOrders.filter(p => !["received", "closed", "cancelled"].includes(p.status)).length,
+    notMatched: purchaseOrders.filter(p => p.status === "received" && !p.invoice_matched).length,
+  };
+
+  const updatePOStatus = (id: string, status: POStatus) => {
+    setPurchaseOrders((prev) => prev.map((po) => po.id === id ? { ...po, status, approver: status === "approved" ? "Aditi Singh" : po.approver } : po));
+    setSelected((prev) => prev && prev.id === id ? { ...prev, status, approver: status === "approved" ? "Aditi Singh" : prev.approver } : prev);
+  };
+
+  const createPO = () => {
+    const amount = Number(newPO.amount);
+    if (!newPO.vendor.trim() || !newPO.category.trim() || !Number.isFinite(amount) || amount <= 0) {
+      return;
+    }
+    const nextIndex = purchaseOrders.length + 42;
+    const created: PurchaseOrder = {
+      id: String(Date.now()),
+      number: `PO-2026-${String(nextIndex).padStart(3, "0")}`,
+      vendor: newPO.vendor.trim(),
+      category: newPO.category,
+      created_date: new Date().toISOString().slice(0, 10),
+      expected_date: newPO.expected_date,
+      amount,
+      received_amount: 0,
+      status: "pending_approval",
+      requestor: newPO.requestor,
+      items: [{ description: `${newPO.category} purchase`, qty: 1, unit_price: amount }],
+      invoice_matched: false,
+    };
+    setPurchaseOrders((prev) => [created, ...prev]);
+    setShowNew(false);
+    setNewPO({ vendor: "", category: "Infrastructure", amount: "", expected_date: "2026-05-30", requestor: "Finance Team" });
   };
 
   return (
@@ -185,8 +217,8 @@ export default function ProcurementPage() {
                         <div className="flex items-center gap-1">
                           {po.status === "pending_approval" && (
                             <>
-                              <button className="p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-600"><ThumbsUp className="h-4 w-4" /></button>
-                              <button className="p-1.5 rounded-lg hover:bg-red-50 text-red-500"><ThumbsDown className="h-4 w-4" /></button>
+                              <button onClick={() => updatePOStatus(po.id, "approved")} className="p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-600" title="Approve"><ThumbsUp className="h-4 w-4" /></button>
+                              <button onClick={() => updatePOStatus(po.id, "cancelled")} className="p-1.5 rounded-lg hover:bg-red-50 text-red-500" title="Reject"><ThumbsDown className="h-4 w-4" /></button>
                             </>
                           )}
                           <button onClick={() => setSelected(po)} className="p-1.5 rounded-lg hover:bg-[#f0ebe3] text-[#776b5a]"><Eye className="h-4 w-4" /></button>
@@ -245,6 +277,47 @@ export default function ProcurementPage() {
                     <p className="font-semibold text-[#2a2017]">{formatCurrency(item.qty * item.unit_price)}</p>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showNew && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg rounded-2xl border border-[#ddcfbd] bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-[#ede8e0] p-5">
+              <h2 className="text-lg font-bold text-[#2a2017]">Create New Purchase Order</h2>
+              <button onClick={() => setShowNew(false)} className="rounded-lg p-2 hover:bg-[#f0ebe3]"><X className="h-4 w-4" /></button>
+            </div>
+            <div className="space-y-4 p-5">
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-wide text-[#776b5a]">Vendor</label>
+                <input value={newPO.vendor} onChange={(e) => setNewPO((prev) => ({ ...prev, vendor: e.target.value }))} className="mt-1.5 w-full rounded-xl border border-[#ddd2c2] bg-[#faf7f3] px-3 py-2.5 text-sm outline-none" placeholder="Vendor name" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wide text-[#776b5a]">Category</label>
+                  <input value={newPO.category} onChange={(e) => setNewPO((prev) => ({ ...prev, category: e.target.value }))} className="mt-1.5 w-full rounded-xl border border-[#ddd2c2] bg-[#faf7f3] px-3 py-2.5 text-sm outline-none" placeholder="Category" />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wide text-[#776b5a]">Amount</label>
+                  <input type="number" value={newPO.amount} onChange={(e) => setNewPO((prev) => ({ ...prev, amount: e.target.value }))} className="mt-1.5 w-full rounded-xl border border-[#ddd2c2] bg-[#faf7f3] px-3 py-2.5 text-sm outline-none" placeholder="0" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wide text-[#776b5a]">Expected Date</label>
+                  <input type="date" value={newPO.expected_date} onChange={(e) => setNewPO((prev) => ({ ...prev, expected_date: e.target.value }))} className="mt-1.5 w-full rounded-xl border border-[#ddd2c2] bg-[#faf7f3] px-3 py-2.5 text-sm outline-none" />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wide text-[#776b5a]">Requestor</label>
+                  <input value={newPO.requestor} onChange={(e) => setNewPO((prev) => ({ ...prev, requestor: e.target.value }))} className="mt-1.5 w-full rounded-xl border border-[#ddd2c2] bg-[#faf7f3] px-3 py-2.5 text-sm outline-none" />
+                </div>
+              </div>
+              <div className="flex gap-3 pt-1">
+                <button onClick={() => setShowNew(false)} className="flex-1 rounded-xl border border-[#ddd2c2] py-2.5 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea]">Cancel</button>
+                <button onClick={createPO} className="flex-1 rounded-xl bg-[#231c15] py-2.5 text-sm font-medium text-[#fff7eb] hover:bg-[#17120d]">Create PO</button>
               </div>
             </div>
           </div>

@@ -54,6 +54,7 @@ export default function ExpenseClaimsPage() {
   const [showNewModal, setShowNewModal] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState<ExpenseClaim | null>(null);
   const [claims, setClaims] = useState<ExpenseClaim[]>(MOCK_CLAIMS);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const [newClaim, setNewClaim] = useState({
     description: "",
@@ -88,6 +89,86 @@ export default function ExpenseClaimsPage() {
     setSelectedClaim(null);
   };
 
+  const handleMarkReimbursed = (id: string) => {
+    setClaims((prev) => prev.map((c) => c.id === id ? { ...c, status: "reimbursed" as ClaimStatus, approver: "Finance Ops" } : c));
+    setSelectedClaim((prev) => prev && prev.id === id ? { ...prev, status: "reimbursed", approver: "Finance Ops" } : prev);
+    setNotice("Claim marked as reimbursed.");
+  };
+
+  const handleAIAssist = () => {
+    const submitted = claims.filter((c) => c.status === "submitted").length;
+    setStatusFilter("submitted");
+    setNotice(submitted > 0
+      ? `AI prioritized ${submitted} submitted claim${submitted > 1 ? "s" : ""} for review.`
+      : "No submitted claims found right now.");
+  };
+
+  const handleExport = () => {
+    const headers = ["claim_number", "employee", "department", "date", "category", "amount", "status", "receipts", "approver", "description"];
+    const rows = claims.map((c) => [
+      c.claimNumber,
+      c.employee,
+      c.department,
+      c.submittedDate,
+      c.category,
+      String(c.amount),
+      c.status,
+      String(c.receipts),
+      c.approver,
+      c.description,
+    ]);
+    const csv = [headers, ...rows]
+      .map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `expense-claims-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    setNotice("Expense claims exported as CSV.");
+  };
+
+  const saveClaim = (status: ClaimStatus) => {
+    if (!newClaim.description.trim() || !newClaim.amount.trim()) {
+      setNotice("Description and amount are required.");
+      return;
+    }
+    const amount = Number(newClaim.amount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      setNotice("Amount must be greater than zero.");
+      return;
+    }
+    const claimNumber = `EXP-${new Date().getFullYear()}-${String(claims.length + 1).padStart(3, "0")}`;
+    const created: ExpenseClaim = {
+      id: String(Date.now()),
+      claimNumber,
+      employee: "Current User",
+      department: "Finance",
+      submittedDate: newClaim.date,
+      amount,
+      category: newClaim.category,
+      description: newClaim.description,
+      status,
+      receipts: 0,
+      approver: status === "draft" ? "Unassigned" : "Aditi Singh",
+    };
+    setClaims((prev) => [created, ...prev]);
+    setShowNewModal(false);
+    setNewClaim({
+      description: "",
+      category: "Travel",
+      amount: "",
+      date: "2026-04-27",
+      merchant: "",
+      notes: "",
+    });
+    setNotice(status === "draft" ? "Expense claim saved as draft." : "Expense claim submitted for approval.");
+  };
+
   return (
     <div className="min-h-screen bg-[#f6f3ee] pb-14 text-[#1d1b17]">
       <TopBar title="Expense Claims" />
@@ -107,10 +188,10 @@ export default function ExpenseClaimsPage() {
               </p>
             </div>
             <div className="flex items-center gap-3 flex-wrap">
-              <button className="inline-flex items-center gap-2 rounded-xl border border-[#d9c29a] bg-white/80 px-4 py-2.5 text-sm font-medium text-[#6b4c1e] hover:bg-white">
+              <button onClick={handleAIAssist} className="inline-flex items-center gap-2 rounded-xl border border-[#d9c29a] bg-white/80 px-4 py-2.5 text-sm font-medium text-[#6b4c1e] hover:bg-white">
                 <Sparkles className="h-4 w-4" /> AI Review
               </button>
-              <button className="inline-flex items-center gap-2 rounded-xl border border-[#d9c29a] bg-white/80 px-4 py-2.5 text-sm font-medium text-[#6b4c1e] hover:bg-white">
+              <button onClick={handleExport} className="inline-flex items-center gap-2 rounded-xl border border-[#d9c29a] bg-white/80 px-4 py-2.5 text-sm font-medium text-[#6b4c1e] hover:bg-white">
                 <Download className="h-4 w-4" /> Export
               </button>
               <button onClick={() => setShowNewModal(true)} className="inline-flex items-center gap-2 rounded-xl bg-[#231c15] px-4 py-2.5 text-sm font-medium text-[#fff7eb] hover:bg-[#17120d]">
@@ -119,6 +200,12 @@ export default function ExpenseClaimsPage() {
             </div>
           </div>
         </section>
+
+        {notice && (
+          <div className="rounded-xl border border-[#ddcfbd] bg-[#fff7ea] px-4 py-3 text-sm text-[#6b4c1e]">
+            {notice}
+          </div>
+        )}
 
         {/* Stats */}
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -227,7 +314,7 @@ export default function ExpenseClaimsPage() {
                             </>
                           )}
                           {claim.status === "approved" && (
-                            <button className="p-1.5 rounded-lg hover:bg-purple-50 text-purple-600 text-xs font-semibold px-2" title="Mark Reimbursed">
+                            <button onClick={() => handleMarkReimbursed(claim.id)} className="p-1.5 rounded-lg hover:bg-purple-50 text-purple-600 text-xs font-semibold px-2" title="Mark Reimbursed">
                               Pay
                             </button>
                           )}
@@ -298,8 +385,8 @@ export default function ExpenseClaimsPage() {
               </div>
 
               <div className="flex gap-3 pt-2">
-                <button onClick={() => setShowNewModal(false)} className="flex-1 rounded-xl border border-[#ddd2c2] py-2.5 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea]">Save Draft</button>
-                <button className="flex-1 rounded-xl bg-[#231c15] py-2.5 text-sm font-medium text-[#fff7eb] hover:bg-[#17120d] inline-flex items-center justify-center gap-2">
+                <button onClick={() => saveClaim("draft")} className="flex-1 rounded-xl border border-[#ddd2c2] py-2.5 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea]">Save Draft</button>
+                <button onClick={() => saveClaim("submitted")} className="flex-1 rounded-xl bg-[#231c15] py-2.5 text-sm font-medium text-[#fff7eb] hover:bg-[#17120d] inline-flex items-center justify-center gap-2">
                   <FileText className="h-4 w-4" /> Submit for Approval
                 </button>
               </div>
@@ -359,7 +446,7 @@ export default function ExpenseClaimsPage() {
                 </div>
               )}
               {selectedClaim.status === "approved" && (
-                <button className="w-full rounded-xl bg-[#7c3aed] py-2.5 text-sm font-medium text-white hover:bg-[#6d28d9] flex items-center justify-center gap-2">
+                <button onClick={() => handleMarkReimbursed(selectedClaim.id)} className="w-full rounded-xl bg-[#7c3aed] py-2.5 text-sm font-medium text-white hover:bg-[#6d28d9] flex items-center justify-center gap-2">
                   <DollarSign className="h-4 w-4" /> Mark as Reimbursed
                 </button>
               )}

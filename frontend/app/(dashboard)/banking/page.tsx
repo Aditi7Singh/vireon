@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TopBar from "@/components/TopBar";
 import { useAppStore } from "@/lib/store";
 import { cn, formatCurrency } from "@/lib/utils";
@@ -116,6 +116,24 @@ export default function BankingPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [reconFilter, setReconFilter] = useState<"all" | "unmatched" | "matched">("all");
 
+  useEffect(() => {
+    const applyHash = () => {
+      if (typeof window === "undefined") return;
+      const hash = window.location.hash.toLowerCase();
+      if (hash === "#reconcile") {
+        setActiveTab("reconcile");
+      } else if (hash === "#feeds") {
+        setActiveTab("feeds");
+      } else {
+        setActiveTab("accounts");
+      }
+    };
+
+    applyHash();
+    window.addEventListener("hashchange", applyHash);
+    return () => window.removeEventListener("hashchange", applyHash);
+  }, []);
+
   const totalBalance = BANK_ACCOUNTS.reduce((s, a) => s + (a.currency === "INR" ? a.balance : a.balance * 83.5), 0);
   const totalUnreconciled = BANK_ACCOUNTS.reduce((s, a) => s + a.unreconciled, 0);
 
@@ -186,7 +204,13 @@ export default function BankingPage() {
           {TABS.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => {
+                setActiveTab(tab.id);
+                if (typeof window !== "undefined") {
+                  const targetHash = tab.id === "accounts" ? "" : `#${tab.id}`;
+                  window.history.replaceState(null, "", `${window.location.pathname}${targetHash}`);
+                }
+              }}
               className={cn(
                 "px-4 py-2 rounded-lg text-xs font-bold transition-all",
                 activeTab === tab.id

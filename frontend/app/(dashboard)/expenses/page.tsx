@@ -37,6 +37,16 @@ const MONTHLY_TREND = [
   { month: "Apr", payroll: 4800000, aws: 850000, saas: 410000, marketing: 1240000, other: 510000 },
 ];
 
+const FALLBACK_BREAKDOWN: Record<string, number> = {
+  payroll: 4800000,
+  aws: 850000,
+  saas: 410000,
+  marketing: 1240000,
+  office: 260000,
+  hiring: 180000,
+  legal: 225000,
+};
+
 const CUSTOM_TOOLTIP = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   const total = payload.reduce((s: number, p: any) => s + (p.value || 0), 0);
@@ -74,6 +84,8 @@ const PIE_TOOLTIP = ({ active, payload }: any) => {
 export default function ExpensesPage() {
   const [department, setDepartment] = useState<string>("all");
   const [activeView, setActiveView] = useState<"breakdown" | "trend">("breakdown");
+  const [notice, setNotice] = useState<string | null>(null);
+  const [localBreakdown, setLocalBreakdown] = useState<Record<string, number>>({});
   const { expenses } = useExpenses(3, department === "all" ? undefined : { department });
   const { alerts } = useAlerts();
   const { openChat } = useAppStore();
@@ -82,10 +94,18 @@ export default function ExpensesPage() {
     ["spending_spike", "duplicate_invoice"].includes(a.alert_type)
   );
 
-  const totalExpenses = Object.values(expenses.breakdown as Record<string, number>)
+  const baseBreakdown = Object.keys(expenses.breakdown || {}).length > 0
+    ? expenses.breakdown as Record<string, number>
+    : FALLBACK_BREAKDOWN;
+  const mergedBreakdown = Object.entries(localBreakdown).reduce((acc, [key, value]) => {
+    acc[key] = (acc[key] || 0) + value;
+    return acc;
+  }, { ...baseBreakdown });
+
+  const totalExpenses = Object.values(mergedBreakdown)
     .reduce((a: number, b: number) => a + b, 0);
 
-  const nonZeroBreakdown = Object.entries(expenses.breakdown as Record<string, number>)
+  const nonZeroBreakdown = Object.entries(mergedBreakdown)
     .filter(([, amount]) => Number(amount || 0) > 0)
     .sort((a, b) => Number(b[1]) - Number(a[1]));
 
@@ -98,6 +118,48 @@ export default function ExpensesPage() {
 
   const topTwo = nonZeroBreakdown.slice(0, 2);
   const departments = ["all", "Engineering", "Marketing", "Sales", "Operations", "Finance"];
+
+  const showNotice = (message: string) => {
+    setNotice(message);
+    window.setTimeout(() => setNotice(null), 3500);
+  };
+
+  const handleExport = () => {
+    const rows = [
+      ["category", "label", "amount", "percent_of_total", "department"],
+      ...nonZeroBreakdown.map(([key, amount]) => [
+        key,
+        categoryMeta[key]?.label || key,
+        String(amount),
+        totalExpenses > 0 ? ((Number(amount) / totalExpenses) * 100).toFixed(2) : "0",
+        department,
+      ]),
+    ];
+    const csv = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `expenses-${department}-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    showNotice("Expense export downloaded.");
+  };
+
+  const handleAddExpense = () => {
+    const category = (window.prompt("Category: payroll, aws, saas, marketing, office, hiring, legal", "saas") || "").trim().toLowerCase();
+    if (!category) return;
+    const amount = Number(window.prompt("Amount", "25000") || 0);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      showNotice("Enter a valid expense amount.");
+      return;
+    }
+    const key = categoryMeta[category] ? category : "office";
+    setLocalBreakdown(prev => ({ ...prev, [key]: (prev[key] || 0) + amount }));
+    showNotice(`${formatCurrency(amount)} added to ${categoryMeta[key]?.label || key}.`);
+  };
 
   return (
     <div className="min-h-screen bg-[#f6f3ee] pb-14 text-[#1d1b17]">
@@ -131,11 +193,11 @@ export default function ExpensesPage() {
               </div>
             </div>
             <div className="flex gap-3">
-              <button className="inline-flex items-center gap-2 rounded-xl border border-[#cebda8] bg-white px-4 py-2.5 text-sm font-medium text-[#4a3f35] hover:bg-[#faf5ec]">
+              <button onClick={handleExport} className="inline-flex items-center gap-2 rounded-xl border border-[#cebda8] bg-white px-4 py-2.5 text-sm font-medium text-[#4a3f35] hover:bg-[#faf5ec]">
                 <Download className="h-4 w-4" />
                 Export
               </button>
-              <button className="inline-flex items-center gap-2 rounded-xl border border-[#cebda8] bg-white px-4 py-2.5 text-sm font-medium text-[#4a3f35] hover:bg-[#faf5ec]">
+              <button onClick={handleAddExpense} className="inline-flex items-center gap-2 rounded-xl border border-[#cebda8] bg-white px-4 py-2.5 text-sm font-medium text-[#4a3f35] hover:bg-[#faf5ec]">
                 <Plus className="h-4 w-4" />
                 Add Expense
               </button>
@@ -149,6 +211,12 @@ export default function ExpensesPage() {
             </div>
           </div>
         </section>
+
+        {notice && (
+          <section className="rounded-xl border border-[#b8ddbf] bg-[#edf8ef] px-4 py-3 text-sm font-medium text-[#2f6a45]">
+            {notice}
+          </section>
+        )}
 
         {/* KPI Cards */}
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

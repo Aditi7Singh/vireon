@@ -41,6 +41,14 @@ const DEMO_ENTITIES: Entity[] = [
   { id: "4", name: "Vireon India Pvt Ltd", currency: "INR", revenue: 8_500_000, expenses: 5_200_000, cash: 12_000_000 },
 ];
 
+const FX_RATES: Record<string, number> = { USD: 1, GBP: 1.27, EUR: 1.09, AED: 0.272, INR: 0.012, SGD: 0.74 };
+
+const convertCurrency = (amount: number, fromCurrency: string, toCurrency: string) => {
+  const fromUSD = FX_RATES[fromCurrency] || 1;
+  const toUSD = FX_RATES[toCurrency] || 1;
+  return (amount * fromUSD) / toUSD;
+};
+
 export default function ConsolidationPage() {
   
   const [loading, setLoading] = useState(false);
@@ -49,25 +57,21 @@ export default function ConsolidationPage() {
   const [baseCurrency, setBaseCurrency] = useState("USD");
   const [period, setPeriod] = useState(new Date().toISOString().slice(0, 7));
 
-  // FX rates (demo) — in production these come from the fx-provider API
-  const FX_RATES: Record<string, number> = { USD: 1, GBP: 1.27, EUR: 1.09, AED: 0.272, INR: 0.012, SGD: 0.74 };
-
   const consolidate = () => {
     setLoading(true);
     setTimeout(() => {
-      const inUSD = entities.map((e) => {
-        const rate = FX_RATES[e.currency] || 1;
+      const inBase = entities.map((e) => {
         return {
           ...e,
-          revenue_usd: e.revenue * rate,
-          expenses_usd: e.expenses * rate,
-          cash_usd: e.cash * rate,
+          revenue_base: convertCurrency(e.revenue, e.currency, baseCurrency),
+          expenses_base: convertCurrency(e.expenses, e.currency, baseCurrency),
+          cash_base: convertCurrency(e.cash, e.currency, baseCurrency),
         };
       });
 
-      const totalRevenue = inUSD.reduce((sum, e) => sum + e.revenue_usd, 0);
-      const totalExpenses = inUSD.reduce((sum, e) => sum + e.expenses_usd, 0);
-      const totalCash = inUSD.reduce((sum, e) => sum + e.cash_usd, 0);
+      const totalRevenue = inBase.reduce((sum, e) => sum + e.revenue_base, 0);
+      const totalExpenses = inBase.reduce((sum, e) => sum + e.expenses_base, 0);
+      const totalCash = inBase.reduce((sum, e) => sum + e.cash_base, 0);
       const eliminations = totalRevenue * 0.04; // 4% typical interco elimination
 
       setResult({
@@ -81,16 +85,19 @@ export default function ConsolidationPage() {
         },
         intercompany_eliminations: eliminations,
         fx_adjustments: Object.fromEntries(
-          entities.map((e) => [e.name, FX_RATES[e.currency] || 1])
+          entities.map((e) => [e.name, convertCurrency(1, e.currency, baseCurrency)])
         ),
       });
       setLoading(false);
     }, 800);
   };
 
-  const formatUSD = (n: number) =>
-    n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(2)}M` :
-    n >= 1_000 ? `$${(n / 1_000).toFixed(0)}K` : `$${n.toFixed(0)}`;
+  const formatBase = (n: number) => {
+    const symbols: Record<string, string> = { USD: "$", GBP: "£", EUR: "€", AED: "AED ", INR: "₹", SGD: "S$" };
+    const sym = symbols[baseCurrency] || `${baseCurrency} `;
+    return n >= 1_000_000 ? `${sym}${(n / 1_000_000).toFixed(2)}M` :
+    n >= 1_000 ? `${sym}${(n / 1_000).toFixed(0)}K` : `${sym}${n.toFixed(0)}`;
+  };
 
   const formatLocal = (n: number, currency: string) => {
     const symbols: Record<string, string> = { USD: "$", GBP: "£", EUR: "€", AED: "AED ", INR: "₹", SGD: "S$" };
@@ -186,11 +193,11 @@ export default function ConsolidationPage() {
               </Title>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {[
-                  { label: "Total Revenue", value: formatUSD(result.consolidated.total_revenue), color: "text-green-600" },
-                  { label: "Total Expenses", value: formatUSD(result.consolidated.total_expenses), color: "text-red-600" },
-                  { label: "Net Income", value: formatUSD(result.consolidated.net_income), color: result.consolidated.net_income >= 0 ? "text-green-600" : "text-red-600" },
-                  { label: "Total Cash", value: formatUSD(result.consolidated.total_cash), color: "text-blue-600" },
-                  { label: "Interco Eliminations", value: formatUSD(result.intercompany_eliminations), color: "text-amber-600" },
+                  { label: "Total Revenue", value: formatBase(result.consolidated.total_revenue), color: "text-green-600" },
+                  { label: "Total Expenses", value: formatBase(result.consolidated.total_expenses), color: "text-red-600" },
+                  { label: "Net Income", value: formatBase(result.consolidated.net_income), color: result.consolidated.net_income >= 0 ? "text-green-600" : "text-red-600" },
+                  { label: "Total Cash", value: formatBase(result.consolidated.total_cash), color: "text-blue-600" },
+                  { label: "Interco Eliminations", value: formatBase(result.intercompany_eliminations), color: "text-amber-600" },
                 ].map((kpi) => (
                   <div key={kpi.label} className="p-3 bg-[#fdf5ea] rounded-xl text-center">
                     <p className="text-xs text-[#8c6a4a] mb-1">{kpi.label}</p>
@@ -207,7 +214,7 @@ export default function ConsolidationPage() {
                 {Object.entries(result.fx_adjustments).map(([entity, rate]) => (
                   <div key={entity} className="text-xs p-3 bg-[#fdf5ea] rounded-xl">
                     <p className="text-[#8c6a4a] truncate">{entity}</p>
-                    <p className="font-semibold text-[#3d2c1e] mt-1">Rate: {rate.toFixed(4)} → USD</p>
+                    <p className="font-semibold text-[#3d2c1e] mt-1">Rate: {rate.toFixed(4)} → {baseCurrency}</p>
                   </div>
                 ))}
               </div>

@@ -31,6 +31,7 @@ export default function CTODashboardPage() {
   const [hiringForm, setHiringForm] = useState({ annual_ctc: 1800000 });
   const [isCalculating, setIsCalculating] = useState(false);
   const [calcError, setCalcError] = useState<string>("");
+  const [exportMessage, setExportMessage] = useState<string>("");
 
   useEffect(() => {
     const load = async () => {
@@ -207,18 +208,36 @@ export default function CTODashboardPage() {
   }
 
   async function exportTechPdf() {
-    if (!companyId) return;
-    const res = await fetch(`${API_V1}/reports/export/summary/pdf?company_id=${companyId}`);
-    if (!res.ok) return;
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `cto-summary-${companyId}-${new Date().toISOString().slice(0, 10)}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+    setExportMessage("");
+    if (!companyId) {
+      setExportMessage("Company is not loaded yet. Try again in a moment.");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("access_token") || localStorage.getItem("auth_token") || "";
+      const res = await fetch(`${API_V1}/reports/export/summary/pdf?company_id=${companyId}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      });
+      if (!res.ok) {
+        const errPayload = await res.json().catch(() => ({}));
+        throw new Error(errPayload?.detail || `Export failed (${res.status})`);
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `cto-summary-${companyId}-${new Date().toISOString().slice(0, 10)}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      setExportMessage("PDF export downloaded successfully.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "PDF export failed. Please try again.";
+      setExportMessage(message);
+    }
   }
 
   return (
@@ -230,6 +249,11 @@ export default function CTODashboardPage() {
           <button onClick={exportTechPdf} className="px-4 py-2 rounded bg-[#1f1a16] hover:bg-[#151210] text-white text-sm font-semibold">Export PDF</button>
         </div>
       </div>
+      {exportMessage && (
+        <div className="rounded border border-[#e1d3c2] bg-[#fff9ef] px-3 py-2 text-sm text-[#6b4c1e]">
+          {exportMessage}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card><Title>Total Tech Spend</Title><Metric>{formatINR(totalTechSpend)}</Metric></Card>

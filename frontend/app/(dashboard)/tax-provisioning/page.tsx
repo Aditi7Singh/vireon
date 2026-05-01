@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, Title } from "@tremor/react";
 import TopBar from "@/components/TopBar";
 import { useAppStore } from "@/lib/store";
 import { Calculator, TrendingDown, Play, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const API_V1 = `${API_BASE.replace(/\/$/, "")}/api/v1`;
 
 type TaxResult = {
@@ -54,12 +54,33 @@ export default function TaxProvisioningPage() {
   const [state, setState] = useState("CA");
   const [showDeductions, setShowDeductions] = useState(false);
   const [showSchedule, setShowSchedule] = useState(false);
+  const [companyId, setCompanyId] = useState<string>("");
+
+  useEffect(() => {
+    const bootstrapCompany = async () => {
+      try {
+        const token = localStorage.getItem("access_token") || localStorage.getItem("auth_token") || "";
+        const healthRes = await fetch(`${API_V1}/system/startup-health`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        });
+        if (healthRes.ok) {
+          const health = await healthRes.json();
+          if (health?.default_company_id) {
+            setCompanyId(String(health.default_company_id));
+          }
+        }
+      } catch {
+        // Keep silent; runtime fallback is handled in runProvisioning.
+      }
+    };
+    void bootstrapCompany();
+  }, []);
 
   const runProvisioning = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("access_token") || "";
-      const cid = localStorage.getItem("company_id") || "";
+      const token = localStorage.getItem("access_token") || localStorage.getItem("auth_token") || "";
+      const cid = companyId || localStorage.getItem("company_id") || "";
       const quarter = Math.ceil((new Date().getMonth() + 1) / 3);
       const params = new URLSearchParams({
         company_id: cid,
@@ -70,30 +91,41 @@ export default function TaxProvisioningPage() {
 
       const res = await fetch(`${API_V1}/phase3/tax/provision?${params}`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       setResult(data);
     } catch {
+      const defaultRates: Record<string, number> = {
+        US: 0.30,
+        UK: 0.25,
+        Dubai: 0.09,
+        India: 0.25,
+        Singapore: 0.17,
+        EU: 0.22,
+      };
+      const effectiveRate = (defaultRates[jurisdiction] || 0.25) * 100;
+      const taxableIncome = 820000;
+      const corporateTaxTotal = Math.round(taxableIncome * (effectiveRate / 100));
       // Demo fallback
       setResult({
         jurisdiction,
         state: jurisdiction === "US" ? state : null,
         period: `Q${Math.ceil((new Date().getMonth() + 1) / 3)} ${new Date().getFullYear()}`,
-        taxable_income: 820000,
+        taxable_income: taxableIncome,
         total_revenue: 1500000,
         total_expenses: 680000,
         corporate_tax: {
-          total_tax: 244860,
-          effective_rate: 29.86,
-          remaining_due: 194860,
-          federal_tax: 172200,
-          state_tax: 72660,
+          total_tax: corporateTaxTotal,
+          effective_rate: Number(effectiveRate.toFixed(2)),
+          remaining_due: Math.round(corporateTaxTotal * 0.8),
+          federal_tax: jurisdiction === "US" ? 172200 : undefined,
+          state_tax: jurisdiction === "US" ? 72660 : undefined,
         },
         payroll_tax: { total_employer_tax: 109500, effective_rate_pct: 10.95 },
         rd_credit: { estimated_credit: 24000, qualifying_expenses: 120000, credit_rate: "20%" },
-        net_tax_after_credits: 220860,
+        net_tax_after_credits: Math.max(corporateTaxTotal - 24000, 0),
         quarterly_schedule: {
           schedule: [
             { quarter: "Q1", due_date: "Apr 15", amount: 88590, status: "past" },
@@ -101,8 +133,8 @@ export default function TaxProvisioningPage() {
             { quarter: "Q3", due_date: "Sep 15", amount: 88590, status: "upcoming" },
             { quarter: "Q4", due_date: "Jan 15", amount: 88590, status: "upcoming" },
           ],
-          annual_estimate: 354360,
-          remaining_balance: 265770,
+          annual_estimate: Math.round(corporateTaxTotal * 1.45),
+          remaining_balance: Math.round(corporateTaxTotal * 1.1),
           catch_up_per_quarter: 88590,
         },
         deduction_opportunities: [
@@ -129,7 +161,7 @@ export default function TaxProvisioningPage() {
           },
         ],
         total_deduction_savings: 28522,
-        summary: "Estimated annual tax: $354,360. Net after R&D credit: $330,360. 3 deduction opportunities found.",
+        summary: `${jurisdiction} tax estimate ready. Effective corporate tax rate: ${effectiveRate.toFixed(1)}%. Fallback mode is showing demo assumptions until live endpoint responds.`,
       });
     } finally {
       setLoading(false);

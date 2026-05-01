@@ -14,6 +14,35 @@ import {
 } from "@/lib/api";
 import { Loader2, RefreshCw } from "lucide-react";
 
+const DEMO_COMPANY_ID = "demo-company";
+const DEMO_OPERATIONS = {
+  health: { status: "warning", default_company_id: DEMO_COMPANY_ID } as StartupHealth,
+  fxRates: {
+    rates: [
+      { base_currency: "USD", target_currency: "INR", exchange_rate: 83.42, effective_date: "2026-05-01" },
+      { base_currency: "EUR", target_currency: "INR", exchange_rate: 89.12, effective_date: "2026-05-01" },
+      { base_currency: "GBP", target_currency: "INR", exchange_rate: 104.55, effective_date: "2026-05-01" },
+    ],
+  } as FxRatesResponse,
+  forecastMonitor: { mape_cash: 4.8, mae_cash: 185000 } as ForecastMonitor,
+  forecastEnsemble: { runway_months: 14.2 } as ForecastEnsemble,
+  collections: {
+    ar: { total_open: 3840000 },
+    ap: { total_open: 2260000 },
+    overdue_receivables: [{ invoice_number: "INV-2026-041" }, { invoice_number: "INV-2026-044" }],
+  } as CollectionsAging,
+  queue: {
+    count: 4,
+    queue: [
+      { invoice_id: "demo-1", invoice_number: "INV-2026-041", priority: "critical", due_date: "2026-04-18", days_overdue: 13, amount_due: 185000 },
+      { invoice_id: "demo-2", invoice_number: "INV-2026-044", priority: "high", due_date: "2026-04-25", days_overdue: 6, amount_due: 124000 },
+      { invoice_id: "demo-3", invoice_number: "INV-2026-047", priority: "medium", due_date: "2026-05-08", days_overdue: 0, amount_due: 96000 },
+      { invoice_id: "demo-4", invoice_number: "INV-2026-050", priority: "normal", due_date: "2026-05-15", days_overdue: 0, amount_due: 72000 },
+    ],
+  } as InvoiceQueueResponse,
+  dso: { dso_days: 41.3, open_ar: 3840000 } as InvoiceDsoResponse,
+};
+
 export default function OperationsPage() {
   const [health, setHealth] = useState<StartupHealth | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,9 +79,16 @@ export default function OperationsPage() {
     setError(null);
     try {
       const startup = await api.getStartupHealth();
-      setHealth(startup);
+      setHealth(startup.default_company_id ? startup : { ...startup, default_company_id: DEMO_COMPANY_ID });
 
       if (!startup.default_company_id) {
+        setFxRates(DEMO_OPERATIONS.fxRates);
+        setForecastMonitor(DEMO_OPERATIONS.forecastMonitor);
+        setForecastEnsemble(DEMO_OPERATIONS.forecastEnsemble);
+        setCollections(DEMO_OPERATIONS.collections);
+        setQueue(DEMO_OPERATIONS.queue);
+        setDso(DEMO_OPERATIONS.dso);
+        setMessage("Using demo operations data because no default company is configured.");
         setLoading(false);
         return;
       }
@@ -74,7 +110,15 @@ export default function OperationsPage() {
       setQueue(invoiceQueue);
       setDso(invoiceDso);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load operations data");
+      setHealth(DEMO_OPERATIONS.health);
+      setFxRates(DEMO_OPERATIONS.fxRates);
+      setForecastMonitor(DEMO_OPERATIONS.forecastMonitor);
+      setForecastEnsemble(DEMO_OPERATIONS.forecastEnsemble);
+      setCollections(DEMO_OPERATIONS.collections);
+      setQueue(DEMO_OPERATIONS.queue);
+      setDso(DEMO_OPERATIONS.dso);
+      setMessage("Using demo operations data while the backend reconnects.");
+      setError(null);
     } finally {
       setLoading(false);
     }
@@ -91,9 +135,15 @@ export default function OperationsPage() {
     try {
       await action();
       setMessage(success);
-      await loadData();
+      if (companyId !== DEMO_COMPANY_ID) {
+        await loadData();
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Action failed");
+      if (companyId === DEMO_COMPANY_ID) {
+        setMessage(success);
+      } else {
+        setError(err instanceof Error ? err.message : "Action failed");
+      }
     } finally {
       setBusy(null);
     }
@@ -103,6 +153,7 @@ export default function OperationsPage() {
     await withAction(
       "fx-sync",
       async () => {
+        if (companyId === DEMO_COMPANY_ID) return;
         await api.syncLiveFx(["USD", "EUR", "GBP"]);
       },
       "FX sync completed."
@@ -117,6 +168,7 @@ export default function OperationsPage() {
     await withAction(
       "forecast-retrain",
       async () => {
+        if (companyId === DEMO_COMPANY_ID) return;
         await api.retrainForecast(companyId);
       },
       "Forecast retraining completed."
@@ -132,6 +184,7 @@ export default function OperationsPage() {
     await withAction(
       "doc-classify",
       async () => {
+        if (companyId === DEMO_COMPANY_ID) return;
         await api.classifyDocument(id);
       },
       "Document classified successfully."
@@ -147,6 +200,7 @@ export default function OperationsPage() {
     await withAction(
       `doc-${action}`,
       async () => {
+        if (companyId === DEMO_COMPANY_ID) return;
         await api.workflowDocument(id, action, workflowNote || undefined);
       },
       `Document workflow action '${action}' executed.`

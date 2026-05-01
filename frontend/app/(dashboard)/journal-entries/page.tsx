@@ -105,11 +105,12 @@ export default function JournalEntriesPage() {
   const [statusFilter, setStatusFilter] = useState<JEStatus | "all">("all");
   const [showNewModal, setShowNewModal] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
+  const [entries, setEntries] = useState<JournalEntry[]>(MOCK_ENTRIES);
   const [newDate, setNewDate] = useState("2026-04-27");
   const [newDesc, setNewDesc] = useState("");
   const [newLines, setNewLines] = useState<JournalLine[]>([{ ...EMPTY_LINE }, { ...EMPTY_LINE }]);
 
-  const filtered = MOCK_ENTRIES.filter(je => {
+  const filtered = entries.filter(je => {
     const matchSearch = je.number.includes(search) || je.description.toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter === "all" || je.status === statusFilter;
     return matchSearch && matchStatus;
@@ -123,6 +124,81 @@ export default function JournalEntriesPage() {
     const lines = [...newLines];
     (lines[i] as any)[field] = value;
     setNewLines(lines);
+  };
+
+  const exportEntries = () => {
+    const headers = ["entry_no", "date", "description", "status", "created_by", "total"];
+    const rows = entries.map((e) => [e.number, e.date, e.description, e.status, e.createdBy, String(e.total)]);
+    const csv = [headers, ...rows]
+      .map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `journal-entries-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const duplicateEntry = (entry: JournalEntry) => {
+    const clone: JournalEntry = {
+      ...entry,
+      id: String(Date.now()),
+      number: `JE-2026-${String(entries.length + 90).padStart(4, "0")}`,
+      date: new Date().toISOString().slice(0, 10),
+      status: "draft",
+      createdBy: "Current User",
+    };
+    setEntries((prev) => [clone, ...prev]);
+  };
+
+  const reverseEntry = (entry: JournalEntry) => {
+    const reversedLines = entry.lines.map((line) => ({ ...line, debit: line.credit, credit: line.debit }));
+    const reversed: JournalEntry = {
+      id: String(Date.now()),
+      number: `JE-2026-${String(entries.length + 90).padStart(4, "0")}`,
+      date: new Date().toISOString().slice(0, 10),
+      description: `Reversal: ${entry.description}`,
+      status: "reversed",
+      lines: reversedLines,
+      createdBy: "Current User",
+      total: entry.total,
+    };
+    setEntries((prev) => [reversed, ...prev]);
+  };
+
+  const approveEntry = (entry: JournalEntry) => {
+    setEntries((prev) => prev.map((e) => e.id === entry.id ? { ...e, status: "posted" as JEStatus } : e));
+    setSelectedEntry((prev) => prev ? { ...prev, status: "posted" } : prev);
+  };
+
+  const postNewEntry = () => {
+    if (!isBalanced || !newDesc.trim()) return;
+    const normalizedLines = newLines
+      .filter((line) => line.account && (line.debit > 0 || line.credit > 0))
+      .map((line) => {
+        const accountCode = line.account.split("-")[0]?.trim() || "";
+        return { ...line, accountCode };
+      });
+    if (normalizedLines.length < 2) return;
+
+    const next: JournalEntry = {
+      id: String(Date.now()),
+      number: `JE-2026-${String(entries.length + 90).padStart(4, "0")}`,
+      date: newDate,
+      description: newDesc,
+      status: "posted",
+      lines: normalizedLines,
+      createdBy: "Current User",
+      total: totalDebits,
+    };
+    setEntries((prev) => [next, ...prev]);
+    setShowNewModal(false);
+    setNewDesc("");
+    setNewLines([{ ...EMPTY_LINE }, { ...EMPTY_LINE }]);
   };
 
   return (
@@ -147,7 +223,7 @@ export default function JournalEntriesPage() {
               <button className="inline-flex items-center gap-2 rounded-xl border border-[#d9c29a] bg-white/80 px-4 py-2.5 text-sm font-medium text-[#6b4c1e] hover:bg-white">
                 <Sparkles className="h-4 w-4" /> AI Suggest
               </button>
-              <button className="inline-flex items-center gap-2 rounded-xl border border-[#d9c29a] bg-white/80 px-4 py-2.5 text-sm font-medium text-[#6b4c1e] hover:bg-white">
+              <button onClick={exportEntries} className="inline-flex items-center gap-2 rounded-xl border border-[#d9c29a] bg-white/80 px-4 py-2.5 text-sm font-medium text-[#6b4c1e] hover:bg-white">
                 <Download className="h-4 w-4" /> Export
               </button>
               <button onClick={() => setShowNewModal(true)} className="inline-flex items-center gap-2 rounded-xl bg-[#231c15] px-4 py-2.5 text-sm font-medium text-[#fff7eb] hover:bg-[#17120d]">
@@ -160,10 +236,10 @@ export default function JournalEntriesPage() {
         {/* Stats */}
         <section className="grid gap-4 sm:grid-cols-4">
           {[
-            { label: "Total Entries (Apr)", value: "87", sub: "JE-2026-0001 to 0087", color: "text-[#2a2017]" },
-            { label: "Posted", value: MOCK_ENTRIES.filter(e => e.status === "posted").length.toString(), sub: "Auto + manual", color: "text-emerald-700" },
-            { label: "Pending Approval", value: MOCK_ENTRIES.filter(e => e.status === "pending_approval").length.toString(), sub: "Need review", color: "text-amber-600" },
-            { label: "Total Debits (Apr)", value: "₹38.4L", sub: "Balanced period", color: "text-blue-700" },
+            { label: "Total Entries (Apr)", value: entries.length.toString(), sub: "Live ledger list", color: "text-[#2a2017]" },
+            { label: "Posted", value: entries.filter(e => e.status === "posted").length.toString(), sub: "Auto + manual", color: "text-emerald-700" },
+            { label: "Pending Approval", value: entries.filter(e => e.status === "pending_approval").length.toString(), sub: "Need review", color: "text-amber-600" },
+            { label: "Total Debits (Apr)", value: formatCurrency(entries.reduce((sum, e) => sum + e.total, 0)), sub: "Balanced period", color: "text-blue-700" },
           ].map((s) => (
             <article key={s.label} className="rounded-2xl border border-[#ddd2c2] bg-[#fffdf8] p-5">
               <p className="text-xs uppercase tracking-[0.12em] text-[#776b5a]">{s.label}</p>
@@ -228,9 +304,9 @@ export default function JournalEntriesPage() {
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-1">
                           <button onClick={() => setSelectedEntry(je)} className="p-1.5 rounded-lg hover:bg-[#f0ebe3] text-[#776b5a]" title="View"><Eye className="h-4 w-4" /></button>
-                          <button className="p-1.5 rounded-lg hover:bg-[#f0ebe3] text-[#776b5a]" title="Copy"><Copy className="h-4 w-4" /></button>
+                          <button onClick={() => duplicateEntry(je)} className="p-1.5 rounded-lg hover:bg-[#f0ebe3] text-[#776b5a]" title="Copy"><Copy className="h-4 w-4" /></button>
                           {je.status === "posted" && (
-                            <button className="p-1.5 rounded-lg hover:bg-[#f0ebe3] text-[#776b5a]" title="Reverse"><ArrowRight className="h-4 w-4" /></button>
+                            <button onClick={() => reverseEntry(je)} className="p-1.5 rounded-lg hover:bg-[#f0ebe3] text-[#776b5a]" title="Reverse"><ArrowRight className="h-4 w-4" /></button>
                           )}
                         </div>
                       </td>
@@ -241,7 +317,7 @@ export default function JournalEntriesPage() {
             </table>
           </div>
           <div className="flex items-center justify-between px-5 py-3 border-t border-[#ede8e0] bg-[#faf7f3]">
-            <p className="text-xs text-[#9a8872]">Showing {filtered.length} of {MOCK_ENTRIES.length} entries</p>
+            <p className="text-xs text-[#9a8872]">Showing {filtered.length} of {entries.length} entries</p>
           </div>
         </section>
       </div>
@@ -339,7 +415,7 @@ export default function JournalEntriesPage() {
 
               <div className="flex gap-3 pt-2">
                 <button onClick={() => setShowNewModal(false)} className="flex-1 rounded-xl border border-[#ddd2c2] py-2.5 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea]">Save Draft</button>
-                <button disabled={!isBalanced} className={cn("flex-1 rounded-xl py-2.5 text-sm font-medium inline-flex items-center justify-center gap-2",
+                <button onClick={postNewEntry} disabled={!isBalanced} className={cn("flex-1 rounded-xl py-2.5 text-sm font-medium inline-flex items-center justify-center gap-2",
                   isBalanced ? "bg-[#231c15] text-[#fff7eb] hover:bg-[#17120d]" : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 )}>
                   <CheckCircle2 className="h-4 w-4" /> Post Entry
@@ -406,16 +482,16 @@ export default function JournalEntriesPage() {
               <p className="text-xs text-[#9a8872]">Created by: {selectedEntry.createdBy}</p>
 
               <div className="grid grid-cols-2 gap-3">
-                <button className="rounded-xl border border-[#ddd2c2] py-2.5 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea] flex items-center justify-center gap-2">
+                <button onClick={() => duplicateEntry(selectedEntry)} className="rounded-xl border border-[#ddd2c2] py-2.5 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea] flex items-center justify-center gap-2">
                   <Copy className="h-4 w-4" /> Duplicate
                 </button>
                 {selectedEntry.status === "posted" && (
-                  <button className="rounded-xl border border-[#ddd2c2] py-2.5 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea] flex items-center justify-center gap-2">
+                  <button onClick={() => reverseEntry(selectedEntry)} className="rounded-xl border border-[#ddd2c2] py-2.5 text-sm font-medium text-[#776b5a] hover:bg-[#f5f0ea] flex items-center justify-center gap-2">
                     <ArrowRight className="h-4 w-4" /> Reverse
                   </button>
                 )}
                 {selectedEntry.status === "pending_approval" && (
-                  <button className="rounded-xl bg-[#231c15] py-2.5 text-sm font-medium text-[#fff7eb] hover:bg-[#17120d] flex items-center justify-center gap-2">
+                  <button onClick={() => approveEntry(selectedEntry)} className="rounded-xl bg-[#231c15] py-2.5 text-sm font-medium text-[#fff7eb] hover:bg-[#17120d] flex items-center justify-center gap-2">
                     <CheckCircle2 className="h-4 w-4" /> Approve
                   </button>
                 )}

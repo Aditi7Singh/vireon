@@ -187,6 +187,7 @@ const totalPending   = MONTHLY_STATS.reduce((s, m) => s + m.pending, 0);
 
 export default function EInvoicePage() {
   const [tab, setTab] = useState<Tab>("register");
+  const [qrInvoice, setQrInvoice] = useState<(typeof RECENT_INVOICES)[number] | null>(null);
 
   return (
     <div className="p-6 space-y-6">
@@ -288,7 +289,13 @@ export default function EInvoicePage() {
                   <td className="px-3 py-3 font-mono text-[10px] text-[#8a7968]">{inv.ack_no ?? "—"}</td>
                   <td className="px-3 py-3">
                     {inv.qr ? (
-                      <QrCode className="w-4 h-4 text-emerald-600" />
+                      <button
+                        onClick={() => setQrInvoice(inv)}
+                        className="rounded-md p-1 text-emerald-600 hover:bg-emerald-50"
+                        title="Open QR details"
+                      >
+                        <QrCode className="w-4 h-4" />
+                      </button>
                     ) : (
                       <span className="text-[10px] text-[#c0a990]">—</span>
                     )}
@@ -504,6 +511,29 @@ export default function EInvoicePage() {
           ))}
         </div>
       </div>
+
+      {qrInvoice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-[#e3d6c7] bg-white p-5 shadow-2xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-base font-black text-[#1d1b19]">Invoice QR Details</h3>
+              <button onClick={() => setQrInvoice(null)} className="rounded-lg px-2 py-1 text-xs font-bold text-[#8a7968] hover:bg-[#f6f0e8]">Close</button>
+            </div>
+            <div className="rounded-xl border border-[#f0e8de] bg-[#faf5ef] p-4">
+              <p className="text-xs font-bold text-[#6a6054]">{qrInvoice.inv_no}</p>
+              <p className="mt-1 text-[11px] text-[#8a7968]">Ack: {qrInvoice.ack_no || "N/A"}</p>
+              <p className="mt-1 text-[11px] text-[#8a7968]">Buyer GSTIN: {qrInvoice.gstin_buyer}</p>
+              <div className="mt-4 flex items-center justify-center rounded-xl border border-dashed border-[#cbbba8] bg-white p-6">
+                <div className="text-center">
+                  <QrCode className="mx-auto h-20 w-20 text-[#1d1b19]" />
+                  <p className="mt-2 text-[10px] text-[#8a7968]">Signed QR metadata preview</p>
+                </div>
+              </div>
+              <p className="mt-3 break-all font-mono text-[10px] text-[#6a6054]">IRN: {qrInvoice.irn || "Unavailable"}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

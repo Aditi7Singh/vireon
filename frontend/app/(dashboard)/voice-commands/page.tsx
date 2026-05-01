@@ -20,10 +20,13 @@ interface CommandMessage {
 
 type SpeechRecognitionConstructor = new () => {
   lang: string;
+  continuous?: boolean;
+  interimResults?: boolean;
   onresult: ((event: any) => void) | null;
-  onerror: (() => void) | null;
+  onerror: ((event?: any) => void) | null;
   onend: (() => void) | null;
   start: () => void;
+  stop?: () => void;
 };
 
 const SUGGESTIONS = [
@@ -81,6 +84,9 @@ export default function VoiceCommandsPage() {
   const [recording, setRecording] = useState(false);
   const [processing, setProcessing] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<InstanceType<SpeechRecognitionConstructor> | null>(null);
+  const transcriptRef = useRef("");
+  const lastVoiceSendRef = useRef("");
 
   useEffect(() => {
     api.getStartupHealth().then(h => { if (h.default_company_id) setCompanyId(h.default_company_id); }).catch(() => {});
@@ -132,35 +138,61 @@ export default function VoiceCommandsPage() {
   };
 
   const toggleMic = () => {
-    if (!recording) {
-      setRecording(true);
-      if (typeof window !== "undefined" && ("SpeechRecognition" in window || "webkitSpeechRecognition" in window)) {
-        const speechWindow = window as Window & {
-          SpeechRecognition?: SpeechRecognitionConstructor;
-          webkitSpeechRecognition?: SpeechRecognitionConstructor;
-        };
-        const SR = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
-        if (SR) {
-          const recognition = new SR();
-          recognition.lang = "en-IN";
-          recognition.onresult = (event: any) => {
-            const transcript = event.results[0][0].transcript;
-            setRecording(false);
-            sendCommand(transcript);
-          };
-          recognition.onerror = () => setRecording(false);
-          recognition.onend = () => setRecording(false);
-          recognition.start();
-        }
-      } else {
-        setTimeout(() => {
-          setRecording(false);
-          sendCommand("What is our current cash balance and runway?");
-        }, 2000);
-      }
-    } else {
+    if (recording) {
+      recognitionRef.current?.stop?.();
       setRecording(false);
+      return;
     }
+
+    setRecording(true);
+    transcriptRef.current = "";
+
+    if (typeof window !== "undefined" && ("SpeechRecognition" in window || "webkitSpeechRecognition" in window)) {
+      const speechWindow = window as Window & {
+        SpeechRecognition?: SpeechRecognitionConstructor;
+        webkitSpeechRecognition?: SpeechRecognitionConstructor;
+      };
+      const SR = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
+      if (SR) {
+        const recognition = new SR();
+        recognitionRef.current = recognition;
+        recognition.lang = "en-IN";
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.onresult = (event: any) => {
+          let interim = "";
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const segment = event.results[i][0]?.transcript || "";
+            if (event.results[i].isFinal) {
+              transcriptRef.current = `${transcriptRef.current} ${segment}`.trim();
+            } else {
+              interim += segment;
+            }
+          }
+          setInput(`${transcriptRef.current} ${interim}`.trim());
+        };
+        recognition.onerror = () => {
+          setRecording(false);
+        };
+        recognition.onend = () => {
+          setRecording(false);
+          const finalTranscript = transcriptRef.current.trim() || input.trim();
+          setInput("");
+          transcriptRef.current = "";
+          if (finalTranscript && finalTranscript !== lastVoiceSendRef.current) {
+            lastVoiceSendRef.current = finalTranscript;
+            void sendCommand(finalTranscript);
+          }
+        };
+        recognition.start();
+        return;
+      }
+    }
+
+    setTimeout(() => {
+      setRecording(false);
+      void sendCommand("What is our current cash balance and runway?");
+    }, 2000);
   };
 
   return (

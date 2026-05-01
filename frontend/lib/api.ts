@@ -889,8 +889,10 @@ export const api = {
   getEmployees: () => fetchAPI<any[]>("/payroll/employees"),
   getAssets: (companyId: string) => fetchAPI<any[]>("/depreciation/assets", { params: { company_id: companyId } }),
   getDepreciationEntries: (companyId: string) => fetchAPI<any[]>("/depreciation/entries", { params: { company_id: companyId } }),
-  getDepreciationExpense: (companyId: string, month: string) =>
-    fetchAPI<any>("/depreciation/monthly-expense", { params: { company_id: companyId, month } }),
+  getDepreciationExpense: (companyId: string, month: string) => {
+    const normalizedMonth = /^\d{4}-\d{2}$/.test(month) ? `${month}-01` : month;
+    return fetchAPI<any>("/depreciation/monthly-expense", { params: { company_id: companyId, month: normalizedMonth } });
+  },
   getMe: () => fetchAPI<any>("/users/me/"),
   login: (usernameOrEmail: string, password: string) =>
     fetchAPI<AuthTokenResponse>("/token", {
