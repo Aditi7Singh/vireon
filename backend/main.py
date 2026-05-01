@@ -154,10 +154,12 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # Configure CORS
 _raw_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:3001")
 _allowed_origins = [o.strip() for o in _raw_origins.split(",") if o.strip()]
+_allowed_origin_regex = os.getenv("ALLOWED_ORIGIN_REGEX", r"https://.*\.vercel\.app")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_allowed_origins,
+    allow_origin_regex=_allowed_origin_regex,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

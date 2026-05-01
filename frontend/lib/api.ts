@@ -1,4 +1,5 @@
-﻿const RAW_API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+﻿const RAW_API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const API_BASE = RAW_API_BASE.replace(/\/$/, "").endsWith("/api/v1")
   ? RAW_API_BASE.replace(/\/$/, "")
   : `${RAW_API_BASE.replace(/\/$/, "")}/api/v1`;
