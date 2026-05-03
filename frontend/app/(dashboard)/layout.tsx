@@ -86,8 +86,9 @@ export default function DashboardLayout({
         const health = await api.getStartupHealth();
         setStartupIssues(health.issues || []);
         setStartupActions(health.actions || []);
-      } catch {
-        setStartupIssues(["Startup health check unavailable"]);
+      } catch (error) {
+        console.warn("Startup health check unavailable; continuing with dashboard fallback.", error);
+        setStartupIssues([]);
         setStartupActions([]);
       }
     };
