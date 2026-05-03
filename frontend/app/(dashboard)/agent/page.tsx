@@ -540,7 +540,7 @@ export default function AgentPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeToolCall, setActiveToolCall] = useState<string>("");
   const [completedTools, setCompletedTools] = useState<string[]>([]);
-  const [healthStatus, setHealthStatus] = useState<"ok" | "warning" | "unknown">("unknown");
+  const [healthStatus, setHealthStatus] = useState<"ok" | "warning" | "offline" | "unknown">("unknown");
   const [showActions, setShowActions] = useState(true);
   const [activeCategory, setActiveCategory] = useState("Analysis");
   const [attachments, setAttachments] = useState<File[]>([]);
@@ -557,10 +557,14 @@ export default function AgentPage() {
 
   useEffect(() => {
     const init = async () => {
+      let backendReachable = false;
       try {
         const health = await api.getStartupHealth();
+        backendReachable = true;
         setHealthStatus(health.status || "unknown");
-        const history = await api.getHistory(chatSessionId || "");
+        const history = chatSessionId
+          ? await api.getHistory(chatSessionId).catch(() => ({ messages: [] }))
+          : { messages: [] };
         if (history.messages?.length) {
           setMessages(history.messages.map((m: any) => ({
             role: m.role, content: m.content, timestamp: new Date().toLocaleTimeString(),
@@ -574,6 +578,7 @@ export default function AgentPage() {
           }]);
         }
       } catch {
+        setHealthStatus(backendReachable ? "warning" : "offline");
         setMessages([{
           role: "assistant",
           content: "Ready to help — I'm working with cached financial data. Live sync will resume when backend reconnects.",
@@ -673,10 +678,15 @@ export default function AgentPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {healthStatus === "ok"
-                  ? <span className="inline-flex items-center gap-1 rounded-full border border-[#b7d8bf] bg-[#edf8ef] px-2.5 py-1 text-[10px] font-semibold text-[#2f6a45]"><CheckCircle2 className="h-3 w-3" />Live</span>
-                  : <span className="inline-flex items-center gap-1 rounded-full border border-[#e1c4af] bg-[#fff2ee] px-2.5 py-1 text-[10px] font-semibold text-[#9f3f30]"><AlertCircle className="h-3 w-3" />Offline</span>
-                }
+                {healthStatus === "ok" && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-[#b7d8bf] bg-[#edf8ef] px-2.5 py-1 text-[10px] font-semibold text-[#2f6a45]"><CheckCircle2 className="h-3 w-3" />Live</span>
+                )}
+                {healthStatus === "warning" && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-[#e7d6a8] bg-[#fff7df] px-2.5 py-1 text-[10px] font-semibold text-[#7a4f14]"><AlertCircle className="h-3 w-3" />Degraded</span>
+                )}
+                {(healthStatus === "offline" || healthStatus === "unknown") && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-[#e1c4af] bg-[#fff2ee] px-2.5 py-1 text-[10px] font-semibold text-[#9f3f30]"><AlertCircle className="h-3 w-3" />Offline</span>
+                )}
                 <button
                   onClick={() => { setMessages([{ role: "assistant", content: "Session cleared. How can I help you?", timestamp: new Date().toLocaleTimeString(), followUps: ["Show me our current runway and burn rate", "Which invoices are overdue?"] }]); setCompletedTools([]); }}
                   className="rounded-lg border border-[#ddcfbc] px-2.5 py-1 text-xs font-medium text-[#776b5a] hover:bg-white/50"
