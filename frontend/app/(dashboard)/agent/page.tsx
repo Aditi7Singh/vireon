@@ -685,7 +685,7 @@ export default function AgentPage() {
                   <span className="inline-flex items-center gap-1 rounded-full border border-[#e7d6a8] bg-[#fff7df] px-2.5 py-1 text-[10px] font-semibold text-[#7a4f14]"><AlertCircle className="h-3 w-3" />Degraded</span>
                 )}
                 {(healthStatus === "offline" || healthStatus === "unknown") && (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-[#e1c4af] bg-[#fff2ee] px-2.5 py-1 text-[10px] font-semibold text-[#9f3f30]"><AlertCircle className="h-3 w-3" />Offline</span>
+                  <span className="inline-flex items-center gap-1 rounded-full border border-[#d8c8b6] bg-[#fff8ee] px-2.5 py-1 text-[10px] font-semibold text-[#6f5534]"><AlertCircle className="h-3 w-3" />Cached</span>
                 )}
                 <button
                   onClick={() => { setMessages([{ role: "assistant", content: "Session cleared. How can I help you?", timestamp: new Date().toLocaleTimeString(), followUps: ["Show me our current runway and burn rate", "Which invoices are overdue?"] }]); setCompletedTools([]); }}
