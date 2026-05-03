@@ -55,7 +55,6 @@ class ConnectorConflictPolicyUpdate(BaseModel):
 @router.get("/startup-health")
 def startup_health(
     db: Session = Depends(database.get_db),
-    current_user: models.User = Depends(auth.get_current_user),
 ):
     default_company_row = db.query(models.Company.id).order_by(models.Company.created_at.asc()).first()
     default_company_id = str(default_company_row[0]) if default_company_row else None
