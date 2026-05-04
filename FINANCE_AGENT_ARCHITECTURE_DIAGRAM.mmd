@@ -1,0 +1,141 @@
+%%{ init: { 'theme': 'base', 'themeVariables': { 'primaryColor': '#3b82f6', 'primaryTextColor': '#fff', 'primaryBorderColor': '#1e40af', 'lineColor': '#6b7280', 'secondaryColor': '#10b981', 'tertiaryColor': '#f59e0b' } } }%%
+
+graph TB
+    subgraph "External Data Sources"
+        ERP[ERPNext REST API<br/>📊 GL, AR, AP, Invoices]
+        PLAID[Plaid Bank API<br/>🏦 Real-time Transactions]
+        STRIPE[Stripe Webhooks<br/>💳 MRR, Churn, Payments]
+        AWS[AWS Billing API<br/>☁️ Cloud Costs]
+    end
+
+    subgraph "Ingestion & Validation Layer"
+        INGEST[Ingest Router<br/>✓ Chart of Accounts Sync<br/>✓ GL Entry Normalization<br/>✓ Duplicate Detection]
+        WEBHOOK[Webhook Handler<br/>🔒 HMAC-SHA256 Verification<br/>⚡ Real-time Processing]
+    end
+
+    subgraph "LangGraph Multi-Agent Layer 🤖"
+        ROUTER{Intelligent Router<br/>Query Classification}
+
+        subgraph "CFO Agent"
+            CFO_CLASS[Classify Query<br/>simple/complex/alert]
+            CFO_AGENT[LLM with Tools<br/>GPT-4o<br/>100+ Tools Bound]
+            CFO_TOOLS[Execute Tools<br/>Max 3 Retries]
+            CFO_ANALYZE[Synthesize Results<br/>Tool Output Summary]
+        end
+
+        subgraph "Auditor Agent"
+            AUD_FETCH[Fetch GL & Bank Data]
+            AUD_RECON[Reconcile Accounts<br/>Fuzzy Matching]
+            AUD_REPORT[Generate Report<br/>Discrepancy Summary]
+        end
+
+        subgraph "Strategist Agent"
+            STRAT_BASE[Calculate Baseline<br/>Current Metrics]
+            STRAT_MATH[Call Math Engine<br/>Deterministic Simulation]
+            STRAT_SUM[Summarize Scenario<br/>Natural Language]
+        end
+
+        subgraph "Finance Manager Agent"
+            FM_INV[Process Invoices<br/>Batch Operations]
+            FM_PAY[Schedule Payments<br/>Cash Optimization]
+            FM_COLL[Run Collections<br/>AR Workflow]
+        end
+    end
+
+    subgraph "Deterministic Engines 🔢"
+        MATH[Math Engine<br/>✓ Fully-Loaded Cost Calculator<br/>✓ Runway Simulator<br/>✓ Scenario Projector<br/>⚠️ ZERO LLM ARITHMETIC]
+        IF[Isolation Forest Service<br/>🧠 Sklearn ML Model<br/>✓ Seasonal Pattern Learning<br/>✓ Split Invoice Detection<br/>✓ 90-Day Baseline]
+        FORECAST[Forecasting Service<br/>📈 SARIMA + Prophet Ensemble<br/>✓ Model Selection Cascade<br/>✓ DSO-Aware Cash Projection]
+    end
+
+    subgraph "Database Layer 💾"
+        PG[(PostgreSQL 15<br/>80+ SQLAlchemy Models<br/>━━━━━━━━━━━━━━<br/>Companies<br/>GeneralLedger<br/>FinancialLedgerEntry<br/>Invoices<br/>Expenses<br/>MonthlyMetrics<br/>Anomalies<br/>AgentSession<br/>AgentTurn<br/>ToolAudit)]
+        REDIS[(Redis 8<br/>Session Store<br/>Celery Job Queue<br/>Rate Limiting)]
+    end
+
+    subgraph "Background Jobs ⏰"
+        BEAT[Celery Beat Scheduler<br/>━━━━━━━━━━━━━━<br/>⏰ Hourly: Anomaly Scan<br/>⏰ Daily: Forecast Update<br/>⏰ Daily: FX Rate Sync]
+        WORKER[Celery Worker Pool<br/>━━━━━━━━━━━━━━<br/>📧 Email Alerts<br/>📱 Slack Notifications<br/>🔄 Webhook Processing]
+    end
+
+    subgraph "API Layer (FastAPI) 🚀"
+        ANALYTICS[Analytics Router<br/>/api/v1/analytics/*<br/>━━━━━━━━━━━━━━<br/>GET /runway<br/>GET /burn-rate<br/>GET /cash-flow<br/>GET /metrics]
+        ADVANCED[Advanced Analytics Router<br/>/api/v1/advanced/*<br/>━━━━━━━━━━━━━━<br/>GET /gl/drilldown<br/>GET /cash-flow/sankey<br/>GET /burn-analysis/waterfall<br/>POST /anomalies/scan]
+        AGENT_API[Agent Router<br/>/api/v1/agent/*<br/>━━━━━━━━━━━━━━<br/>POST /cfo/chat<br/>POST /auditor/reconcile<br/>POST /strategist/scenario<br/>POST /finance-manager/query]
+    end
+
+    subgraph "Frontend (Next.js 14) 💻"
+        DASHBOARD[Multi-Dashboard Views<br/>━━━━━━━━━━━━━━<br/>👔 CEO Dashboard<br/>💻 CTO Dashboard<br/>💼 Finance Dashboard]
+        SANKEY[Sankey Cash Flow Chart<br/>Revenue → OpEx → Net Profit<br/>🖱️ Click to Drill Down]
+        WATERFALL[Waterfall Burn Analysis<br/>Month-over-Month Changes<br/>🖱️ Click to Drill Down]
+        DRAWER[GL Drill-Down Drawer<br/>Real-time Transaction View<br/>Source-Level Transparency]
+        CHAT[Agent Chat Interface<br/>Natural Language Queries<br/>Session Memory]
+    end
+
+    %% Data Flow Connections
+    ERP --> INGEST
+    PLAID --> INGEST
+    STRIPE --> WEBHOOK
+    AWS --> INGEST
+
+    INGEST --> PG
+    WEBHOOK --> PG
+
+    CHAT --> AGENT_API
+    AGENT_API --> ROUTER
+    ROUTER -->|Strategic Query| CFO_CLASS
+    ROUTER -->|Reconciliation| AUD_FETCH
+    ROUTER -->|Scenario| STRAT_BASE
+    ROUTER -->|Operations| FM_INV
+
+    CFO_CLASS --> CFO_AGENT
+    CFO_AGENT --> CFO_TOOLS
+    CFO_TOOLS --> CFO_ANALYZE
+    CFO_ANALYZE --> CFO_AGENT
+
+    AUD_FETCH --> AUD_RECON
+    AUD_RECON --> AUD_REPORT
+
+    STRAT_BASE --> STRAT_MATH
+    STRAT_MATH --> STRAT_SUM
+
+    FM_INV --> FM_PAY
+    FM_PAY --> FM_COLL
+
+    CFO_TOOLS --> MATH
+    CFO_TOOLS --> IF
+    CFO_TOOLS --> FORECAST
+    STRAT_MATH --> MATH
+
+    AUD_FETCH --> PG
+    FM_INV --> PG
+
+    ANALYTICS --> PG
+    ADVANCED --> PG
+    ADVANCED --> IF
+
+    DASHBOARD --> ANALYTICS
+    DASHBOARD --> ADVANCED
+    DASHBOARD --> AGENT_API
+    SANKEY --> ADVANCED
+    WATERFALL --> ADVANCED
+    DRAWER --> ADVANCED
+
+    BEAT --> WORKER
+    WORKER --> IF
+    WORKER --> FORECAST
+    WORKER --> PG
+    WORKER --> REDIS
+
+    PG <--> REDIS
+
+    %% Styling
+    classDef agentClass fill:#3b82f6,stroke:#1e40af,stroke-width:2px,color:#fff
+    classDef engineClass fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff
+    classDef dataClass fill:#6366f1,stroke:#4f46e5,stroke-width:2px,color:#fff
+    classDef apiClass fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#fff
+
+    class CFO_CLASS,CFO_AGENT,CFO_TOOLS,CFO_ANALYZE,AUD_FETCH,AUD_RECON,AUD_REPORT,STRAT_BASE,STRAT_MATH,STRAT_SUM,FM_INV,FM_PAY,FM_COLL agentClass
+    class MATH,IF,FORECAST engineClass
+    class PG,REDIS dataClass
+    class ANALYTICS,ADVANCED,AGENT_API apiClass
