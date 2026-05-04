@@ -3,6 +3,12 @@
   "outputDirectory": ".next",
   "installCommand": "npm install",
   "framework": "nextjs",
+  "rewrites": [
+    {
+      "source": "/api/v1/(.*)",
+      "destination": "https://vireon-sq3h.onrender.com/api/v1/$1"
+    }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",
