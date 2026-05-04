@@ -22,4 +22,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 COPY . .
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run emergency migrations to fix any missing columns before starting
+RUN python emergency_migrations.py || true
+
+CMD ["sh", "-c", "python emergency_migrations.py || true && uvicorn main:app --host 0.0.0.0 --port 8000"]

@@ -228,10 +228,20 @@ export function Sidebar() {
                     if (!active && item.path !== "/dashboard") {
                       active = pathname.startsWith(itemPath + "/");
                     }
+
+                    const handleClick = (e: React.MouseEvent) => {
+                      if (itemHash) {
+                        e.preventDefault();
+                        router.push(item.path);
+                        setHash(itemHash);
+                      }
+                    };
+
                     return (
                       <Link
                         key={item.name}
                         href={item.path}
+                        onClick={handleClick}
                         className={cn(
                           "flex items-center gap-2.5 px-2.5 py-2 rounded-[12px] transition-all duration-200 group font-medium relative",
                           active

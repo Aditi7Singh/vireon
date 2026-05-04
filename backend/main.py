@@ -167,12 +167,26 @@ app.add_middleware(
 
 # Create tables if they don't exist
 models.Base.metadata.create_all(bind=database.engine)
+
+# Run emergency migrations to add any missing columns to existing tables
+try:
+    import emergency_migrations
+    emergency_migrations.run_emergency_migrations()
+except Exception as e:
+    print(f"⚠️  Emergency migrations skipped: {e}")
+
 bootstrap.run_bootstrap()
 
 
 @app.on_event("startup")
 def on_startup() -> None:
     app.state.startup_check_report = wait_for_dependencies()
+    # Re-run emergency migrations on startup (safety net for race conditions)
+    try:
+        import emergency_migrations
+        emergency_migrations.run_emergency_migrations()
+    except Exception:
+        pass
 
 @app.get("/")
 def read_root():

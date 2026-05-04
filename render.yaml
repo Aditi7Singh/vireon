@@ -16,8 +16,8 @@ services:
     rootDir: backend
     plan: free
     healthCheckPath: /health/ready
-    buildCommand: pip install -r requirements.txt -r requirements_agent.txt && alembic upgrade head
-    startCommand: uvicorn main:app --host 0.0.0.0 --port 8000
+    buildCommand: pip install -r requirements.txt -r requirements_agent.txt && alembic upgrade head && python emergency_migrations.py || true
+    startCommand: python emergency_migrations.py && uvicorn main:app --host 0.0.0.0 --port 8000
     envVars:
       - key: ENV
         value: production

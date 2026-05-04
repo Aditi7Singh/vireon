@@ -131,7 +131,13 @@ export default function BankingPage() {
 
     applyHash();
     window.addEventListener("hashchange", applyHash);
-    return () => window.removeEventListener("hashchange", applyHash);
+
+    const interval = setInterval(applyHash, 500);
+
+    return () => {
+      window.removeEventListener("hashchange", applyHash);
+      clearInterval(interval);
+    };
   }, []);
 
   const totalBalance = BANK_ACCOUNTS.reduce((s, a) => s + (a.currency === "INR" ? a.balance : a.balance * 83.5), 0);
