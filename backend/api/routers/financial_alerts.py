@@ -292,7 +292,8 @@ def send_financial_alerts(
     Scan for financial anomalies and send alerts to CEO and Finance team.
     """
     try:
-        if x_user_role not in ["ceo", "finance", "system"]:
+        resolved_role = (str(current_user.role) if current_user and getattr(current_user, "role", None) else (x_user_role or "")).lower()
+        if resolved_role not in ["ceo", "finance", "system"]:
             raise HTTPException(status_code=403, detail="Only authorized roles can trigger alerts")
         
         company = db.query(models.Company).filter(models.Company.id == company_id).first()
@@ -453,10 +454,6 @@ def configure_alert_recipients(
 ):
     """Configure email recipients for financial alerts."""
     try:
-        # Allow system and any authenticated user
-        if not current_user:
-            raise HTTPException(status_code=403, detail="Authentication required")
-        
         company = db.query(models.Company).filter(models.Company.id == company_id).first()
         if not company:
             raise HTTPException(status_code=404, detail="Company not found")

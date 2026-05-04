@@ -112,7 +112,7 @@ const ACCOUNT_TYPE_ICONS: Record<string, React.ElementType> = {
 export default function BankingPage() {
   const { openChat } = useAppStore();
   const [activeTab, setActiveTab] = useState<"accounts" | "reconcile" | "feeds">("accounts");
-  const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
+  const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [reconFilter, setReconFilter] = useState<"all" | "unmatched" | "matched">("all");
 
@@ -140,6 +140,14 @@ export default function BankingPage() {
   const filteredTxns = RECENT_TRANSACTIONS.filter(t =>
     reconFilter === "all" ? true : t.status === reconFilter
   );
+
+  const toggleSelectedAccount = (accountId: string) => {
+    setSelectedAccountIds((current) =>
+      current.includes(accountId)
+        ? current.filter((id) => id !== accountId)
+        : [...current, accountId]
+    );
+  };
 
   const TABS = [
     { id: "accounts", label: "Bank Accounts" },
@@ -229,11 +237,11 @@ export default function BankingPage() {
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {BANK_ACCOUNTS.map((account) => {
                 const TypeIcon = ACCOUNT_TYPE_ICONS[account.type] || Banknote;
-                const isSelected = selectedAccount === account.id;
+                const isSelected = selectedAccountIds.includes(account.id);
                 return (
                   <article
                     key={account.id}
-                    onClick={() => setSelectedAccount(isSelected ? null : account.id)}
+                    onClick={() => toggleSelectedAccount(account.id)}
                     className={cn(
                       "rounded-2xl border p-5 cursor-pointer transition-all hover:shadow-md",
                       isSelected ? "border-[#b3622d] bg-[#fff8ec] shadow-md" : "border-[#ddd2c2] bg-[#fffdf8] hover:border-[#c4a882]"
@@ -254,6 +262,17 @@ export default function BankingPage() {
                       )}>
                         {account.status === "synced" ? "Synced" : "Pending"}
                       </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-[#9a8872]">
+                      <span>{isSelected ? "Selected" : "Tap to select"}</span>
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleSelectedAccount(account.id)}
+                        onClick={(event) => event.stopPropagation()}
+                        className="h-4 w-4 rounded border-[#c9b89f] text-[#8d4f27] focus:ring-[#8d4f27]"
+                        aria-label={`Select ${account.name}`}
+                      />
                     </div>
                     <p className={cn("text-2xl font-black", account.balance < 0 ? "text-red-600" : "text-[#2a2017]")}>
                       {account.currency === "USD" ? `$${(Math.abs(account.balance) / 1000).toFixed(0)}K` : formatINR(account.balance)}
@@ -376,6 +395,7 @@ export default function BankingPage() {
               <div className="space-y-3">
                 {BANK_ACCOUNTS.map((account) => {
                   const TypeIcon = ACCOUNT_TYPE_ICONS[account.type] || Banknote;
+                  const isSelected = selectedAccountIds.includes(account.id);
                   return (
                     <div key={account.id} className="flex items-center gap-4 p-4 rounded-xl border border-[#ede8e0] bg-white">
                       <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: account.color + "15" }}>
@@ -395,6 +415,16 @@ export default function BankingPage() {
                         )}>
                           {account.status === "synced" ? "● Active" : "⚠ Pending"}
                         </span>
+                        <label className="inline-flex items-center gap-2 rounded-lg border border-[#ddd2c2] px-2 py-1 text-[10px] font-semibold text-[#776b5a]">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleSelectedAccount(account.id)}
+                            className="h-3.5 w-3.5 rounded border-[#c9b89f] text-[#8d4f27] focus:ring-[#8d4f27]"
+                            aria-label={`Connect ${account.name}`}
+                          />
+                          Selected
+                        </label>
                         <button className="p-1.5 rounded-lg hover:bg-[#f0ebe3] text-[#776b5a]">
                           <RefreshCw className="h-4 w-4" />
                         </button>

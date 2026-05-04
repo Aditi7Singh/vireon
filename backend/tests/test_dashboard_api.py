@@ -11,6 +11,28 @@ from main import app
 client = TestClient(app)
 
 
+def _create_user_token(username: str, role: str) -> str:
+    create_res = client.post(
+        "/api/v1/users/",
+        json={
+            "username": username,
+            "email": f"{username}@example.com",
+            "password": "password123",
+            "role": role,
+        },
+    )
+    assert create_res.status_code == 200, create_res.text
+
+    token_res = client.post(
+        "/api/v1/token",
+        data={"username": username, "password": "password123"},
+    )
+    assert token_res.status_code == 200, token_res.text
+    token = token_res.json().get("access_token")
+    assert token
+    return token
+
+
 def _get_default_company_id() -> str:
     res = client.get("/api/v1/system/startup-health")
     assert res.status_code == 200
@@ -36,9 +58,11 @@ def test_dashboard_core_endpoints_return_success():
 def test_finance_and_export_endpoints():
     company_id = _get_default_company_id()
 
+    finance_token = _create_user_token("finance-pending-user", "FINANCE")
+
     pending = client.get(
         f"/api/v1/inputs/pending-review?company_id={company_id}",
-        headers={"X-User-Role": "finance"},
+        headers={"Authorization": f"Bearer {finance_token}"},
     )
     assert pending.status_code == 200
 
@@ -49,6 +73,35 @@ def test_finance_and_export_endpoints():
     pdf_export = client.get(f"/api/v1/reports/export/summary/pdf?company_id={company_id}")
     assert pdf_export.status_code == 200
     assert "application/pdf" in pdf_export.headers.get("content-type", "")
+
+
+def test_role_gated_dashboard_actions_accept_jwt_role():
+    company_id = _get_default_company_id()
+
+    cto_token = _create_user_token("cto-gated-user", "CTO")
+    finance_token = _create_user_token("finance-gated-user", "FINANCE")
+
+    tech_cost = client.post(
+        "/api/v1/inputs/tech-cost",
+        json={
+            "company_id": company_id,
+            "cost_type": "saas_tool",
+            "product_tag": "ai_lab",
+            "amount_inr": 18000,
+            "billing_period": "2026-04",
+            "vendor_name": "Anthropic Claude",
+            "description": "Claude subscription April 2026",
+            "is_recurring": True,
+        },
+        headers={"Authorization": f"Bearer {cto_token}"},
+    )
+    assert tech_cost.status_code == 200, tech_cost.text
+
+    pending = client.get(
+        f"/api/v1/inputs/pending-review?company_id={company_id}",
+        headers={"Authorization": f"Bearer {finance_token}"},
+    )
+    assert pending.status_code == 200, pending.text
 
 
 def test_group_consolidated_pl_applies_intercompany_elimination():

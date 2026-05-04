@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 import database
 import models
 import schemas
+import auth
 from services.ledger_service import create_ledger_entry
 
 router = APIRouter(prefix="/inputs", tags=["inputs"])
@@ -101,8 +102,14 @@ class HiringCostInput(BaseModel):
     description: str
 
 
-def _require_role(actual: Optional[str], allowed: List[str]):
-    role = (actual or "").lower()
+def _resolve_role(current_user: Optional[models.User], actual: Optional[str]) -> str:
+    if current_user and getattr(current_user, "role", None):
+        return str(current_user.role).lower()
+    return (actual or "").lower()
+
+
+def _require_role(current_user: Optional[models.User], actual: Optional[str], allowed: List[str]):
+    role = _resolve_role(current_user, actual)
     if role not in allowed:
         raise HTTPException(status_code=403, detail=f"Role {role or 'unknown'} cannot access this endpoint")
 
@@ -111,9 +118,10 @@ def _require_role(actual: Optional[str], allowed: List[str]):
 def create_tech_cost(
     payload: TechCostInput,
     db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
     x_user_role: Optional[str] = Header(None),
 ):
-    _require_role(x_user_role, ["cto", "ceo"])
+    _require_role(current_user, x_user_role, ["cto", "ceo"])
     entry = create_ledger_entry(
         db,
         {
@@ -139,9 +147,10 @@ def create_tech_cost(
 def create_marketing_cost(
     payload: MarketingCostInput,
     db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
     x_user_role: Optional[str] = Header(None),
 ):
-    _require_role(x_user_role, ["marketing", "ceo"])
+    _require_role(current_user, x_user_role, ["marketing", "ceo"])
     entry = create_ledger_entry(
         db,
         {
@@ -170,9 +179,10 @@ def create_marketing_cost(
 def create_office_expense(
     payload: OfficeExpenseInput,
     db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
     x_user_role: Optional[str] = Header(None),
 ):
-    _require_role(x_user_role, ["finance", "ceo"])
+    _require_role(current_user, x_user_role, ["finance", "ceo"])
     entry = create_ledger_entry(
         db,
         {
@@ -198,9 +208,10 @@ def create_office_expense(
 def create_hiring_cost(
     payload: HiringCostInput,
     db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
     x_user_role: Optional[str] = Header(None),
 ):
-    _require_role(x_user_role, ["finance", "ceo"])
+    _require_role(current_user, x_user_role, ["finance", "ceo"])
     monthly_cost = payload.annual_ctc_inr / 12
     entry = create_ledger_entry(
         db,
@@ -230,8 +241,13 @@ def create_hiring_cost(
 
 
 @router.get("/pending-review")
-def pending_review(company_id: UUID, db: Session = Depends(database.get_db), x_user_role: Optional[str] = Header(None)):
-    _require_role(x_user_role, ["finance", "ceo"])
+def pending_review(
+    company_id: UUID,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_user),
+    x_user_role: Optional[str] = Header(None),
+):
+    _require_role(current_user, x_user_role, ["finance", "ceo"])
     since = date.today() - timedelta(days=7)
     rows = (
         db.query(models.FinancialLedgerEntry)

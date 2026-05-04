@@ -70,6 +70,7 @@ function getSameOriginApiBase() {
 
 async function buildApiError(response: Response, path: string, url: string, method: string) {
   const rawText = await response.text().catch(() => "");
+  const contentType = response.headers.get("content-type") || "";
   let errorDetail = `HTTP ${response.status}`;
   let errorData: any = {};
 
@@ -80,7 +81,10 @@ async function buildApiError(response: Response, path: string, url: string, meth
     }
   } catch {
     if (rawText) {
-      errorDetail = rawText.substring(0, 200);
+      const isHtmlResponse = contentType.includes("text/html") || /^\s*<!doctype html/i.test(rawText) || /^\s*<html/i.test(rawText);
+      errorDetail = isHtmlResponse
+        ? `Received HTML from ${url}. Check the API base URL and any proxy or rewrite configuration.`
+        : rawText.substring(0, 200);
     }
   }
 
