@@ -16,6 +16,7 @@ import WaterfallChart, { WaterfallRow } from "@/components/WaterfallChart";
 import GLDrilldownDrawer from "@/components/GLDrilldownDrawer";
 import { useAppStore } from "@/lib/store";
 import { formatCurrency } from "@/lib/utils";
+import api, { API_V1_BASE } from "@/lib/api";
 import {
   BrainCircuit,
   ChevronRight,
@@ -42,7 +43,7 @@ interface BurnMetrics {
 async function fetchWaterfallData(companyId: string, months: number): Promise<WaterfallRow[]> {
   const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/advanced/burn-analysis/waterfall?company_id=${companyId}&months=${months}`,
+    `${API_V1_BASE}/advanced/burn-analysis/waterfall?company_id=${companyId}&months=${months}`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -134,19 +135,11 @@ export default function BurnAnalysisPage() {
       setLoading(true);
       setError(null);
       try {
-        // Try to get company ID from startup health
-        const healthRes = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/system/startup-health`
-        ).catch(() => null);
-
-        let resolvedId: string | null = null;
-        if (healthRes?.ok) {
-          const h = await healthRes.json();
-          resolvedId = h.default_company_id || null;
-        }
+        const h = await api.getStartupHealth();
+        const resolvedId = h.default_company_id || "demo-company";
         setCompanyId(resolvedId);
 
-        if (resolvedId) {
+        if (resolvedId !== "demo-company") {
           const rows = await fetchWaterfallData(resolvedId, 6);
           if (rows.length > 0) {
             setWaterfall(rows);

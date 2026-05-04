@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import TopBar from "@/components/TopBar";
 import { useAppStore } from "@/lib/store";
 import { formatCurrency } from "@/lib/utils";
+import { API_V1_BASE } from "@/lib/api";
 import {
   TrendingUp, TrendingDown, Users, Flame, Target, MapPin,
   Sparkles, RefreshCw, ChevronRight, BarChart3, Zap,
@@ -88,10 +89,10 @@ export default function ProjectsPage() {
     setLoading(true);
     try {
       const [ov, tr] = await Promise.all([
-        fetch("/api/v1/projects/overview", {
+        fetch(`${API_V1_BASE}/projects/overview`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("access_token") || localStorage.getItem("auth_token")}` },
         }).then((r) => r.json()),
-        fetch("/api/v1/projects/monthly-trend", {
+        fetch(`${API_V1_BASE}/projects/monthly-trend`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("access_token") || localStorage.getItem("auth_token")}` },
         }).then((r) => r.json()),
       ]);

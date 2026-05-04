@@ -17,6 +17,7 @@
 
 import React, { useEffect, useState } from "react";
 import { ArrowDownRight, ArrowUpRight, ExternalLink, Loader2, X } from "lucide-react";
+import { API_V1_BASE } from "@/lib/api";
 
 export interface GLEntry {
   id: string;
@@ -95,7 +96,7 @@ export default function GLDrilldownDrawer({
 
         const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/advanced/gl/drilldown?${params}`,
+          `${API_V1_BASE}/advanced/gl/drilldown?${params}`,
           {
             headers: {
               "Content-Type": "application/json",

@@ -7,9 +7,9 @@ import {
   CheckCircle, XCircle, AlertCircle, Play, ClipboardList, ChevronDown, ChevronUp
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { API_V1_BASE } from "@/lib/api";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-const API_V1 = `${API_BASE.replace(/\/$/, "")}/api/v1`;
+const API_V1 = API_V1_BASE;
 
 type ChecklistItem = {
   id: string;

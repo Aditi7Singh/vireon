@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
 
 export default function DocsRedirectPage() {
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-  redirect(`${apiBaseUrl}/api/v1/docs`);
+  const rawApiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "https://vireon-sq3h.onrender.com";
+  const apiBaseUrl = rawApiBaseUrl.replace(/\/$/, "").endsWith("/api/v1")
+    ? rawApiBaseUrl.replace(/\/$/, "")
+    : `${rawApiBaseUrl.replace(/\/$/, "")}/api/v1`;
+  redirect(`${apiBaseUrl}/docs`);
 }

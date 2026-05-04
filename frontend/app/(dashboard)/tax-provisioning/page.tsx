@@ -6,9 +6,9 @@ import TopBar from "@/components/TopBar";
 import { useAppStore } from "@/lib/store";
 import { Calculator, TrendingDown, Play, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { API_V1_BASE } from "@/lib/api";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-const API_V1 = `${API_BASE.replace(/\/$/, "")}/api/v1`;
+const API_V1 = API_V1_BASE;
 
 type TaxResult = {
   jurisdiction: string;

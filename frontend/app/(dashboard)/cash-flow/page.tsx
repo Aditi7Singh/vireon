@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import TopBar from "@/components/TopBar";
 import SankeyChart, { SankeyLink, SankeyNode } from "@/components/SankeyChart";
 import GLDrilldownDrawer from "@/components/GLDrilldownDrawer";
-import api, { ForecastPoint } from "@/lib/api";
+import api, { API_V1_BASE, ForecastPoint } from "@/lib/api";
 import { useAppStore } from "@/lib/store";
 import { formatCurrency } from "@/lib/utils";
 import {
@@ -37,7 +37,7 @@ interface SankeyData {
 async function fetchSankeyData(companyId: string): Promise<SankeyData> {
   const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/advanced/cash-flow/sankey?company_id=${companyId}`,
+    `${API_V1_BASE}/advanced/cash-flow/sankey?company_id=${companyId}`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -104,12 +104,8 @@ export default function CashFlowPage() {
       setError(null);
       try {
         const health = await api.getStartupHealth();
-        const resolvedCompanyId = health.default_company_id || null;
+        const resolvedCompanyId = health.default_company_id || "demo-company";
         setCompanyId(resolvedCompanyId);
-        if (!resolvedCompanyId) {
-          setError("No default company is configured yet.");
-          return;
-        }
 
         const [scorecard, forecastRows, sankey] = await Promise.allSettled([
           api.getScorecard(),
@@ -127,7 +123,11 @@ export default function CashFlowPage() {
         if (forecastRows.status === "fulfilled") setForecast(forecastRows.value || []);
         if (sankey.status === "fulfilled") setSankeyData(sankey.value);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to load cash flow data.");
+        setCompanyId("demo-company");
+        setBaseline({ cash: 9230000, revenue: 1677000, expenses: 1869000 });
+        setForecast([]);
+        setSankeyData(DEMO_SANKEY);
+        setError("Using demo cash-flow data while the backend reconnects.");
       } finally {
         setLoading(false);
       }

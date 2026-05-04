@@ -12,7 +12,9 @@ COPY . .
 RUN find . -not -path "*/node_modules/*" \( -name "*.tsx" -o -name "*.ts" -o -name "*.js" -o -name "*.mjs" \) -exec sed -i 's/\r$//' {} +
 
 # NEXT_PUBLIC_* vars must be present at build time to be embedded in client bundles
-ARG NEXT_PUBLIC_API_URL=http://localhost:8000
+ARG NEXT_PUBLIC_API_URL=https://vireon-sq3h.onrender.com
+ARG NEXT_PUBLIC_API_BASE_URL=https://vireon-sq3h.onrender.com
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 RUN npm run build

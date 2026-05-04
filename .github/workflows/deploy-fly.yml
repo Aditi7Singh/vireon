@@ -1,12 +1,6 @@
 name: Deploy Backend to Fly.io
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'backend/**'
-      - 'fly.toml'
-      - '.github/workflows/deploy-fly.yml'
   workflow_dispatch:
     inputs:
       environment:

@@ -4,10 +4,35 @@ import { useEffect, useState } from "react";
 import { BarChart, Card, DonutChart, Metric, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Title, Badge } from "@tremor/react";
 import { AlertCircle, CheckCircle2, Loader, TrendingUp } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import api from "@/lib/api";
+import api, { API_V1_BASE } from "@/lib/api";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-const API_V1 = API_BASE.replace(/\/$/, "").endsWith("/api/v1") ? API_BASE.replace(/\/$/, "") : `${API_BASE.replace(/\/$/, "")}/api/v1`;
+const API_V1 = API_V1_BASE;
+const DEMO_COMPANY_ID = "demo-company";
+const DEMO_TECH_DATA = {
+  summary: { net_burn: 1869000 },
+  expenses: {
+    tech_costs: {
+      aws_total: 850000,
+      licenses_total: 410000,
+      saas_total: 260000,
+      by_product: { "AI Lab": 620000, Orchard: 540000, Sprout: 360000 },
+    },
+  },
+};
+const DEMO_ENTRIES = [
+  { id: "demo-aws", description: "AWS compute and storage", amount_inr: 850000 },
+  { id: "demo-openai", description: "OpenAI API usage", amount_inr: 185000 },
+  { id: "demo-github", description: "GitHub Enterprise", amount_inr: 96000 },
+  { id: "demo-datadog", description: "Datadog monitoring", amount_inr: 72000 },
+];
+const DEMO_HISTORY = [
+  { month: "2025-12", amount: 980000 },
+  { month: "2026-01", amount: 1080000 },
+  { month: "2026-02", amount: 1160000 },
+  { month: "2026-03", amount: 1290000 },
+  { month: "2026-04", amount: 1410000 },
+  { month: "2026-05", amount: 1520000 },
+];
 
 const formatINR = (v: number) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(v || 0);
 
@@ -37,9 +62,14 @@ export default function CTODashboardPage() {
     const load = async () => {
       try {
         const health = await api.getStartupHealth();
-        const cid = health.default_company_id || "";
+        const cid = health.default_company_id || DEMO_COMPANY_ID;
         setCompanyId(cid);
-        if (!cid) return;
+        if (cid === DEMO_COMPANY_ID) {
+          setTechData(DEMO_TECH_DATA);
+          setRecentEntries(DEMO_ENTRIES);
+          setHistory(DEMO_HISTORY);
+          return;
+        }
 
         const historyRes = await fetch(`${API_V1}/metrics/history/${cid}?months=6`);
         const historyPayload = historyRes.ok ? await historyRes.json() : [];
@@ -80,6 +110,10 @@ export default function CTODashboardPage() {
         setRecentEntries(ledgerEntries.slice(0, 8));
         setHistory(monthlyDashboardResults);
       } catch (err) {
+        setCompanyId(DEMO_COMPANY_ID);
+        setTechData(DEMO_TECH_DATA);
+        setRecentEntries(DEMO_ENTRIES);
+        setHistory(DEMO_HISTORY);
         console.error("Failed to load CTO data:", err);
       }
     };
@@ -88,7 +122,7 @@ export default function CTODashboardPage() {
 
   async function submitTechCost() {
     if (!companyId) {
-      setSubmitError("Company ID not loaded");
+      setSubmitError("Company ID not loaded yet. Using demo mode in a moment.");
       return;
     }
     if (!formData.cost_type) {
@@ -103,6 +137,17 @@ export default function CTODashboardPage() {
     setSubmitError("");
     setIsSubmitting(true);
     try {
+      if (companyId === DEMO_COMPANY_ID) {
+        const created = {
+          id: `local-${Date.now()}`,
+          description: formData.description || formData.vendor_name || formData.cost_type,
+          amount_inr: formData.amount_inr,
+        };
+        setRecentEntries((prev) => [created, ...prev].slice(0, 8));
+        setFormData((prev) => ({ ...prev, cost_type: "", amount_inr: 0, vendor_name: "", description: "", is_recurring: false }));
+        setSubmitError("Saved locally in demo mode. Connect a live company to persist this entry.");
+        return;
+      }
       const res = await fetch(`${API_V1}/inputs/tech-cost`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-User-Role": "cto" },
@@ -138,7 +183,7 @@ export default function CTODashboardPage() {
   async function calculateImpact() {
     setCalcError("");
     if (!companyId) {
-      setCalcError("Company ID not loaded");
+      setCalcError("Company ID not loaded yet. Using demo mode in a moment.");
       return;
     }
     if (!hiringForm.annual_ctc || hiringForm.annual_ctc <= 0) {
@@ -148,6 +193,21 @@ export default function CTODashboardPage() {
     
     setIsCalculating(true);
     try {
+      if (companyId === DEMO_COMPANY_ID) {
+        const monthlyCost = hiringForm.annual_ctc / 12;
+        const currentMonthlyBurn = 1869000;
+        const cash = 9230000;
+        const baseline = cash / currentMonthlyBurn;
+        const next = cash / (currentMonthlyBurn + monthlyCost);
+        setImpact({
+          baseline_runway_months: Number(baseline.toFixed(1)),
+          new_runway_months: Number(next.toFixed(1)),
+          runway_impact_days: Math.round((next - baseline) * 30),
+          projected_12m_costs: hiringForm.annual_ctc,
+        });
+        setCalcError("Calculated locally in demo mode. Connect a live company for persisted planning data.");
+        return;
+      }
       const res = await fetch(`${API_V1}/forecast/hiring-impact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

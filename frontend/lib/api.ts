@@ -2,11 +2,16 @@
   typeof window !== "undefined" && window.location.hostname !== "localhost"
     ? "https://vireon-sq3h.onrender.com"
     : "http://localhost:8000";
+const DEFAULT_API_V1_BASE = DEFAULT_API_BASE.replace(/\/$/, "").endsWith("/api/v1")
+  ? DEFAULT_API_BASE.replace(/\/$/, "")
+  : `${DEFAULT_API_BASE.replace(/\/$/, "")}/api/v1`;
 const RAW_API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || DEFAULT_API_BASE;
-const API_BASE = RAW_API_BASE.replace(/\/$/, "").endsWith("/api/v1")
-  ? RAW_API_BASE.replace(/\/$/, "")
-  : `${RAW_API_BASE.replace(/\/$/, "")}/api/v1`;
+export const API_BASE_URL = RAW_API_BASE.replace(/\/$/, "");
+export const API_V1_BASE = API_BASE_URL.endsWith("/api/v1")
+  ? API_BASE_URL
+  : `${API_BASE_URL}/api/v1`;
+const API_BASE = API_V1_BASE;
 
 // API Error class for better error handling
 export class APIError extends Error {
@@ -52,6 +57,36 @@ function logError(error: Error, context: string) {
   if (process.env.NODE_ENV === "development") {
     console.error(error);
   }
+}
+
+function getSameOriginApiBase() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const sameOriginBase = `${window.location.origin}/api/v1`;
+  return sameOriginBase === API_BASE ? null : sameOriginBase;
+}
+
+async function buildApiError(response: Response, path: string, url: string, method: string) {
+  const rawText = await response.text().catch(() => "");
+  let errorDetail = `HTTP ${response.status}`;
+  let errorData: any = {};
+
+  try {
+    if (rawText) {
+      errorData = JSON.parse(rawText);
+      errorDetail = errorData.detail || errorData.message || errorData.error || errorDetail;
+    }
+  } catch {
+    if (rawText) {
+      errorDetail = rawText.substring(0, 200);
+    }
+  }
+
+  const apiError = new APIError(response.status, path, errorDetail, errorData);
+  logError(apiError, `API request failed: ${method} ${url}`);
+  return apiError;
 }
 
 async function fetchAPI<T>(
@@ -103,24 +138,12 @@ async function fetchAPI<T>(
       logResponse(response.status, url, duration);
 
       if (!response.ok) {
-        const rawText = await response.text().catch(() => "");
-        let errorDetail = `HTTP ${response.status}`;
-        let errorData: any = {};
-
-        try {
-          if (rawText) {
-            errorData = JSON.parse(rawText);
-            errorDetail = errorData.detail || errorData.message || errorData.error || errorDetail;
-          }
-        } catch {
-          // If JSON parsing fails, use raw text
-          if (rawText) {
-            errorDetail = rawText.substring(0, 200);
-          }
-        }
-
-        const apiError = new APIError(response.status, path, errorDetail, errorData);
-        logError(apiError, `API request failed: ${fetchOptions.method || "GET"} ${url}`);
+        const apiError = await buildApiError(
+          response,
+          path,
+          url,
+          fetchOptions.method || "GET"
+        );
 
         // Retry on certain status codes (5xx errors, 429 rate limit)
         if ((response.status >= 500 || response.status === 429) && attempt <= retries) {
@@ -144,6 +167,46 @@ async function fetchAPI<T>(
       lastError = error as Error;
 
       if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
+        const sameOriginBase = getSameOriginApiBase();
+        if (sameOriginBase) {
+          const fallbackUrl = url.replace(API_BASE, sameOriginBase);
+          try {
+            const token =
+              typeof window !== "undefined"
+                ? localStorage.getItem("access_token") || localStorage.getItem("auth_token")
+                : null;
+
+            const fallbackResponse = await fetch(fallbackUrl, {
+              ...fetchOptions,
+              signal: controller.signal,
+              headers: {
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                "Content-Type": "application/json",
+                ...fetchOptions.headers,
+              },
+            });
+
+            if (fallbackResponse.ok) {
+              const fallbackData = await fallbackResponse.json().catch((err) => {
+                throw new Error(`Failed to parse API response as JSON: ${err.message}`);
+              });
+              return fallbackData as T;
+            }
+
+            throw await buildApiError(
+              fallbackResponse,
+              path,
+              fallbackUrl,
+              fetchOptions.method || "GET"
+            );
+          } catch (fallbackError) {
+            if (fallbackError instanceof APIError) {
+              throw fallbackError;
+            }
+            // Continue to throw the original network error message below.
+          }
+        }
+
         const networkError = new Error(
           "Network error: Unable to reach the API server. Check your connection and try again."
         );

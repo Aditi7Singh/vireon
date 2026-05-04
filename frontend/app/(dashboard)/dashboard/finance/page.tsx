@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useFinancialData } from "@/hooks/useFinancialData";
-import api, { FinancialRecommendationsResponse } from "@/lib/api";
+import api, { API_V1_BASE, FinancialRecommendationsResponse } from "@/lib/api";
 import TopBar from "@/components/TopBar";
 import { useAppStore } from "@/lib/store";
 import {
@@ -16,10 +16,7 @@ import {
   PieChart, Pie, Cell, Legend,
 } from "recharts";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-const API_V1 = API_BASE.replace(/\/$/, "").endsWith("/api/v1")
-  ? API_BASE.replace(/\/$/, "")
-  : `${API_BASE.replace(/\/$/, "")}/api/v1`;
+const API_V1 = API_V1_BASE;
 
 const fmt = (v: number) => {
   const abs = Math.abs(v);
