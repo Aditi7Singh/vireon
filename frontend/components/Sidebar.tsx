@@ -17,7 +17,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/store";
 import { Logo } from "./Logo";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type NavItem = { name: string; path: string; icon: React.ElementType };
 type NavSection = { title: string; items: NavItem[] };
@@ -147,6 +147,16 @@ export function Sidebar() {
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
     new Set(["Intelligence", "System"])
   );
+  const [hash, setHash] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setHash(window.location.hash.toLowerCase());
+      const onHashChange = () => setHash(window.location.hash.toLowerCase());
+      window.addEventListener("hashchange", onHashChange);
+      return () => window.removeEventListener("hashchange", onHashChange);
+    }
+  }, []);
 
   const toggleSection = (title: string) => {
     setCollapsedSections((prev) => {
@@ -205,9 +215,19 @@ export function Sidebar() {
               {(!isCollapsed || !sidebarExpanded) && (
                 <div className="space-y-0.5">
                   {section.items.map((item) => {
-                    const isActive = pathname === item.path || (item.path !== "/dashboard" && pathname.startsWith(item.path.split("#")[0] + "/"));
-                    const exactActive = pathname === item.path.split("#")[0];
-                    const active = isActive || exactActive;
+                    const itemPath = item.path.split("#")[0];
+                    const itemHash = item.path.includes("#") ? `#${item.path.split("#")[1].toLowerCase()}` : "";
+                    let active = false;
+
+                    if (itemHash) {
+                      active = pathname === itemPath && hash === itemHash;
+                    } else {
+                      active = pathname === itemPath && !hash;
+                    }
+
+                    if (!active && item.path !== "/dashboard") {
+                      active = pathname.startsWith(itemPath + "/");
+                    }
                     return (
                       <Link
                         key={item.name}

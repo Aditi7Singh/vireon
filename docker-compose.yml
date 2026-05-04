@@ -45,6 +45,8 @@ services:
       - BACKEND_URL=http://backend:8000
       - USE_LOCAL_LLM=false
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - ALLOW_DEMO_WITHOUT_TOKEN=true
+      - ENV=development
     env_file:
       - ./backend/.env
     volumes:
