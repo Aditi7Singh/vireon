@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import TopBar from "@/components/TopBar";
 import SankeyChart, { SankeyLink, SankeyNode } from "@/components/SankeyChart";
 import GLDrilldownDrawer from "@/components/GLDrilldownDrawer";
-import api, { API_V1_BASE, ForecastPoint } from "@/lib/api";
+import api, { APIError, API_V1_BASE, ForecastPoint } from "@/lib/api";
 import { useAppStore } from "@/lib/store";
 import { formatCurrency } from "@/lib/utils";
 import {
@@ -72,6 +72,10 @@ const DEMO_SANKEY: SankeyData = {
   summary: { revenue: 380000, total_opex: 620000, gross_profit: 285000, net_profit: -240000 },
 };
 
+function isAuthorizationError(error: unknown) {
+  return error instanceof APIError && (error.status === 401 || error.status === 403);
+}
+
 // ── Page component ────────────────────────────────────────────────────────────
 
 export default function CashFlowPage() {
@@ -123,6 +127,15 @@ export default function CashFlowPage() {
         if (forecastRows.status === "fulfilled") setForecast(forecastRows.value || []);
         if (sankey.status === "fulfilled") setSankeyData(sankey.value);
       } catch (e) {
+        if (isAuthorizationError(e)) {
+          setCompanyId(null);
+          setBaseline({ cash: 0, revenue: 0, expenses: 0 });
+          setForecast([]);
+          setSankeyData(DEMO_SANKEY);
+          setError("Cash flow data is protected. Sign in with a valid account to load the live view.");
+          return;
+        }
+
         setCompanyId("demo-company");
         setBaseline({ cash: 9230000, revenue: 1677000, expenses: 1869000 });
         setForecast([]);

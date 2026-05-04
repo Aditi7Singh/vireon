@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import TopBar from "@/components/TopBar";
-import api, { PayrollEntryItem } from "@/lib/api";
+import api, { APIError, PayrollEntryItem } from "@/lib/api";
 import { useAppStore } from "@/lib/store";
 import { formatCurrency } from "@/lib/utils";
 import { Briefcase, Calculator, RefreshCw, Sparkles, TrendingUp, Users } from "lucide-react";
@@ -21,6 +21,10 @@ const FALLBACK_ENTRIES: PayrollEntryItem[] = [
   { id: "demo-pay-2", pay_date: "2026-04-30", department: "Sales", status: "posted", gross_pay: 210000, net_pay: 189000 },
   { id: "demo-pay-3", pay_date: "2026-04-30", department: "Finance", status: "posted", gross_pay: 110000, net_pay: 99000 },
 ];
+
+function isAuthorizationError(error: unknown) {
+  return error instanceof APIError && (error.status === 401 || error.status === 403);
+}
 
 export default function PayrollPage() {
   const { openChat } = useAppStore();
@@ -44,6 +48,14 @@ export default function PayrollPage() {
         setEntries(entryRows || []);
         setMonthlyCost(costRows || null);
       } catch (e) {
+        if (isAuthorizationError(e)) {
+          setEmployees([]);
+          setEntries([]);
+          setMonthlyCost(null);
+          setError("Payroll data is protected. Sign in with a valid account to load live payroll records.");
+          return;
+        }
+
         const fallbackMonthly = FALLBACK_ENTRIES.reduce((sum, row) => sum + Number(row.gross_pay || 0), 0);
         setEmployees(FALLBACK_EMPLOYEES);
         setEntries(FALLBACK_ENTRIES);
