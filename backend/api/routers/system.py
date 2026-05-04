@@ -104,9 +104,20 @@ def startup_health(
             if _is_missing(os.getenv(key)):
                 missing_credentials.append(key)
 
-    for key in ["MERGE_API_KEY", "MERGE_ACCOUNT_TOKEN", "PLAID_CLIENT_ID", "PLAID_SECRET"]:
-        if _is_missing(os.getenv(key)):
-            missing_credentials.append(key)
+    data_source = os.getenv("DATA_SOURCE", "").lower()
+
+    if data_source in {"merge", "mergedev"}:
+        for key in ["MERGE_API_KEY"]:
+            if _is_missing(os.getenv(key)):
+                missing_credentials.append(key)
+        merge_account_token = os.getenv("MERGE_ACCOUNT_TOKEN") or os.getenv("MERGE_LINKED_ACCOUNT_TOKEN")
+        if _is_missing(merge_account_token):
+            missing_credentials.append("MERGE_ACCOUNT_TOKEN")
+
+    if data_source in {"plaid"}:
+        for key in ["PLAID_CLIENT_ID", "PLAID_SECRET"]:
+            if _is_missing(os.getenv(key)):
+                missing_credentials.append(key)
 
     for key in ["SMTP_HOST", "SMTP_USER", "SMTP_PASS"]:
         if _is_missing(os.getenv(key)):

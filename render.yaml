@@ -40,10 +40,28 @@ services:
         value: ""
       - key: OPENAI_API_KEY
         value: ""
+      # Merge.dev connector
       - key: MERGE_API_KEY
         value: ""
       - key: MERGE_SECRET_KEY
         value: ""
+      - key: MERGE_ACCOUNT_TOKEN
+        value: ""
+      # Plaid connector (optional — leave empty if not using Plaid)
+      - key: PLAID_CLIENT_ID
+        value: ""
+      - key: PLAID_SECRET
+        value: ""
+      # Email alerts (SMTP)
+      - key: SMTP_HOST
+        value: ""
+      - key: SMTP_USER
+        value: ""
+      - key: SMTP_PASS
+        value: ""
+      - key: SMTP_FROM
+        value: ""
+      # Other integrations
       - key: ERPNEXT_URL
         value: ""
       - key: REQUIRE_REDIS_FOR_READINESS
